@@ -35,14 +35,14 @@ export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
+    // Scroll to top on mount
+    window.scrollTo(0, 0);
+
     // Check system preference or local storage (client-side only)
     if (typeof window !== 'undefined') {
       const isDark = localStorage.getItem('theme') === 'dark' || 
         (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
       setDarkMode(isDark);
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      }
 
       // Handle scroll for Back to Top button
       const handleScroll = () => {
@@ -375,14 +375,36 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center justify-center">
-                  <div className="relative w-full max-w-md">
-                    <div className="aspect-square bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center">
-                      <BookOpen className="h-32 w-32 text-primary opacity-50" />
-                    </div>
-                    <div className="absolute -top-4 -right-4 bg-primary p-4 rounded-xl shadow-lg">
+                  <motion.div 
+                    className="relative w-full max-w-md"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div 
+                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Image 
+                        src="/undraw-assets/undraw_transfer-files_anat.svg"
+                        alt="IELTS Preparation Manual"
+                        width={300}
+                        height={220}
+                        className="w-full h-auto"
+                      />
+                    </motion.div>
+                    <motion.div 
+                      className="absolute -top-4 -right-4 bg-primary p-4 rounded-xl shadow-lg"
+                      initial={{ rotate: -20 }}
+                      animate={{ rotate: [-20, 10, -20] }}
+                      transition={{ duration: 3, ease: "easeInOut" }}
+                      whileHover={{ scale: 1.2, rotate: 0 }}
+                    >
                       <Zap className="h-8 w-8 text-primary-foreground" />
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 </div>
               </div>
             </Card>
@@ -393,11 +415,17 @@ export default function Home() {
                 <div className="order-2 md:order-1">
                   <div className="relative w-full max-w-md">
                     <motion.div 
-                      className="aspect-square bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center"
+                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Code className="h-32 w-32 text-primary opacity-50" />
+                      <Image 
+                        src="/undraw-assets/undraw_building-blocks_h5jb.svg"
+                        alt="Quickland Website Builder"
+                        width={260}
+                        height={180}
+                        className="w-full h-auto"
+                      />
                     </motion.div>
                     <motion.div 
                       className="absolute -top-4 -right-4 bg-primary p-3 rounded-full shadow-lg"
@@ -651,11 +679,11 @@ export default function Home() {
                     aria-label="Twitter"
                   >
                     <Twitter className="h-5 w-5" />
-                  </a>
-                  <a 
+          </a>
+          <a
                     href="https://facebook.com/crypticsolutions" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+            target="_blank"
+            rel="noopener noreferrer"
                     className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                     aria-label="Facebook"
                   >
