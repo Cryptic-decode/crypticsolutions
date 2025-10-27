@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import axios from 'axios';
+
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,28 +16,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In a real implementation, you would:
-    // 1. Call Paystack API to initialize payment
-    // 2. Get the authorization URL
-    // 3. Return it to the client
-    
-    // For now, we'll return a mock response
-    // Replace this with actual Paystack integration
-    const paymentData = {
-      success: true,
-      authorization_url: '#', // This will be the Paystack payment URL
-      access_code: 'mock_access_code',
-      reference: `ref_${Date.now()}`,
-      email,
-      amount,
-      metadata
-    };
+    if (!PAYSTACK_SECRET_KEY) {
+      return NextResponse.json(
+        { error: 'Paystack secret key is not configured' },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json(paymentData);
-  } catch (error) {
+    // Generate reference
+    const reference = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Call Paystack API to initialize transaction
+    const response = await axios.post(
+      'https://api.paystack.co/transaction/initialize',
+      {
+        email,
+        amount: amount * 100, // Convert to kobo (lowest currency unit)
+        reference,
+        callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?reference=${reference}`,
+        metadata
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (response.data.status) {
+      return NextResponse.json({
+        success: true,
+        authorization_url: response.data.data.authorization_url,
+        access_code: response.data.data.access_code,
+        reference,
+        email,
+        amount
+      });
+    } else {
+      return NextResponse.json(
+        { error: 'Failed to initialize payment' },
+        { status: 400 }
+      );
+    }
+  } catch (error: any) {
     console.error('Payment initiation error:', error);
     return NextResponse.json(
-      { error: 'Failed to initiate payment' },
+      { error: error.response?.data?.message || 'Failed to initiate payment' },
       { status: 500 }
     );
   }

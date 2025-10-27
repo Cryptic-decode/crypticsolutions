@@ -24,10 +24,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { PaystackPayment } from '@/components/payment-paystack';
 
 export default function IELTSManualPage() {
   const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -451,11 +453,36 @@ export default function IELTSManualPage() {
                     </li>
                   </ul>
 
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button size="lg" className="w-full text-lg h-14">
-                      Get Your Manual Now
-                    </Button>
-                  </motion.div>
+              <div className="space-y-4">
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium text-muted-foreground">
+                    Enter your email to continue
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+                  />
+                </div>
+
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <PaystackPayment 
+                    email={email}
+                    amount={5000}
+                    metadata={{
+                      product: "IELTS Manual",
+                      currency: "NGN"
+                    }}
+                    onError={(error) => {
+                      console.error('Payment failed:', error);
+                      // You might want to show a toast notification here
+                    }}
+                  />
+                </motion.div>
+              </div>
                 </div>
               </div>
             </Card>
