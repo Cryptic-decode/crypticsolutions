@@ -10,6 +10,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/lib/auth";
+import { generatePassword } from "@/lib/utils";
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
@@ -54,12 +56,26 @@ export default function PaymentSuccessPage() {
     }
   };
 
+  const { signUp, user } = useAuth();
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
 
     try {
-      // Create user account and store purchase
+      // Generate a secure random password
+      const password = generatePassword();
+
+      // Create user account with Supabase Auth
+      const { data: authData, error: authError } = await signUp(formData.email, password, {
+        full_name: formData.name,
+      });
+
+      if (authError) throw authError;
+
+      // Store purchase details
       const response = await fetch('/api/payment/success', {
         method: 'POST',
         headers: {
@@ -67,21 +83,26 @@ export default function PaymentSuccessPage() {
         },
         body: JSON.stringify({
           ...formData,
-          reference
+          reference,
+          userId: authData.user?.id || null
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to dashboard or login page
-        router.push('/login?email=' + encodeURIComponent(formData.email));
+        // Store password temporarily in sessionStorage for display
+        sessionStorage.setItem('temp_password', password);
+        sessionStorage.setItem('user_email', formData.email);
+        
+        // Redirect to account setup page
+        router.push('/account-created');
       } else {
         throw new Error(data.error || 'Failed to process payment');
       }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      alert('An error occurred. Please contact support.');
+    } catch (error: any) {
+      console.error('Account creation error:', error);
+      setErrorMessage(error.message || 'An error occurred. Please contact support at crypticsolutions.contact@gmail.com');
     } finally {
       setLoading(false);
     }
@@ -113,6 +134,12 @@ export default function PaymentSuccessPage() {
                 <p className="text-muted-foreground mb-8">
                   Thank you for your purchase. Please complete your account setup below to access your IELTS Manual.
                 </p>
+
+                {errorMessage && (
+                  <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg mb-4">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
                   <div>

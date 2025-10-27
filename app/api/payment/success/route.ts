@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, reference } = body;
+    const { name, email, reference, userId } = body;
 
     if (!name || !email || !reference) {
       return NextResponse.json(
@@ -13,8 +18,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store purchase in database
-    const { data: purchase, error: purchaseError } = await supabase
+    // Store purchase in database using admin client to bypass RLS
+    const { data: purchase, error: purchaseError } = await supabaseAdmin
       .from('purchases')
       .insert({
         transaction_id: reference,
@@ -23,7 +28,8 @@ export async function POST(request: NextRequest) {
         product_id: 'ielts-manual',
         status: 'completed',
         amount: 5000,
-        currency: 'NGN'
+        currency: 'NGN',
+        user_id: userId || null, // Will be null if user hasn't confirmed email yet
       })
       .select()
       .single();
@@ -31,7 +37,10 @@ export async function POST(request: NextRequest) {
     if (purchaseError) {
       console.error('Database error:', purchaseError);
       return NextResponse.json(
-        { error: 'Failed to store purchase' },
+        { 
+          error: 'Failed to store purchase',
+          details: purchaseError.message
+        },
         { status: 500 }
       );
     }
