@@ -231,7 +231,6 @@ export default function Home() {
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
                   Explore Products
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </a>
               </Button>
             </motion.div>
@@ -368,7 +367,6 @@ export default function Home() {
                     <Button asChild size="lg" className="w-full">
                       <a href="#contact">
                         Get Your Manual Now
-                        <ArrowRight className="ml-2 h-4 w-4" />
                       </a>
                     </Button>
                   </motion.div>
@@ -512,7 +510,6 @@ export default function Home() {
                 <Button asChild size="lg">
                   <a href="#contact">
                     Get IELTS Manual
-                    <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
               </motion.div>
