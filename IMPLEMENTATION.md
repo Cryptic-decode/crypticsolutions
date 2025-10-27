@@ -19,7 +19,12 @@ This document outlines the implementation steps for the IELTS manual sales flow 
 
 1. Go to [supabase.com](https://supabase.com) and create a new project
 2. Run the SQL from `database-schema.sql` in your Supabase SQL Editor
-3. Copy your Project URL and Anon Key from Settings → API
+3. Get your API credentials from Project Settings → API:
+   - Project URL: Copy the URL under "Project Configuration"
+   - Anon Key: Copy the "anon" public key under "Project API keys"
+   - Service Role Key: Copy the "service_role" secret key under "Project API keys"
+     - This key has admin access and is needed to store purchases before user authentication
+     - Never expose this key to the client or commit it to version control
 
 #### 2. Paystack Setup (You Need to Do This)
 
@@ -35,6 +40,7 @@ Create a `.env.local` file in the project root:
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # Get this from Project Settings → API → service_role key
 
 # Paystack
 NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=your_paystack_public_key

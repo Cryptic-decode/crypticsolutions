@@ -29,11 +29,27 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await signIn(formData.email, formData.password);
+      const result = await signIn(formData.email, formData.password.trim());
+      console.log('Login successful:', result);
+      
+      // Wait a bit for session to be established
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       router.push('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
-      setError(error.message || 'Failed to sign in');
+      
+      let errorMessage = error.message || 'Failed to sign in';
+      
+      if (errorMessage.includes('Invalid login')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (errorMessage.includes('Email not confirmed')) {
+        errorMessage = 'Please confirm your email before signing in. Check your inbox for the confirmation email.';
+      } else if (errorMessage.includes('User not found')) {
+        errorMessage = 'No account found with this email. Please check your email address.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

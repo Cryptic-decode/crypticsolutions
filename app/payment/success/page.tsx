@@ -69,13 +69,11 @@ export default function PaymentSuccessPage() {
       const password = generatePassword();
 
       // Create user account with Supabase Auth
-      const { data: authData, error: authError } = await signUp(formData.email, password, {
+      const authData = await signUp(formData.email, password, {
         full_name: formData.name,
       });
 
-      if (authError) throw authError;
-
-      // Store purchase details
+      // Store purchase details without user_id (will be linked after email confirmation)
       const response = await fetch('/api/payment/success', {
         method: 'POST',
         headers: {
@@ -84,11 +82,18 @@ export default function PaymentSuccessPage() {
         body: JSON.stringify({
           ...formData,
           reference,
-          userId: authData.user?.id || null
+          // Don't pass userId - we'll link it after email confirmation
         }),
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
+        throw new Error(errorData.error || `Server error: ${response.status}`);
+      }
+
+      const data = await response.json().catch(() => {
+        throw new Error('Failed to parse success response');
+      });
 
       if (data.success) {
         // Store password temporarily in sessionStorage for display
@@ -102,7 +107,21 @@ export default function PaymentSuccessPage() {
       }
     } catch (error: any) {
       console.error('Account creation error:', error);
-      setErrorMessage(error.message || 'An error occurred. Please contact support at crypticsolutions.contact@gmail.com');
+      
+      // Handle different types of errors with specific messages
+      let errorMessage = 'An unexpected error occurred. Please try again or contact support.';
+      
+      if (error.message?.includes('Missing required environment variables')) {
+        errorMessage = 'Server configuration error. Please contact support.';
+      } else if (error.message?.includes('Server error')) {
+        errorMessage = 'Server error. Please try again in a few minutes.';
+      } else if (error.message?.includes('Failed to parse')) {
+        errorMessage = 'Communication error with server. Please try again.';
+      } else if (error.message?.includes('already exists')) {
+        errorMessage = 'An account with this email already exists. Please log in instead.';
+      }
+      
+      setErrorMessage(`${errorMessage} If the issue persists, contact support at crypticsolutions.contact@gmail.com`);
     } finally {
       setLoading(false);
     }

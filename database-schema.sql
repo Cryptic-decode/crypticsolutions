@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS purchases (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Make user_id nullable to allow purchases before user confirms email
+ALTER TABLE purchases ALTER COLUMN user_id DROP NOT NULL;
+
 -- Create index for faster lookups
 CREATE INDEX IF NOT EXISTS idx_purchases_user_id ON purchases(user_id);
 CREATE INDEX IF NOT EXISTS idx_purchases_transaction_id ON purchases(transaction_id);

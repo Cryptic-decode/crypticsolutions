@@ -95,10 +95,23 @@ export default function AccountCreatedPage() {
               </div>
             </Card>
 
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>Important:</strong> Please save this password securely. You'll need it to access your IELTS Manual. You can change it after logging in.
-              </p>
+            <div className="space-y-4 mb-6">
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-left">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <strong>Important:</strong> Please save this password securely. You'll need it to access your IELTS Manual. You can change it after logging in.
+                </p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-left">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  <strong>Important - Check Your Email:</strong> We've sent a confirmation link to {email}. You must click this link before you can log in.
+                </p>
+                <ul className="mt-2 text-sm text-blue-800 dark:text-blue-200 list-disc list-inside">
+                  <li>Check your spam/junk folder if you don't see it</li>
+                  <li>The link expires in 24 hours</li>
+                  <li>After confirming, return here to log in</li>
+                </ul>
+              </div>
             </div>
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>

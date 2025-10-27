@@ -47,10 +47,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: metadata,
+        emailRedirectTo: `${window.location.origin}/login`,
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
+
+    // Log the response to see what we're getting
+    console.log('Signup response:', data);
+
+    if (!data?.user?.confirmation_sent_at) {
+      console.error('No confirmation email was sent');
+      throw new Error('Failed to send confirmation email. Please contact support.');
+    }
+
     return data;
   };
 
@@ -60,7 +73,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase sign in error:', error);
+      throw error;
+    }
+    
+    // Check if email is confirmed
+    if (data.user && !data.user.email_confirmed_at) {
+      throw new Error('Please confirm your email before signing in. Check your inbox for the confirmation email.');
+    }
+    
     return data;
   };
 
