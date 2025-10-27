@@ -32,7 +32,7 @@ export default function IELTSManualPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const isDark = localStorage.getItem('theme') === 'dark' || 
-        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (!localStorage.getItem('theme'));
       setDarkMode(isDark);
 
       const handleScroll = () => {
@@ -63,7 +63,7 @@ export default function IELTSManualPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -100,34 +100,7 @@ export default function IELTSManualPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24 overflow-hidden">
-        {/* Gradient Background Animation */}
-        <div className="absolute inset-0 -z-10">
-          <motion.div 
-            className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/15 dark:bg-primary/10 rounded-full blur-3xl"
-            animate={{ 
-              x: [0, 100, 0],
-              y: [0, 50, 0],
-            }}
-            transition={{ 
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/10 dark:bg-primary/5 rounded-full blur-3xl"
-            animate={{ 
-              x: [0, -100, 0],
-              y: [0, -50, 0],
-            }}
-            transition={{ 
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
         <motion.div 
           className="max-w-4xl mx-auto"
           initial="initial"

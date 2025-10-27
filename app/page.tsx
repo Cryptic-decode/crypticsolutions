@@ -38,10 +38,10 @@ export default function Home() {
     // Scroll to top on mount
     window.scrollTo(0, 0);
 
-    // Check system preference or local storage (client-side only)
+    // Check local storage (client-side only)
     if (typeof window !== 'undefined') {
       const isDark = localStorage.getItem('theme') === 'dark' || 
-        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (!localStorage.getItem('theme'));
       setDarkMode(isDark);
 
       // Handle scroll for Back to Top button
@@ -165,34 +165,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-32 overflow-hidden">
-        {/* Gradient Background Animation */}
-        <div className="absolute inset-0 -z-10">
-          <motion.div 
-            className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/15 dark:bg-primary/10 rounded-full blur-3xl"
-            animate={{ 
-              x: [0, 100, 0],
-              y: [0, 50, 0],
-            }}
-            transition={{ 
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-primary/10 dark:bg-primary/5 rounded-full blur-3xl"
-            animate={{ 
-              x: [0, -100, 0],
-              y: [0, -50, 0],
-            }}
-            transition={{ 
-              duration: 25,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </div>
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-32">
         <motion.div 
           className="mx-auto max-w-4xl text-center"
           initial="initial"
@@ -365,7 +338,7 @@ export default function Home() {
 
                   <motion.div whileTap={buttonTap} className="w-full sm:w-auto">
                     <Button asChild size="lg" className="w-full">
-                      <a href="#contact">
+                      <a href="/ielts-manual">
                         Get Your Manual Now
                       </a>
                     </Button>
@@ -508,7 +481,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div whileTap={buttonTap}>
                 <Button asChild size="lg">
-                  <a href="#contact">
+                  <a href="/ielts-manual">
                     Get IELTS Manual
                   </a>
                 </Button>
