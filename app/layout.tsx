@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cryptic Solutions - Digital Products & Business Solutions",
   description: "We build business digital products such as landing pages, websites, and web apps that connect brands to their customers online. IELTS preparation manual and Quickland available.",
+  icons: {
+    icon: '/cryptic-assets/logoIconGreen.png',
+    apple: '/cryptic-assets/logoIconGreen.png',
+  },
 };
 
 export default function RootLayout({
