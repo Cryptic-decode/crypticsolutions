@@ -1,70 +1,107 @@
 "use client";
 
-import { Sidebar } from "@/components/dashboard/sidebar";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { useAuth } from "@/lib/auth";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Drawer } from "@/components/ui/drawer";
+import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { Menu } from "lucide-react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
-  const [loggingOut, setLoggingOut] = useState(false);
+  const pathname = usePathname();
+  const [darkMode, setDarkMode] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!user) {
       router.push("/login");
+      return;
     }
-  }, [user, loading, router]);
 
-  const handleSignOut = async () => {
-    setLoggingOut(true);
-    try {
-      await signOut();
-      router.push("/login");
-    } catch (error) {
-      console.error("Sign out error:", error);
-    } finally {
-      setLoggingOut(false);
+    // Check theme
+    if (typeof window !== 'undefined') {
+      const isDark = localStorage.getItem('theme') === 'dark' || 
+        (!localStorage.getItem('theme'));
+      setDarkMode(isDark);
+    }
+  }, [user, router]);
+
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   };
 
-  if (loading || loggingOut) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">
-            {loggingOut ? "Signing out..." : "Loading..."}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   if (!user) {
-    return null; // Will redirect
+    return null;
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <div className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <Sidebar onSignOut={handleSignOut} />
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r bg-background">
+        <DashboardDrawer
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          onSignOut={signOut}
+          currentPath={pathname}
+        />
       </div>
 
+      {/* Mobile Drawer */}
+      <Drawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        position="left"
+      >
+        <DashboardDrawer
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          onSignOut={signOut}
+          onClose={() => setDrawerOpen(false)}
+          currentPath={pathname}
+        />
+      </Drawer>
+
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <DashboardHeader />
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
-      </div>
+      <main className="lg:pl-80 pt-16 lg:pt-0">
+        {/* Desktop Header */}
+        <div className="hidden lg:block">
+          <DashboardHeader 
+            userName={user.user_metadata?.full_name}
+            userEmail={user.email}
+          />
+        </div>
+        
+        {/* Mobile Header with Menu */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur z-50">
+          <div className="flex items-center justify-between h-full px-4">
+            <h1 className="text-xl font-semibold">Dashboard</h1>
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+        
+        {children}
+      </main>
     </div>
   );
 }

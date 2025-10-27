@@ -18,18 +18,23 @@ import {
   Twitter,
   Facebook,
   Shield,
-  ArrowUp
+  ArrowUp,
+  Menu,
+  X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Drawer } from "@/components/ui/drawer";
+import { MainDrawer } from "@/components/navigation/main-drawer";
 import { PaystackPayment } from '@/components/payment-paystack';
 
 export default function IELTSManualPage() {
   const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [email, setEmail] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -91,13 +96,47 @@ export default function IELTSManualPage() {
             <div className="flex items-center gap-6">
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"
+                className="hidden md:block p-2 rounded-lg hover:bg-secondary/50 transition-colors"
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
+              <button 
+                className="md:hidden p-2"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
             </div>
           </div>
+
+          {/* Mobile Menu */}
+          <Drawer
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+          >
+            <MainDrawer
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+              onClose={() => setMobileMenuOpen(false)}
+              links={[
+                {
+                  href: "/",
+                  label: "Back to Home"
+                }
+              ]}
+              ctaButton={{
+                label: "Get the Manual – ₦5,000",
+                onClick: () => {
+                  const element = document.getElementById('pricing');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }
+              }}
+            />
+          </Drawer>
         </div>
       </nav>
 

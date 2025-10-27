@@ -12,6 +12,7 @@ import {
   Lightbulb,
   TrendingUp,
   Menu,
+  X,
   Send,
   Mail,
   ChevronDown,
@@ -28,6 +29,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Drawer } from "@/components/ui/drawer";
+import { MainDrawer } from "@/components/navigation/main-drawer";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -157,10 +160,44 @@ export default function Home() {
             <button 
               className="md:hidden p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
             >
-              <Menu className="h-6 w-6" />
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
+
+          {/* Mobile Menu */}
+          <Drawer
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+          >
+            <MainDrawer
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+              onClose={() => setMobileMenuOpen(false)}
+              links={[
+                {
+                  href: "#services",
+                  label: "Services",
+                  onClick: (e) => handleNavClick(e, "services")
+                },
+                {
+                  href: "#products",
+                  label: "Products",
+                  onClick: (e) => handleNavClick(e, "products")
+                },
+                {
+                  href: "#contact",
+                  label: "Contact",
+                  onClick: (e) => handleNavClick(e, "contact")
+                }
+              ]}
+              ctaButton={{
+                label: "Get Started",
+                onClick: (e) => handleNavClick(e, "products")
+              }}
+            />
+          </Drawer>
         </div>
       </nav>
 
