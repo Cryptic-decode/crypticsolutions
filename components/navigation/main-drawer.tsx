@@ -12,11 +12,11 @@ interface MainDrawerProps {
   links: Array<{
     href: string;
     label: string;
-    onClick?: (e: React.MouseEvent) => void;
+    onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   }>;
   ctaButton?: {
     label: string;
-    onClick: () => void;
+    onClick?: (e?: React.MouseEvent<HTMLAnchorElement>) => void;
   };
 }
 
@@ -94,7 +94,9 @@ export function MainDrawer({
                 size="lg" 
                 className="w-full cursor-pointer"
                 onClick={() => {
-                  ctaButton.onClick();
+                  if (ctaButton.onClick) {
+                    ctaButton.onClick();
+                  }
                   onClose();
                 }}
               >

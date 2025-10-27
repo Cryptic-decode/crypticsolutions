@@ -194,7 +194,11 @@ export default function Home() {
               ]}
               ctaButton={{
                 label: "Get Started",
-                onClick: (e) => handleNavClick(e, "products")
+                onClick: (e) => {
+                  if (e) {
+                    handleNavClick(e, "products");
+                  }
+                }
               }}
             />
           </Drawer>
