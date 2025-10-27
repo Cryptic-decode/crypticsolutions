@@ -67,7 +67,7 @@ export default function IELTSManualPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center">
@@ -102,7 +102,7 @@ export default function IELTSManualPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-24 pb-16 md:pt-32 md:pb-24">
         <motion.div 
           className="max-w-4xl mx-auto"
           initial="initial"
@@ -124,7 +124,7 @@ export default function IELTSManualPage() {
             </motion.h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-8">
-              Don't just prepare for IELTS, <em>understand it.</em> Our <strong>IELTS Preparation Manual</strong> is your step-by-step guide to mastering the test — built from real strategies that help you think like the examiner and perform like a top scorer.
+              Don't just prepare for IELTS, <em>understand it.</em> Our <strong>IELTS Preparation Manual</strong> is your step-by-step guide to mastering the test. Built from real strategies that help you think like the examiner and perform like a top scorer.
             </p>
 
             <motion.div 
@@ -134,7 +134,16 @@ export default function IELTSManualPage() {
               transition={{ delay: 0.3 }}
             >
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-8">
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto text-lg h-14 px-8 cursor-pointer"
+                  onClick={() => {
+                    const element = document.getElementById('pricing');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
                   Get the Complete Manual – ₦5,000
                 </Button>
               </motion.div>
@@ -157,7 +166,7 @@ export default function IELTSManualPage() {
             </h2>
             <Card className="p-8 text-lg text-muted-foreground">
               <p className="mb-4">
-                Preparing for IELTS can feel overwhelming — not because it's hard, but because most people don't know <em>what the test really measures.</em>
+                Preparing for IELTS can feel overwhelming, not because it's hard, but because most people don't know what the test really measures.
               </p>
               <p className="mb-4">
                 After three or more attempts, many still struggle because they keep "studying English" instead of "studying the test."
@@ -166,7 +175,7 @@ export default function IELTSManualPage() {
                 This manual changes that.
               </p>
               <p>
-                It doesn't just throw practice questions at you — it teaches you how to <strong>think strategically</strong> for each section: Listening, Reading, Writing, and Speaking. It's your <em>blueprint</em> for understanding the test from the inside out.
+                It doesn't just throw practice questions at you, it teaches you how to <strong>think strategically</strong> for each section: Listening, Reading, Writing, and Speaking. It's your blueprint for understanding the test from the inside out.
               </p>
             </Card>
           </motion.div>
@@ -257,7 +266,7 @@ export default function IELTSManualPage() {
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-[#1B2242] dark:text-white">Simple Language, Human Tone</h3>
                 <p className="text-muted-foreground text-sm">
-                  No jargon, no fluff — just straight, clear, effective guidance.
+                  No jargon, no fluff; just straight, clear, effective guidance.
                 </p>
               </div>
             </div>
@@ -270,7 +279,7 @@ export default function IELTSManualPage() {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            This isn't just a study book — it's your <strong>personal IELTS coach in a manual.</strong>
+            This isn't just a study book, it's your <strong>personal IELTS coach in a manual.</strong>
           </motion.p>
         </div>
       </section>
@@ -290,7 +299,7 @@ export default function IELTSManualPage() {
             </h2>
             
             <Card className="p-8">
-              <p className="text-lg mb-6">This guide is perfect for you if:</p>
+              <p className="text-lg mb-2">This guide is perfect for you if:</p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -374,7 +383,7 @@ export default function IELTSManualPage() {
       </section>
 
       {/* Pricing & Offer */}
-      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-16">
+      <section id="pricing" className="container mx-auto px-4 md:px-6 lg:px-8 py-16">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -421,10 +430,10 @@ export default function IELTSManualPage() {
                     </li>
                   </ul>
 
-                  <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+                  {/* <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
                     <p className="font-medium text-[#1B2242] dark:text-white mb-1">Community Access</p>
-                    <p className="text-sm text-muted-foreground">Join our IELTS Success Community — share progress and get support</p>
-                  </div>
+                    <p className="text-sm text-muted-foreground">Join our IELTS Success Community, share progress and get support</p>
+                  </div> */}
                 </div>
 
                 {/* Right Column - Pricing */}
@@ -465,10 +474,14 @@ export default function IELTSManualPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+                    required
                   />
+                  {email && !email.includes('@') && (
+                    <p className="text-xs text-destructive">Please enter a valid email address</p>
+                  )}
                 </div>
 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div whileHover={email && email.includes('@') ? { scale: 1.02 } : {}} whileTap={{ scale: 0.98 }}>
                   <PaystackPayment 
                     email={email}
                     amount={5000}
@@ -547,13 +560,22 @@ export default function IELTSManualPage() {
               <span className="text-[#1B2242] dark:text-white">Still Thinking About It?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              That's okay. Here's something to remember: Most people fail IELTS not because they're bad at English — but because they're not <em>strategic</em>.
+              That's okay. Here's something to remember: Most people fail IELTS not because they're bad at English, but because they're not <em>strategic</em>.
             </p>
             <p className="text-lg mb-8 max-w-2xl mx-auto">
               This manual gives you that strategy. So before you spend months guessing what works, learn from something designed to help you <strong>win the test, not just write it.</strong>
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button size="lg" className="w-full md:w-auto text-lg h-14 px-12">
+              <Button 
+                size="lg" 
+                className="w-full md:w-auto text-lg h-14 px-12 cursor-pointer"
+                onClick={() => {
+                  const element = document.getElementById('pricing');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+              >
                 I'm Ready – Get the Manual
               </Button>
             </motion.div>

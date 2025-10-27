@@ -11,6 +11,7 @@ interface PaystackPaymentProps {
   metadata?: Record<string, any>;
   onSuccess?: (response: any) => void;
   onError?: (error: any) => void;
+  disabled?: boolean;
 }
 
 export function PaystackPayment({ 
@@ -18,7 +19,8 @@ export function PaystackPayment({
   amount, 
   metadata, 
   onSuccess, 
-  onError 
+  onError,
+  disabled = false
 }: PaystackPaymentProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -69,12 +71,14 @@ export function PaystackPayment({
     }
   };
 
+  const isDisabled = disabled || loading || !email || !email.includes('@');
+
   return (
     <Button 
       onClick={initializePayment} 
-      disabled={loading}
+      disabled={isDisabled}
       size="lg"
-      className="w-full"
+      className="w-full cursor-pointer"
     >
       {loading ? (
         <>

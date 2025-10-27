@@ -192,8 +192,8 @@ export default function Home() {
             className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
             variants={fadeInUp}
           >
-            We build business digital products such as landing pages, websites, and web apps 
-            that connect brands to their customers online.
+            We create innovative digital products and solutions that empower businesses and individuals 
+            to achieve their goals. From educational tools to web platforms, we're building the future of digital excellence.
           </motion.p>
           
           <motion.div 
@@ -224,7 +224,7 @@ export default function Home() {
                 <span className="text-[#1B2242] dark:text-white">What</span> <span className="text-primary">We Do</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Expert digital product development services tailored to your business needs
+              Innovative solutions that transform ideas into impactful digital products
             </p>
           </div>
           
@@ -242,11 +242,27 @@ export default function Home() {
             >
               <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
-                  <FileText className="h-6 w-6 text-primary" />
+                  <BookOpen className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Landing Pages</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Educational Tools</h3>
                 <p className="text-muted-foreground">
-                  High-converting landing pages that capture attention and drive results for your business.
+                  Comprehensive digital learning solutions that make education more accessible and effective.
+                </p>
+              </Card>
+            </motion.div>
+
+            <motion.div 
+              variants={fadeInUp}
+              whileHover={{ y: -5, scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
+                  <Lightbulb className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Digital Products</h3>
+                <p className="text-muted-foreground">
+                  Innovative solutions that solve real-world problems and create value for users.
                 </p>
               </Card>
             </motion.div>
@@ -260,25 +276,9 @@ export default function Home() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
                   <Code className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Websites</h3>
+                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Web Platforms</h3>
                 <p className="text-muted-foreground">
-                  Beautiful, responsive websites that showcase your brand and engage your audience online.
-                </p>
-              </Card>
-            </motion.div>
-
-            <motion.div 
-              variants={fadeInUp}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
-                  <FileCode className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Web Apps</h3>
-                <p className="text-muted-foreground">
-                  Custom web applications that solve business challenges and automate workflows efficiently.
+                  Scalable web solutions that help businesses and individuals achieve their digital goals.
                 </p>
               </Card>
             </motion.div>
