@@ -31,6 +31,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
+import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,6 +101,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+      <ScrollBackdrop />
       {/* Navigation */}
       <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -207,14 +209,69 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-32">
+        {/* Decorative Floating Elements */}
+        <motion.div
+          className="absolute top-16 left-8 w-6 h-6 rounded-full bg-primary/50 dark:bg-primary/45 hidden md:block z-[1] pointer-events-none"
+          style={{
+            boxShadow: '0 0 20px rgba(147, 224, 48, 0.15), 0 0 40px rgba(147, 224, 48, 0.1)'
+          }}
+          aria-hidden="true"
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.5, 0.65, 0.5],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-24 right-8 w-7 h-7 rounded-full bg-emerald-400/45 dark:bg-emerald-300/40 hidden lg:block z-[1] pointer-events-none"
+          style={{
+            boxShadow: '0 0 25px rgba(34, 197, 94, 0.15), 0 0 50px rgba(34, 197, 94, 0.1)'
+          }}
+          aria-hidden="true"
+          animate={{
+            y: [0, 15, 0],
+            opacity: [0.45, 0.6, 0.45],
+            scale: [1, 1.25, 1]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 right-12 w-7 h-7 rounded-full bg-primary/40 dark:bg-primary/35 hidden lg:block z-[1] pointer-events-none"
+          style={{
+            boxShadow: '0 0 20px rgba(147, 224, 48, 0.15), 0 0 40px rgba(147, 224, 48, 0.1)'
+          }}
+          aria-hidden="true"
+          animate={{
+            y: [0, -18, 0],
+            opacity: [0.4, 0.55, 0.4],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+
         <motion.div 
-          className="mx-auto max-w-4xl text-center"
+          className="mx-auto max-w-4xl text-center relative z-10"
           initial="initial"
           animate="animate"
           variants={fadeInUp}
         >
           <motion.div 
-            className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-8"
+            className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-8 backdrop-blur-sm shadow-sm dark:shadow-primary/5"
             variants={fadeInUp}
           >
             <TrendingUp className="h-4 w-4 text-primary" />
@@ -241,15 +298,23 @@ export default function Home() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             variants={fadeInUp}
           >
-            <motion.div whileTap={buttonTap}>
-              <Button asChild size="lg" className="w-full sm:w-auto">
+            <motion.div 
+              whileTap={buttonTap}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button asChild size="lg" className="w-full sm:w-auto shadow-lg hover:shadow-primary/20 transition-shadow">
                 <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
                   Explore Products
                 </a>
               </Button>
             </motion.div>
-            <motion.div whileTap={buttonTap}>
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+            <motion.div 
+              whileTap={buttonTap}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-primary/5 hover:border-primary/30 transition-colors">
                 <a href="#services" onClick={(e) => handleNavClick(e, "services")}>Learn More</a>
               </Button>
             </motion.div>
@@ -266,8 +331,8 @@ export default function Home() {
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Innovative solutions that transform ideas into impactful digital products
-            </p>
-          </div>
+          </p>
+        </div>
           
           <motion.div 
             className="grid md:grid-cols-3 gap-6"
@@ -359,26 +424,50 @@ export default function Home() {
                   </p>
 
                   <div className="space-y-3 mb-8">
-                    <div className="flex items-center gap-3">
+                    <motion.div 
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true }}
+                    >
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Complete coverage of all IELTS sections</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      viewport={{ once: true }}
+                    >
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Proven test-taking strategies</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Practice questions and examples</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                      viewport={{ once: true }}
+                    >
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Expert tips and insights</span>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <motion.div whileTap={buttonTap} className="w-full sm:w-auto">
-                    <Button asChild size="lg" className="w-full">
+                    <Button asChild size="lg" className="w-fit">
                       <a href="/ielts-manual">
                         Get Your Manual Now
                       </a>

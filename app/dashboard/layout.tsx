@@ -7,6 +7,7 @@ import { Drawer } from "@/components/ui/drawer";
 import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Menu } from "lucide-react";
+import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 export default function DashboardLayout({
   children,
@@ -50,7 +51,8 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
+      <ScrollBackdrop intensity={0.8} />
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r bg-background">
         <DashboardDrawer

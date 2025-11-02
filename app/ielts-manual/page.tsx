@@ -28,6 +28,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
+import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 import { PaystackPayment } from '@/components/payment-paystack';
 
 export default function IELTSManualPage() {
@@ -71,6 +72,7 @@ export default function IELTSManualPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
+      <ScrollBackdrop />
       {/* Navigation */}
       <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
