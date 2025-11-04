@@ -11,10 +11,10 @@ import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-function LoginForm() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { signIn } = useAuth();
+  const { signIn: signInUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,15 +29,15 @@ function LoginForm() {
     setError("");
 
     try {
-      const result = await signIn(formData.email, formData.password.trim());
-      console.log('Login successful:', result);
+      const result = await signInUser(formData.email, formData.password.trim());
+      console.log('Sign in successful:', result);
       
       // Wait a bit for session to be established
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push('/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('Sign in error:', error);
       
       let errorMessage = error.message || 'Failed to sign in';
       
@@ -142,14 +142,14 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+export default function SignInPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 flex items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     }>
-      <LoginForm />
+      <SignInForm />
     </Suspense>
   );
 }

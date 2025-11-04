@@ -17,7 +17,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!loading && !user) {
       // Redirect to login if not authenticated
-      router.push("/login");
+      router.push("/sign-in");
     }
   }, [user, loading, router]);
 
@@ -25,7 +25,7 @@ export default function DashboardPage() {
     setLoggingOut(true);
     try {
       await signOut();
-      router.push("/login");
+      router.push("/sign-in");
     } catch (error) {
       console.error("Sign out error:", error);
     } finally {

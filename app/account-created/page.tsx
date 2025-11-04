@@ -18,7 +18,7 @@ export default function AccountCreatedPage() {
     const userEmail = sessionStorage.getItem('user_email');
     
     if (!tempPassword || !userEmail) {
-      router.push('/login');
+      router.push('/sign-in');
       return;
     }
 
@@ -115,8 +115,8 @@ export default function AccountCreatedPage() {
             </div>
 
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button size="lg" className="w-full" onClick={() => router.push('/login?email=' + encodeURIComponent(email))}>
-                Continue to Login
+              <Button size="lg" className="w-full" onClick={() => router.push('/sign-in?email=' + encodeURIComponent(email))}>
+                Continue to Sign In
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </motion.div>
