@@ -22,7 +22,7 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!user) {
-      router.push("/sign-in");
+      router.push("/signin");
       return;
     }
 
