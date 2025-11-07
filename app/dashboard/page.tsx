@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2, BookOpen, AlertCircle, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -44,6 +45,7 @@ export default function DashboardPage() {
   const { purchases, loading: purchasesLoading, error: purchasesError, refetch } = usePurchases();
   const router = useRouter();
   const [linkingPurchases, setLinkingPurchases] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const hasLinkedPurchases = useRef(false);
 
   useEffect(() => {
@@ -134,7 +136,10 @@ export default function DashboardPage() {
                   Please change your temporary password to ensure account security.
                 </p>
               </div>
-              <button className="px-4 py-2 text-sm font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors">
+              <button
+                onClick={() => setShowPasswordModal(true)}
+                className="px-4 py-2 text-sm font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+              >
                 Change Password
               </button>
             </div>
@@ -292,6 +297,12 @@ export default function DashboardPage() {
           </motion.div>
         </motion.div>
       </motion.div>
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+      />
     </div>
   );
 }
