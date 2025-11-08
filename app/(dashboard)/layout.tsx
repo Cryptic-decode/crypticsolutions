@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Drawer } from "@/components/ui/drawer";
 import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { Menu } from "lucide-react";
+import { Menu, Loader2 } from "lucide-react";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 export default function DashboardGroupLayout({
@@ -14,25 +14,26 @@ export default function DashboardGroupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [darkMode, setDarkMode] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    // Only redirect if loading is complete and user is not authenticated
+    if (!loading && !user) {
       router.push("/signin");
       return;
     }
 
-    if (typeof window !== "undefined") {
+    if (user && typeof window !== "undefined") {
       const isDark =
         localStorage.getItem("theme") === "dark" ||
         !localStorage.getItem("theme");
       setDarkMode(isDark);
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   const toggleDarkMode = () => {
     const newMode = !darkMode;
@@ -46,6 +47,19 @@ export default function DashboardGroupLayout({
     }
   };
 
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated (handled by useEffect, but show nothing while redirecting)
   if (!user) {
     return null;
   }

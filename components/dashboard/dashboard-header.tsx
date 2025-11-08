@@ -12,6 +12,7 @@ interface DashboardHeaderProps {
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "My Library",
+  "/progress": "Study Progress",
   "/dashboard/progress": "Study Progress",
   "/settings": "Settings",
   "/dashboard/support": "Support",

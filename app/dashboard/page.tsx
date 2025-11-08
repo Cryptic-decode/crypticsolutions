@@ -249,16 +249,18 @@ export default function DashboardPage() {
                           </motion.button>
                         </Link>
 
-                        <motion.button
-                          variants={cardVariants}
-                          whileHover="hover"
-                          className="flex items-center justify-center p-4 border-2 border-dashed border-muted-foreground/20 rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="text-center">
-                            <h4 className="font-medium mb-1">Study Progress</h4>
-                            <p className="text-sm text-muted-foreground">Track your learning journey</p>
-                          </div>
-                        </motion.button>
+                        <Link href="/progress">
+                          <motion.button
+                            variants={cardVariants}
+                            whileHover="hover"
+                            className="w-full flex items-center justify-center p-4 border-2 border-dashed border-muted-foreground/20 rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="text-center">
+                              <h4 className="font-medium mb-1">Study Progress</h4>
+                              <p className="text-sm text-muted-foreground">Track your learning journey</p>
+                            </div>
+                          </motion.button>
+                        </Link>
                       </div>
                     </Card>
                   </motion.div>
