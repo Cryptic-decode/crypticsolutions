@@ -94,13 +94,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePassword = async (newPassword: string) => {
-    const { error } = await supabase.auth.updateUser({
+    const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
+      data: {
+        password_changed: true,
+      },
     });
 
     if (error) {
       console.error('Password update error:', error);
       throw error;
+    }
+
+    // Update local user state to reflect metadata change
+    if (data?.user) {
+      setUser(data.user);
     }
   };
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2, BookOpen, AlertCircle, CheckCircle2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
 
@@ -127,24 +127,34 @@ export default function DashboardPage() {
         </div>
 
         {/* Security Alert - Password Change */}
-        <div className="mb-8">
-          <Card className="p-4 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/20">
-            <div className="flex items-start space-x-4">
-              <div className="flex-1">
-                <h3 className="font-medium text-yellow-800 dark:text-yellow-200">Security Recommendation</h3>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                  Please change your temporary password to ensure account security.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowPasswordModal(true)}
-                className="px-4 py-2 text-sm font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
-              >
-                Change Password
-              </button>
-            </div>
-          </Card>
-        </div>
+        <AnimatePresence>
+          {!user.user_metadata?.password_changed && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="mb-8"
+            >
+              <Card className="p-4 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/20">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-yellow-800 dark:text-yellow-200">Security Recommendation</h3>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                      Please change your temporary password to ensure account security.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowPasswordModal(true)}
+                    className="px-4 py-2 text-sm font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+                  >
+                    Change Password
+                  </button>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* My Library Section */}
         <div className="mb-8">

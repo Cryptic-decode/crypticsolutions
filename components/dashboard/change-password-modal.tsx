@@ -77,7 +77,7 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
       // Update password
       await updatePassword(formData.newPassword);
 
-      // Success
+      // Success - close modal immediately
       setSuccess(true);
       
       // Reset form
@@ -87,11 +87,11 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
         confirmPassword: "",
       });
 
-      // Close modal after 2 seconds
+      // Close modal immediately after brief success display
       setTimeout(() => {
         onClose();
         setSuccess(false);
-      }, 2000);
+      }, 500);
     } catch (error: any) {
       console.error("Password update error:", error);
       
