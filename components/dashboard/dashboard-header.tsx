@@ -20,7 +20,16 @@ const pageTitles: Record<string, string> = {
 
 export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = {}) {
   const pathname = usePathname();
-  const pageTitle = pageTitles[pathname] || "Dashboard";
+  
+  // Handle dynamic course pages
+  let pageTitle = pageTitles[pathname] || "Dashboard";
+  if (pathname?.startsWith("/course/")) {
+    const productId = pathname.split("/course/")[1];
+    const productNames: Record<string, string> = {
+      'ielts-manual': 'IELTS Manual',
+    };
+    pageTitle = productNames[productId] || "Course";
+  }
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
