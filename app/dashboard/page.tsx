@@ -5,10 +5,11 @@ import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
+import { Button } from "@/components/ui/button";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -122,9 +123,31 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
           <p className="text-muted-foreground">
-            {user.email}
+            {user.user_metadata?.full_name || user.email}
           </p>
         </div>
+
+        {/* Linking Purchases Indicator - Moved to top */}
+        <AnimatePresence>
+          {linkingPurchases && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="mb-6"
+            >
+              <Card className="p-4 border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10">
+                <div className="flex items-center space-x-3">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  <p className="text-sm font-medium text-[#1B2242] dark:text-white">
+                    Linking your purchases...
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Security Alert - Password Change */}
         <AnimatePresence>
@@ -144,12 +167,13 @@ export default function DashboardPage() {
                       Please change your temporary password to ensure account security.
                     </p>
                   </div>
-                  <button
+                  <Button
                     onClick={() => setShowPasswordModal(true)}
-                    className="px-4 py-2 text-sm font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800 transition-colors"
+                    size="sm"
+                    className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800"
                   >
                     Change Password
-                  </button>
+                  </Button>
                 </div>
               </Card>
             </motion.div>
@@ -184,12 +208,12 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   You haven't purchased any products yet. Explore our products to get started.
                 </p>
-                <Link
-                  href="/ielts-manual"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  Browse Products
-                </Link>
+                <Button asChild size="lg" className="mt-4">
+                  <Link href="/ielts-manual" className="inline-flex items-center gap-2">
+                    Browse Products
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
             </Card>
           )}
@@ -235,32 +259,41 @@ export default function DashboardPage() {
                         </div>
                       </div>
 
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <Link href={`/course/${purchase.product_id}`}>
-                          <motion.button
-                            variants={cardVariants}
-                            whileHover="hover"
-                            className="w-full flex items-center justify-center p-4 border-2 border-primary/20 rounded-lg hover:bg-primary/5 transition-colors"
+                      <div className="grid gap-4 md:grid-cols-2 mt-6">
+                        <motion.div variants={itemVariants}>
+                          <Button
+                            asChild
+                            size="lg"
+                            className="w-full h-auto py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                           >
-                            <div className="text-center">
-                              <h4 className="font-medium mb-1">Continue Reading</h4>
-                              <p className="text-sm text-muted-foreground">Pick up where you left off</p>
-                            </div>
-                          </motion.button>
-                        </Link>
+                            <Link href={`/course/${purchase.product_id}`} className="flex items-center justify-center gap-2">
+                              <BookOpen className="h-5 w-5" />
+                              <div className="text-left">
+                                <div className="font-semibold">Continue Reading</div>
+                                <div className="text-xs opacity-90">Pick up where you left off</div>
+                              </div>
+                              <ArrowRight className="h-4 w-4 ml-auto" />
+                            </Link>
+                          </Button>
+                        </motion.div>
 
-                        <Link href="/progress">
-                          <motion.button
-                            variants={cardVariants}
-                            whileHover="hover"
-                            className="w-full flex items-center justify-center p-4 border-2 border-dashed border-muted-foreground/20 rounded-lg hover:bg-muted/50 transition-colors"
+                        <motion.div variants={itemVariants}>
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="lg"
+                            className="w-full h-auto py-4 border-2 hover:border-primary/50 hover:bg-primary/5 transition-colors"
                           >
-                            <div className="text-center">
-                              <h4 className="font-medium mb-1">Study Progress</h4>
-                              <p className="text-sm text-muted-foreground">Track your learning journey</p>
-                            </div>
-                          </motion.button>
-                        </Link>
+                            <Link href="/progress" className="flex items-center justify-center gap-2">
+                              <BarChart3 className="h-5 w-5" />
+                              <div className="text-left">
+                                <div className="font-semibold">Study Progress</div>
+                                <div className="text-xs text-muted-foreground">Track your learning journey</div>
+                              </div>
+                              <ArrowRight className="h-4 w-4 ml-auto" />
+                            </Link>
+                          </Button>
+                        </motion.div>
                       </div>
                     </Card>
                   </motion.div>
@@ -269,17 +302,6 @@ export default function DashboardPage() {
             </motion.div>
           )}
 
-          {/* Linking Purchases Indicator */}
-          {linkingPurchases && (
-            <Card className="p-4 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20">
-              <div className="flex items-center space-x-3">
-                <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  Linking your purchases...
-                </p>
-              </div>
-            </Card>
-          )}
         </div>
 
         {/* Quick Actions */}
@@ -287,25 +309,45 @@ export default function DashboardPage() {
           variants={containerVariants}
           initial="initial"
           animate="animate"
-          className="grid gap-4 md:grid-cols-3"
+          className="grid gap-4 md:grid-cols-3 mt-8"
         >
           <motion.div variants={itemVariants}>
-            <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-              <h3 className="font-medium mb-1">Account Settings</h3>
-              <p className="text-sm text-muted-foreground">Update your profile and preferences</p>
+            <Link href="/settings">
+              <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Settings className="h-5 w-5 text-primary" />
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+                <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Account Settings</h3>
+                <p className="text-sm text-muted-foreground">Update your profile and preferences</p>
+              </Card>
+            </Link>
+          </motion.div>
+          
+          <motion.div variants={itemVariants}>
+            <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
+              <div className="flex items-start justify-between mb-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <HelpCircle className="h-5 w-5 text-primary" />
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Support</h3>
+              <p className="text-sm text-muted-foreground">Get help with your manual</p>
             </Card>
           </motion.div>
           
           <motion.div variants={itemVariants}>
-            <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-              <h3 className="font-medium mb-1">Support</h3>
-              <p className="text-sm text-muted-foreground">Get help with your manual</p>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-              <h3 className="font-medium mb-1">Updates</h3>
+            <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
+              <div className="flex items-start justify-between mb-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Bell className="h-5 w-5 text-primary" />
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </div>
+              <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Updates</h3>
               <p className="text-sm text-muted-foreground">Check for new content</p>
             </Card>
           </motion.div>
