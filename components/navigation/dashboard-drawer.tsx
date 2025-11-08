@@ -46,7 +46,7 @@ export function DashboardDrawer({
       icon: <BookOpen className="h-5 w-5" />
     },
     {
-      href: "/dashboard/settings",
+      href: "/settings",
       label: "Settings",
       icon: <Settings className="h-5 w-5" />
     }

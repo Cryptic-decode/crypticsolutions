@@ -47,7 +47,7 @@ export function DashboardMenu({
     },
     {
       name: "Settings",
-      href: "/dashboard/settings",
+      href: "/settings",
       icon: Settings
     }
   ];
