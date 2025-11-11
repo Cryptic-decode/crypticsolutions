@@ -152,11 +152,16 @@
   display: none !important;
 }
 
-/* Improve toolbar aesthetics */
+/* Improve toolbar aesthetics and dark mode */
 .rpv-default-layout__toolbar {
   background: color-mix(in oklab, var(--secondary), transparent 20%);
   border-bottom: 1px solid var(--border);
   padding: 0.25rem 0.5rem;
+}
+
+.dark .rpv-default-layout__toolbar {
+  background: color-mix(in oklab, var(--secondary), transparent 30%);
+  border-bottom-color: var(--border);
 }
 .rpv-default-layout__sidebar {
   border-right: 1px solid var(--border);

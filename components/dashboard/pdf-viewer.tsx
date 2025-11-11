@@ -17,6 +17,7 @@ interface PDFViewerProps {
   productId: string;
   userEmail: string;
   productName: string;
+  userName?: string;
 }
 
 // Dynamically import PDF viewer (client-side only)
@@ -29,12 +30,14 @@ export function PDFViewer({
   productId,
   userEmail,
   productName,
+  userName,
 }: PDFViewerProps) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [isDark, setIsDark] = useState(false);
   // Per library docs: call plugin factory at top-level of component (it uses hooks)
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
@@ -69,6 +72,17 @@ export function PDFViewer({
 
     init();
   }, [productId]);
+
+  // Sync dark theme with dashboard
+  useEffect(() => {
+    const updateTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+    updateTheme();
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   // Security: Disable right-click, keyboard shortcuts, and print
   useEffect(() => {
@@ -203,10 +217,47 @@ export function PDFViewer({
   // Worker URL - using CDN for reliability (compatible with @react-pdf-viewer/core v3.12.0)
   const workerUrl = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
+  // Per-page watermark renderer (visible, top-right corner)
+  const renderPage = (props: any) => (
+    <>
+      {props.canvasLayer.children}
+      <div
+        style={{
+          position: "absolute",
+          top: "1rem",
+          right: "1rem",
+          pointerEvents: "none",
+          zIndex: 10,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
+            fontSize: `${0.7 * (props.scale || 1)}rem`,
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+            color: "rgba(0, 0, 0, 0.2)",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            textAlign: "right",
+            lineHeight: "1.4",
+          }}
+        >
+          <div>{userName || "User"}</div>
+          <div style={{ fontSize: "0.85em", marginTop: "0.01rem" }}>
+            {userEmail || "Cryptic Solutions"}
+          </div>
+        </div>
+      </div>
+      {props.annotationLayer.children}
+      {props.textLayer.children}
+    </>
+  );
+
   return (
-    <div className="w-full">
+    <div className={`w-full ${isDark ? "dark" : ""}`}>
       <Card className="p-0 overflow-hidden ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
-        <div className="h-[calc(100vh-300px)] min-h-[600px] no-select bg-secondary/10 dark:bg-secondary/20">
+        <div className="h-[calc(100vh-300px)] min-h-[600px] no-select bg-secondary/10 dark:bg-secondary/20 relative">
           <Worker workerUrl={workerUrl}>
             <Viewer
               fileUrl={pdfUrl}
@@ -214,6 +265,7 @@ export function PDFViewer({
                 Authorization: `Bearer ${authToken}`,
               }}
               plugins={[defaultLayoutPluginInstance]}
+              renderPage={renderPage}
               onDocumentLoad={() => {
                 setLoading(false);
                 setError(null);

@@ -156,6 +156,7 @@ export default function CourseViewPage() {
               productId={productId}
               userEmail={user?.email || ""}
               productName={product.name}
+              userName={user?.user_metadata?.full_name || (user?.email ? user.email.split("@")[0] : "User")}
             />
           </motion.div>
         </motion.div>
