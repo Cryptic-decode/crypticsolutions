@@ -8,6 +8,7 @@ import { Loader2, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePurchases } from "@/lib/hooks/use-purchases";
+import { PDFViewer } from "@/components/dashboard/pdf-viewer";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -149,19 +150,13 @@ export default function CourseViewPage() {
           animate="animate"
           className="space-y-6"
         >
+          {/* PDF Viewer */}
           <motion.div variants={itemVariants}>
-            <Card className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Course Content</h2>
-              <p className="text-muted-foreground mb-4">
-                Content viewer is currently unavailable.
-              </p>
-              <div className="bg-secondary/20 rounded-lg p-8 text-center">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">
-                  We’re preparing a new, more reliable reader. Please check back soon.
-                </p>
-              </div>
-            </Card>
+            <PDFViewer
+              productId={productId}
+              userEmail={user?.email || ""}
+              productName={product.name}
+            />
           </motion.div>
         </motion.div>
       </motion.div>
