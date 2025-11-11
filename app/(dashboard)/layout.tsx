@@ -93,9 +93,9 @@ export default function DashboardGroupLayout({
       </Drawer>
 
       {/* Main Content */}
-      <main className="lg:pl-80 pt-16 lg:pt-0 w-full">
+      <main className="lg:pl-80 pt-16 lg:pt-16 w-full">
         {/* Desktop Header */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block fixed top-0 left-80 right-0 z-40">
           <DashboardHeader
             userName={user.user_metadata?.full_name}
             userEmail={user.email}

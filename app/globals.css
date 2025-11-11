@@ -122,4 +122,65 @@
   }
 }
 
-/* (removed PDF viewer print overrides) */
+/* PDF Viewer Security - Print Prevention & Download Button */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  
+  body::before {
+    content: "Printing is disabled for security purposes.";
+    display: block;
+    visibility: visible;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Hide download button in PDF viewer */
+.rpv-core__display--block button[aria-label*="Download"],
+.rpv-core__display--block button[title*="Download"],
+.rpv-default-layout__toolbar button[aria-label*="Download"] {
+  display: none !important;
+}
+
+/* Hide Open file tool */
+.rpv-default-layout__toolbar button[aria-label*="Open"],
+.rpv-default-layout__toolbar button[title*="Open file"],
+.rpv-default-layout__toolbar button[title*="Open File"] {
+  display: none !important;
+}
+
+/* Improve toolbar aesthetics */
+.rpv-default-layout__toolbar {
+  background: color-mix(in oklab, var(--secondary), transparent 20%);
+  border-bottom: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+}
+.rpv-default-layout__sidebar {
+  border-right: 1px solid var(--border);
+}
+.rpv-core__button {
+  border-radius: var(--radius-md);
+}
+.rpv-core__button:hover {
+  background: color-mix(in oklab, var(--secondary), transparent 40%);
+}
+
+/* Dark mode tweaks */
+.dark .rpv-default-layout__toolbar {
+  background: color-mix(in oklab, var(--secondary), transparent 70%);
+  border-bottom-color: color-mix(in oklab, var(--border), transparent 30%);
+}
+.dark .rpv-default-layout__sidebar {
+  border-right-color: color-mix(in oklab, var(--border), transparent 30%);
+}
+
+/* Disable text selection inside viewer */
+.no-select, .no-select * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}

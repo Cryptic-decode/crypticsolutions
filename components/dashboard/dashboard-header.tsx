@@ -70,7 +70,7 @@ export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = 
   const isDark = document.documentElement.classList.contains("dark");
 
   return (
-    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6 sticky top-0 z-40">
+    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6">
       <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-semibold">{pageTitle}</h1>
         <div className="flex items-center space-x-4">

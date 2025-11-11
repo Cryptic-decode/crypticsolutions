@@ -70,6 +70,60 @@ export function PDFViewer({
     init();
   }, [productId]);
 
+  // Security: Disable right-click, keyboard shortcuts, and print
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Disable right-click context menu
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Block keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block Ctrl+P (Print), Ctrl+S (Save), Ctrl+A (Select All)
+      if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "s" || e.key === "a")) {
+        e.preventDefault();
+        return false;
+      }
+      // Block F12 (DevTools), Print Screen
+      if (e.key === "F12" || e.key === "PrintScreen") {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    // Block copy and dragging
+    const handleCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      return false;
+    };
+    const handleDragStart = (e: DragEvent) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Block print dialog
+    const handleBeforePrint = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("copy", handleCopy);
+    document.addEventListener("dragstart", handleDragStart);
+    window.addEventListener("beforeprint", handleBeforePrint);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("copy", handleCopy);
+      document.removeEventListener("dragstart", handleDragStart);
+      window.removeEventListener("beforeprint", handleBeforePrint);
+    };
+  }, [mounted]);
+
   // Handle PDF load errors
   const handleDocumentLoadError = (error: any) => {
     console.error("PDF load error:", error);
@@ -151,8 +205,8 @@ export function PDFViewer({
 
   return (
     <div className="w-full">
-      <Card className="p-0 overflow-hidden">
-        <div className="h-[calc(100vh-300px)] min-h-[600px]">
+      <Card className="p-0 overflow-hidden ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
+        <div className="h-[calc(100vh-300px)] min-h-[600px] no-select bg-secondary/10 dark:bg-secondary/20">
           <Worker workerUrl={workerUrl}>
             <Viewer
               fileUrl={pdfUrl}
