@@ -38,6 +38,7 @@ export function PDFViewer({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
+  const [documentLoaded, setDocumentLoaded] = useState(false);
   // Per library docs: call plugin factory at top-level of component (it uses hooks)
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
@@ -76,13 +77,126 @@ export function PDFViewer({
   // Sync dark theme with dashboard
   useEffect(() => {
     const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
+      const darkMode = document.documentElement.classList.contains("dark");
+      setIsDark(darkMode);
+      // Apply dark class to PDF viewer containers for theme sync
+      const updateViewerTheme = () => {
+        const viewerContainers = document.querySelectorAll('.rpv-core__viewer, .rpv-default-layout__body, .rpv-core__inner-pages');
+        viewerContainers.forEach((container) => {
+          if (darkMode) {
+            container.classList.add('dark');
+          } else {
+            container.classList.remove('dark');
+          }
+        });
+      };
+      updateViewerTheme();
+      // Also update when viewer is mounted
+      if (mounted) {
+        setTimeout(updateViewerTheme, 100);
+      }
     };
     updateTheme();
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
-  }, []);
+  }, [mounted]);
+
+  // Set initial zoom to 100% after document loads
+  useEffect(() => {
+    if (!documentLoaded || !mounted) return;
+
+    const setZoomTo100 = () => {
+      try {
+        // Method 1: Try to access zoom plugin API directly
+        const zoomPlugin = (defaultLayoutPluginInstance as any).zoomPlugin;
+        if (zoomPlugin) {
+          if (typeof zoomPlugin.zoomTo === 'function') {
+            zoomPlugin.zoomTo(1.0);
+            return true;
+          }
+          if (zoomPlugin.currentScale !== undefined) {
+            if (typeof zoomPlugin.currentScale === 'function') {
+              zoomPlugin.currentScale(1.0);
+            } else {
+              zoomPlugin.currentScale = 1.0;
+            }
+            return true;
+          }
+        }
+
+        // Method 2: Find zoom input/display and set value directly
+        const zoomInput = document.querySelector('input[type="text"][value*="%"], .rpv-core__display--block input') as HTMLInputElement;
+        if (zoomInput && zoomInput.value !== '100%') {
+          // Find parent button/container and click to open menu
+          const zoomContainer = zoomInput.closest('button, .rpv-core__display--block');
+          if (zoomContainer) {
+            (zoomContainer as HTMLElement).click();
+            setTimeout(() => {
+              const popover = document.querySelector('.rpv-core__popover-body, .rpv-popover__body');
+              if (popover) {
+                const buttons = Array.from(popover.querySelectorAll('button, [role="menuitem"], li'));
+                const zoom100 = buttons.find((btn) => {
+                  const text = (btn.textContent || '').trim();
+                  return text === '100%' || text === '1.0' || text.includes('100%') && !text.includes('130%');
+                });
+                if (zoom100) {
+                  (zoom100 as HTMLElement).click();
+                  return true;
+                }
+              }
+              // Close menu if opened
+              if (zoomContainer) {
+                (zoomContainer as HTMLElement).click();
+              }
+            }, 150);
+          }
+        }
+
+        // Method 3: Find zoom dropdown button and select 100%
+        const zoomButtons = document.querySelectorAll('[aria-label*="Zoom" i], [title*="Zoom" i], button');
+        for (const btn of Array.from(zoomButtons)) {
+          const text = (btn.textContent || '').trim();
+          if (text.includes('%') && (text.includes('130%') || text.includes('60%'))) {
+            (btn as HTMLElement).click();
+            setTimeout(() => {
+              const popover = document.querySelector('.rpv-core__popover-body, .rpv-popover__body');
+              if (popover) {
+                const options = Array.from(popover.querySelectorAll('button, [role="menuitem"], li, div[role="option"]'));
+                const zoom100 = options.find((opt) => {
+                  const optText = (opt.textContent || '').trim();
+                  return optText === '100%' || optText === '1.0';
+                });
+                if (zoom100) {
+                  (zoom100 as HTMLElement).click();
+                  return true;
+                }
+              }
+            }, 150);
+            break;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not set zoom to 100%:', err);
+      }
+      return false;
+    };
+
+    // Try multiple times with increasing delays
+    let attempts = 0;
+    const maxAttempts = 5;
+    const trySetZoom = () => {
+      attempts++;
+      if (setZoomTo100() || attempts >= maxAttempts) {
+        return;
+      }
+      setTimeout(trySetZoom, 200 * attempts);
+    };
+
+    trySetZoom();
+    setTimeout(trySetZoom, 500);
+    setTimeout(trySetZoom, 1000);
+  }, [documentLoaded, mounted, defaultLayoutPluginInstance]);
 
   // Security: Disable right-click, keyboard shortcuts, and print
   useEffect(() => {
@@ -266,11 +380,11 @@ export function PDFViewer({
               }}
               plugins={[defaultLayoutPluginInstance]}
               renderPage={renderPage}
-              onDocumentLoad={() => {
+              onDocumentLoad={(e) => {
                 setLoading(false);
                 setError(null);
+                setDocumentLoaded(true);
               }}
-              onLoadError={handleDocumentLoadError}
             />
           </Worker>
         </div>
