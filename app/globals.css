@@ -122,18 +122,4 @@
   }
 }
 
-/* Prevent printing PDF viewer content */
-@media print {
-  [data-pdf-viewer] {
-    display: none !important;
-  }
-  
-  body::before {
-    content: "Printing is disabled for security purposes.";
-    display: block;
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.5rem;
-    color: #000;
-  }
-}
+/* (removed PDF viewer print overrides) */

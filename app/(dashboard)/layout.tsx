@@ -68,7 +68,7 @@ export default function DashboardGroupLayout({
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
       <ScrollBackdrop intensity={0.8} />
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r bg-background">
+      <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r border-border/50 bg-background z-30">
         <DashboardDrawer
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -93,7 +93,7 @@ export default function DashboardGroupLayout({
       </Drawer>
 
       {/* Main Content */}
-      <main className="lg:pl-80 pt-16 lg:pt-0">
+      <main className="lg:pl-80 pt-16 lg:pt-0 w-full">
         {/* Desktop Header */}
         <div className="hidden lg:block">
           <DashboardHeader

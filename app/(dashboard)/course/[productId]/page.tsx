@@ -8,7 +8,6 @@ import { Loader2, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePurchases } from "@/lib/hooks/use-purchases";
-import { PDFViewer } from "@/components/dashboard/pdf-viewer";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -27,11 +26,10 @@ const itemVariants = {
 };
 
 // Product name mapping
-const productNames: Record<string, { name: string; description: string; pdfUrl: string }> = {
+const productNames: Record<string, { name: string; description: string }> = {
   'ielts-manual': {
     name: 'IELTS Preparation Manual',
     description: 'Complete study guide for IELTS exam',
-    pdfUrl: '/cryptic-assets/ielts-manual.pdf', // Update this path to your actual PDF location
   },
 };
 
@@ -56,7 +54,6 @@ export default function CourseViewPage() {
   const product = productNames[productId] || {
     name: productId,
     description: 'Course content',
-    pdfUrl: '',
   };
 
   if (authLoading || purchasesLoading) {
@@ -152,33 +149,20 @@ export default function CourseViewPage() {
           animate="animate"
           className="space-y-6"
         >
-          {/* PDF Viewer */}
-          {product.pdfUrl ? (
-            <motion.div variants={itemVariants}>
-              <Card className="p-6">
-                <PDFViewer
-                  pdfUrl={product.pdfUrl}
-                  userEmail={user.email || ''}
-                  productName={product.name}
-                />
-              </Card>
-            </motion.div>
-          ) : (
-            <motion.div variants={itemVariants}>
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-4">Course Content</h2>
-                <p className="text-muted-foreground mb-4">
-                  Course content is not available for this product.
+          <motion.div variants={itemVariants}>
+            <Card className="p-6">
+              <h2 className="text-2xl font-semibold mb-4">Course Content</h2>
+              <p className="text-muted-foreground mb-4">
+                Content viewer is currently unavailable.
+              </p>
+              <div className="bg-secondary/20 rounded-lg p-8 text-center">
+                <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  We’re preparing a new, more reliable reader. Please check back soon.
                 </p>
-                <div className="bg-secondary/20 rounded-lg p-8 text-center">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-muted-foreground">
-                    Content will be available soon.
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
-          )}
+              </div>
+            </Card>
+          </motion.div>
         </motion.div>
       </motion.div>
     </div>

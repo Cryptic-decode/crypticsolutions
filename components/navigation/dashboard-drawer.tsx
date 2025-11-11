@@ -54,34 +54,38 @@ export function DashboardDrawer({
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background/95 backdrop-blur-sm border-r border-border/50">
-      {/* Header with Logo */}
-      <div className="p-6 md:p-8 border-b border-border/50">
+    <div className="flex flex-col h-full w-full bg-background/95 backdrop-blur-sm">
+      {/* Header with Logo - match app header height */}
+      <div className="h-16 border-b border-border/50 px-6">
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex items-center justify-center"
+          transition={{ duration: 0.25 }}
+          className="h-full flex items-center justify-center"
         >
-          <Image
-            src="/cryptic-assets/fullLogo.png" 
-            alt="Cryptic Solutions" 
-            width={140} 
-            height={35}
-            className="h-[35px] w-auto dark:hidden"
-          />
-          <Image
-            src="/cryptic-assets/fullLogo2.png" 
-            alt="Cryptic Solutions" 
-            width={140} 
-            height={35}
-            className="h-[35px] w-auto hidden dark:block"
-          />
+          <div className="relative flex items-center">
+            <Image
+              src="/cryptic-assets/fullLogo.png" 
+              alt="Cryptic Solutions" 
+              width={132} 
+              height={32}
+              className="h-8 w-auto dark:hidden"
+              priority
+            />
+            <Image
+              src="/cryptic-assets/fullLogo2.png" 
+              alt="Cryptic Solutions" 
+              width={132} 
+              height={32}
+              className="h-8 w-auto hidden dark:block"
+              priority
+            />
+          </div>
         </motion.div>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {links.map((link, index) => {
           // Handle active state: exact match or starts with (for nested routes)
           const isActive = currentPath === link.href || 
@@ -111,7 +115,7 @@ export function DashboardDrawer({
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-primary rounded-r-full"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
