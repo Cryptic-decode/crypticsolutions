@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -41,104 +41,86 @@ export function PDFViewer({
   // Per library docs: call plugin factory at top-level of component (it uses hooks)
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
+  // Initialize PDF viewer - extracted for reusability
+  const initializeViewer = useCallback(async () => {
+    try {
+      // Get session token for API authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        setError("Authentication required. Please sign in again.");
+        setLoading(false);
+        return;
+      }
+
+      setAuthToken(session.access_token);
+
+      // Construct PDF URL with auth token
+      const apiUrl = `/api/course/${productId}/pdf`;
+      setPdfUrl(apiUrl);
+      setMounted(true);
+      setLoading(false);
+    } catch (err: any) {
+      // Handle initialization errors gracefully
+      setError("Failed to initialize PDF viewer. Please refresh the page.");
+      setLoading(false);
+    }
+  }, [productId]);
+
   // Load plugin module and get auth token
   useEffect(() => {
-    const init = async () => {
-      try {
-        // Get session token for API authentication
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (!session?.access_token) {
-          setError("Authentication required. Please sign in again.");
-          setLoading(false);
-          return;
-        }
-
-        setAuthToken(session.access_token);
-
-        // Construct PDF URL with auth token
-        const apiUrl = `/api/course/${productId}/pdf`;
-        setPdfUrl(apiUrl);
-        setMounted(true);
-        setLoading(false);
-      } catch (err: any) {
-        console.error("PDF viewer initialization error:", err);
-        setError("Failed to initialize PDF viewer. Please refresh the page.");
-        setLoading(false);
-      }
-    };
-
-    init();
-  }, [productId]);
+    initializeViewer();
+  }, [initializeViewer]);
 
   // Sync dark theme with dashboard
   useEffect(() => {
     const updateTheme = () => {
-      const darkMode = document.documentElement.classList.contains("dark");
-      setIsDark(darkMode);
-      // Apply dark class to PDF viewer containers for theme sync
-      const updateViewerTheme = () => {
-        const viewerContainers = document.querySelectorAll('.rpv-core__viewer, .rpv-default-layout__body, .rpv-core__inner-pages');
-        viewerContainers.forEach((container) => {
-          if (darkMode) {
-            container.classList.add('dark');
-          } else {
-            container.classList.remove('dark');
-          }
-        });
-      };
-      updateViewerTheme();
-      // Also update when viewer is mounted
-      if (mounted) {
-        setTimeout(updateViewerTheme, 100);
-      }
+      setIsDark(document.documentElement.classList.contains("dark"));
     };
     updateTheme();
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
-  }, [mounted]);
+  }, []);
+
+  // Security event handlers - extracted for better organization
+  const handleContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+    return false;
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    // Block Ctrl+P (Print), Ctrl+S (Save), Ctrl+A (Select All)
+    if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "s" || e.key === "a")) {
+      e.preventDefault();
+      return false;
+    }
+    // Block F12 (DevTools), Print Screen
+    if (e.key === "F12" || e.key === "PrintScreen") {
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  const handleCopy = (e: ClipboardEvent) => {
+    e.preventDefault();
+    return false;
+  };
+
+  const handleDragStart = (e: DragEvent) => {
+    e.preventDefault();
+    return false;
+  };
+
+  const handleBeforePrint = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+  };
 
   // Security: Disable right-click, keyboard shortcuts, and print
   useEffect(() => {
     if (!mounted) return;
-
-    // Disable right-click context menu
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // Block keyboard shortcuts
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Block Ctrl+P (Print), Ctrl+S (Save), Ctrl+A (Select All)
-      if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "s" || e.key === "a")) {
-        e.preventDefault();
-        return false;
-      }
-      // Block F12 (DevTools), Print Screen
-      if (e.key === "F12" || e.key === "PrintScreen") {
-        e.preventDefault();
-        return false;
-      }
-    };
-
-    // Block copy and dragging
-    const handleCopy = (e: ClipboardEvent) => {
-      e.preventDefault();
-      return false;
-    };
-    const handleDragStart = (e: DragEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // Block print dialog
-    const handleBeforePrint = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-    };
 
     document.addEventListener("contextmenu", handleContextMenu);
     document.addEventListener("keydown", handleKeyDown);
@@ -157,7 +139,6 @@ export function PDFViewer({
 
   // Handle PDF load errors
   const handleDocumentLoadError = (error: any) => {
-    console.error("PDF load error:", error);
     let errorMessage = "Failed to load PDF. Please try again.";
 
     const errorStr = String(error?.message || error?.toString() || "");
@@ -205,18 +186,7 @@ export function PDFViewer({
             onClick={() => {
               setError(null);
               setLoading(true);
-              // Re-initialize
-              const init = async () => {
-                const {
-                  data: { session },
-                } = await supabase.auth.getSession();
-                if (session?.access_token) {
-                  setAuthToken(session.access_token);
-                  setPdfUrl(`/api/course/${productId}/pdf`);
-                  setLoading(false);
-                }
-              };
-              init();
+              initializeViewer();
             }}
           >
             Retry
@@ -234,34 +204,40 @@ export function PDFViewer({
   // Worker URL - using CDN for reliability (compatible with @react-pdf-viewer/core v3.12.0)
   const workerUrl = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
+  // Watermark styles - extracted for maintainability
+  const watermarkContainerStyle: React.CSSProperties = {
+    position: "absolute",
+    top: "1rem",
+    right: "1rem",
+    pointerEvents: "none",
+    zIndex: 10,
+  };
+
+  const getWatermarkTextStyle = (scale: number): React.CSSProperties => ({
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
+    fontSize: `${0.7 * scale}rem`,
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+    color: "rgba(0, 0, 0, 0.2)",
+    userSelect: "none",
+    WebkitUserSelect: "none",
+    textAlign: "right",
+    lineHeight: "1.4",
+  });
+
+  const watermarkEmailStyle: React.CSSProperties = {
+    fontSize: "0.85em",
+    marginTop: "0.01rem",
+  };
+
   // Per-page watermark renderer (visible, top-right corner)
   const renderPage = (props: any) => (
     <>
       {props.canvasLayer.children}
-      <div
-        style={{
-          position: "absolute",
-          top: "1rem",
-          right: "1rem",
-          pointerEvents: "none",
-          zIndex: 10,
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
-            fontSize: `${0.7 * (props.scale || 1)}rem`,
-            fontWeight: 700,
-            letterSpacing: "0.02em",
-            color: "rgba(0, 0, 0, 0.2)",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            textAlign: "right",
-            lineHeight: "1.4",
-          }}
-        >
+      <div style={watermarkContainerStyle}>
+        <div style={getWatermarkTextStyle(props.scale || 1)}>
           <div>{userName || "User"}</div>
-          <div style={{ fontSize: "0.85em", marginTop: "0.01rem" }}>
+          <div style={watermarkEmailStyle}>
             {userEmail || "Cryptic Solutions"}
           </div>
         </div>
