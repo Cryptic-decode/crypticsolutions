@@ -42,7 +42,7 @@ export function Drawer({
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className={`fixed top-0 ${position}-0 h-screen w-full md:w-[400px]
                      bg-background md:border-${position === "right" ? "l" : "r"} 
-                     shadow-2xl z-50 overflow-y-auto`}
+                     shadow-2xl z-[60] overflow-y-auto`}
           >
             {showCloseButton && (
               <button

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Drawer } from "@/components/ui/drawer";
 import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { Menu, Loader2 } from "lucide-react";
+import { Menu, X, Loader2 } from "lucide-react";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 export default function DashboardGroupLayout({
@@ -82,6 +82,7 @@ export default function DashboardGroupLayout({
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         position="left"
+        showCloseButton={false}
       >
         <DashboardDrawer
           darkMode={darkMode}
@@ -103,15 +104,15 @@ export default function DashboardGroupLayout({
         </div>
 
         {/* Mobile Header with Menu */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur z-50">
+        <div className={`lg:hidden fixed top-0 left-0 right-0 h-16 border-b bg-background/95 backdrop-blur transition-all ${drawerOpen ? 'z-40' : 'z-50'}`}>
           <div className="flex items-center justify-between h-full px-4">
             <h1 className="text-xl font-semibold">Dashboard</h1>
             <button
-              onClick={() => setDrawerOpen(true)}
+              onClick={() => setDrawerOpen(!drawerOpen)}
               className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
-              aria-label="Open menu"
+              aria-label={drawerOpen ? "Close menu" : "Open menu"}
             >
-              <Menu className="h-6 w-6" />
+              {drawerOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
