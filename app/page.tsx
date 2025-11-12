@@ -130,6 +130,13 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center gap-6">
               <a 
+                href="#about" 
+                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                onClick={(e) => handleNavClick(e, "about")}
+              >
+                About
+              </a>
+              <a 
                 href="#services" 
                 className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
                 onClick={(e) => handleNavClick(e, "services")}
@@ -196,6 +203,11 @@ export default function Home() {
               toggleDarkMode={toggleDarkMode}
               onClose={() => setMobileMenuOpen(false)}
               links={[
+                {
+                  href: "#about",
+                  label: "About",
+                  onClick: (e) => handleNavClick(e, "about")
+                },
                 {
                   href: "#services",
                   label: "Services",
@@ -348,6 +360,53 @@ export default function Home() {
               </Button>
             </motion.div>
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1B2242] dark:text-white mb-4">
+            About Cryptic Solutions
+          </h2>
+          <p className="text-lg text-muted-foreground mb-6">
+            We build innovative digital products and human‑centered solutions that simplify complex workflows,
+            improve productivity, and drive measurable growth. Our approach blends product thinking, clean
+            engineering, and practical UX to deliver secure, scalable, easy‑to‑use software.
+          </p>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-3">
+              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">What we do</h3>
+              <ul className="space-y-2 text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Educational tools that make learning accessible and effective</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Custom digital products tailored to business workflows</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Web platforms and applications for interaction and automation</span>
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">Why choose us</h3>
+              <p className="text-muted-foreground">
+                We don’t just build features — we connect the right pieces. By focusing on outcomes and user
+                experience, we translate complex challenges into elegant, practical solutions that save time,
+                reduce cost, and unlock new value.
+              </p>
+            </div>
+          </div>
         </motion.div>
       </section>
 
