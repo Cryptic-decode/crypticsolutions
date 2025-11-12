@@ -20,6 +20,7 @@ interface DashboardDrawerProps {
   onSignOut: () => void;
   onClose?: () => void;
   currentPath: string;
+  onSignOutClick: () => void;
 }
 
 export function DashboardDrawer({
@@ -27,7 +28,8 @@ export function DashboardDrawer({
   toggleDarkMode,
   onSignOut,
   onClose,
-  currentPath
+  currentPath,
+  onSignOutClick
 }: DashboardDrawerProps) {
   const links = [
     {
@@ -177,8 +179,8 @@ export function DashboardDrawer({
         >
           <Button 
             variant="outline" 
-            className="w-full border-border/50 hover:border-destructive/50 hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-colors"
-            onClick={onSignOut}
+            className="w-full border-border/50 hover:border-destructive/50 hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-colors cursor-pointer"
+            onClick={onSignOutClick}
           >
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out

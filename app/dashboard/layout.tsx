@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Drawer } from "@/components/ui/drawer";
 import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { SignOutModal } from "@/components/dashboard/sign-out-modal";
 import { Menu, Loader2 } from "lucide-react";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
@@ -19,6 +20,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [darkMode, setDarkMode] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   useEffect(() => {
     // Only redirect if loading is complete and user is not authenticated
@@ -74,6 +76,7 @@ export default function DashboardLayout({
           toggleDarkMode={toggleDarkMode}
           onSignOut={signOut}
           currentPath={pathname}
+          onSignOutClick={() => setShowSignOutModal(true)}
         />
       </div>
 
@@ -89,8 +92,16 @@ export default function DashboardLayout({
           onSignOut={signOut}
           onClose={() => setDrawerOpen(false)}
           currentPath={pathname}
+          onSignOutClick={() => setShowSignOutModal(true)}
         />
       </Drawer>
+
+      {/* Sign Out Confirmation Modal - Rendered at page level */}
+      <SignOutModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={signOut}
+      />
 
       {/* Main Content */}
       <main className="lg:pl-80 pt-16 lg:pt-0">

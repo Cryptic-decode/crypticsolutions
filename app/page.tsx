@@ -32,8 +32,12 @@ import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -146,6 +150,14 @@ export default function Home() {
               >
                 Contact
               </a>
+              {!authLoading && !user && (
+                <Link 
+                  href="/signin"
+                  className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"
@@ -154,9 +166,15 @@ export default function Home() {
                 {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
               <motion.div whileTap={buttonTap}>
-                <Button asChild size="sm">
-                  <a href="#products" onClick={(e) => handleNavClick(e, "products")}>Get Started</a>
-                </Button>
+                {user ? (
+                  <Button asChild size="sm">
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                ) : (
+                  <Button asChild size="sm">
+                    <a href="#products" onClick={(e) => handleNavClick(e, "products")}>Get Started</a>
+                  </Button>
+                )}
               </motion.div>
             </div>
             <button 
@@ -192,15 +210,26 @@ export default function Home() {
                   href: "#contact",
                   label: "Contact",
                   onClick: (e) => handleNavClick(e, "contact")
-                }
+                },
+                ...(!authLoading && !user ? [{
+                  href: "/signin",
+                  label: "Sign In",
+                  onClick: undefined
+                }] : [])
               ]}
               ctaButton={{
-                label: "Get Started",
-                onClick: (e) => {
-                  if (e) {
-                    handleNavClick(e, "products");
+                label: user ? "Dashboard" : "Get Started",
+                onClick: () => {
+                  if (user) {
+                    router.push("/dashboard");
+                  } else {
+                    // Scroll to products section
+                    const el = document.getElementById("products");
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
                   }
-                }
+                },
               }}
             />
           </Drawer>
