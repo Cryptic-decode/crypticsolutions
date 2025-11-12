@@ -364,7 +364,22 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+      <section id="about" className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+        {/* Subtle right accent */}
+        <motion.div
+          className="absolute top-8 right-6 w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/15 hidden md:block pointer-events-none"
+          style={{
+            boxShadow:
+              "0 0 30px rgba(147, 224, 48, 0.12), 0 0 60px rgba(147, 224, 48, 0.08)",
+          }}
+          aria-hidden="true"
+          animate={{
+            y: [0, 10, 0],
+            opacity: [0.35, 0.5, 0.35],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
