@@ -85,7 +85,7 @@ export default function DashboardPage() {
         
         hasLinkedPurchases.current = true;
       } catch (error) {
-        console.error('Failed to link purchases:', error);
+        // Handle purchase linking errors silently - user can still use dashboard
       } finally {
         setLinkingPurchases(false);
       }
@@ -122,9 +122,9 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             {user.user_metadata?.full_name || user.email}
-          </p>
+          </p> */}
         </div>
 
         {/* Linking Purchases Indicator - Moved to top */}

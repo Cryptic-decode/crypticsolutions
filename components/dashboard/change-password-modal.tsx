@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
 import { useAuth } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/utils";
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -93,18 +94,7 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
         setSuccess(false);
       }, 500);
     } catch (error: any) {
-      console.error("Password update error:", error);
-      
-      let errorMessage = "Failed to update password. Please try again.";
-      
-      if (error.message?.includes("same as")) {
-        errorMessage = "New password must be different from current password";
-      } else if (error.message?.includes("weak")) {
-        errorMessage = "Password is too weak. Please use a stronger password.";
-      } else if (error.message?.includes("session")) {
-        errorMessage = "Your session has expired. Please sign in again.";
-      }
-      
+      const errorMessage = getErrorMessage(error, 'password') || "Failed to update password. Please try again.";
       setError(errorMessage);
     } finally {
       setLoading(false);

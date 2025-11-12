@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
+import { getErrorMessage } from "@/lib/utils";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
@@ -30,27 +31,14 @@ function SignInForm() {
     setError("");
 
     try {
-      const result = await signInUser(formData.email, formData.password.trim());
-      console.log('Sign in successful:', result);
+      await signInUser(formData.email, formData.password.trim());
       
       // Wait a bit for session to be established
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push('/dashboard');
     } catch (error: any) {
-      console.error('Sign in error:', error);
-      
-      let errorMessage = error.message || 'Failed to sign in';
-      
-      if (errorMessage.includes('Invalid login')) {
-        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-      } else if (errorMessage.includes('Email not confirmed')) {
-        errorMessage = 'Please confirm your email before signing in. Check your inbox for the confirmation email.';
-      } else if (errorMessage.includes('User not found')) {
-        errorMessage = 'No account found with this email. Please check your email address.';
-      }
-      
-      setError(errorMessage);
+      setError(getErrorMessage(error, 'auth'));
     } finally {
       setLoading(false);
     }

@@ -43,7 +43,6 @@ export function usePurchases(): UsePurchasesReturn {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('Error fetching purchases:', fetchError);
         setError(fetchError.message || 'Failed to fetch purchases');
         setPurchases([]);
         return;
@@ -51,7 +50,6 @@ export function usePurchases(): UsePurchasesReturn {
 
       setPurchases(data || []);
     } catch (err: any) {
-      console.error('Unexpected error fetching purchases:', err);
       setError(err.message || 'An unexpected error occurred');
       setPurchases([]);
     } finally {

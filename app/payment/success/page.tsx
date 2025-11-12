@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth";
-import { generatePassword } from "@/lib/utils";
+import { generatePassword, getErrorMessage } from "@/lib/utils";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -52,7 +52,7 @@ function PaymentSuccessContent() {
         });
       }
     } catch (error) {
-      console.error('Payment verification error:', error);
+      // Handle verification errors silently - user will see loading state
     }
   };
 
@@ -106,21 +106,7 @@ function PaymentSuccessContent() {
         throw new Error(data.error || 'Failed to process payment');
       }
     } catch (error: any) {
-      console.error('Account creation error:', error);
-      
-      // Handle different types of errors with specific messages
-      let errorMessage = 'An unexpected error occurred. Please try again or contact support.';
-      
-      if (error.message?.includes('Missing required environment variables')) {
-        errorMessage = 'Server configuration error. Please contact support.';
-      } else if (error.message?.includes('Server error')) {
-        errorMessage = 'Server error. Please try again in a few minutes.';
-      } else if (error.message?.includes('Failed to parse')) {
-        errorMessage = 'Communication error with server. Please try again.';
-      } else if (error.message?.includes('already exists')) {
-        errorMessage = 'An account with this email already exists. Please log in instead.';
-      }
-      
+      const errorMessage = getErrorMessage(error, 'payment') || 'An unexpected error occurred. Please try again or contact support.';
       setErrorMessage(`${errorMessage} If the issue persists, contact support at crypticsolutions.contact@gmail.com`);
     } finally {
       setLoading(false);

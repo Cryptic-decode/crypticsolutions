@@ -54,15 +54,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      console.error('Signup error:', error);
       throw error;
     }
 
-    // Log the response to see what we're getting
-    console.log('Signup response:', data);
-
     if (!data?.user?.confirmation_sent_at) {
-      console.error('No confirmation email was sent');
       throw new Error('Failed to send confirmation email. Please contact support.');
     }
 
@@ -76,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      console.error('Supabase sign in error:', error);
       throw error;
     }
     
@@ -102,7 +96,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      console.error('Password update error:', error);
       throw error;
     }
 

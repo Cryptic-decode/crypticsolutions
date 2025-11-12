@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
+import { getErrorMessage } from "@/lib/utils";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { Worker } from "@react-pdf-viewer/core";
 
@@ -139,20 +140,7 @@ export function PDFViewer({
 
   // Handle PDF load errors
   const handleDocumentLoadError = (error: any) => {
-    let errorMessage = "Failed to load PDF. Please try again.";
-
-    const errorStr = String(error?.message || error?.toString() || "");
-
-    if (errorStr.includes("404") || errorStr.includes("not found")) {
-      errorMessage = "PDF file not found. Please contact support.";
-    } else if (errorStr.includes("403") || errorStr.includes("Access denied")) {
-      errorMessage = "Access denied. Please ensure you have purchased this course.";
-    } else if (errorStr.includes("401") || errorStr.includes("Authentication")) {
-      errorMessage = "Authentication required. Please sign in again.";
-    } else if (errorStr.includes("Network") || errorStr.includes("CORS")) {
-      errorMessage = "Network error. Please check your connection and try again.";
-    }
-
+    const errorMessage = getErrorMessage(error, 'pdf') || "Failed to load PDF. Please try again.";
     setError(errorMessage);
     setLoading(false);
   };
