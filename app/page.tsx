@@ -68,21 +68,14 @@ export default function Home() {
     const sections = ['about', 'services', 'products', 'contact'];
     const observers: IntersectionObserver[] = [];
 
-    // Check if we're at the top of the page (Hero section)
-    const checkScrollPosition = () => {
-      const scrollY = window.scrollY;
-      // If scrolled less than 100px, we're in Hero section - clear active
-      if (scrollY < 100) {
+    // Clear active section when at top (Hero section)
+    const handleScroll = () => {
+      if (window.scrollY < 100) {
         setActiveSection("");
-        return;
       }
     };
 
-    // Initial check
-    checkScrollPosition();
-
-    // Listen to scroll events to clear active when at top
-    window.addEventListener('scroll', checkScrollPosition);
+    window.addEventListener('scroll', handleScroll);
 
     sections.forEach((sectionId) => {
       const element = document.getElementById(sectionId);
@@ -91,8 +84,7 @@ export default function Home() {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            // Only set active if section is intersecting AND we're not at the top
-            if (entry.isIntersecting && window.scrollY >= 100) {
+            if (entry.isIntersecting) {
               setActiveSection(sectionId);
             }
           });
@@ -108,7 +100,7 @@ export default function Home() {
     });
 
     return () => {
-      window.removeEventListener('scroll', checkScrollPosition);
+      window.removeEventListener('scroll', handleScroll);
       observers.forEach((observer) => observer.disconnect());
     };
   }, []);
@@ -454,8 +446,8 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="max-w-3xl"
         >
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1B2242] dark:text-white mb-4">
-            About Cryptic Solutions
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            <span className="text-[#1B2242] dark:text-white">About</span> <span className="text-primary">Cryptic Solutions</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-6">
             We build innovative digital products and human‑centered solutions that simplify complex workflows,
