@@ -50,21 +50,32 @@ export function MainDrawer({
 
         {/* Navigation Links */}
         <nav className="space-y-1">
-          {links.map((link) => (
-            <a 
-              key={link.href}
-              href={link.href}
-              className="flex items-center text-lg md:text-base font-semibold text-[#1B2242] dark:text-white 
-                       hover:text-primary hover:bg-secondary/50 rounded-lg p-4 md:p-3 transition-all cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                if (link.onClick) link.onClick(e);
-                onClose();
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) => {
+            // Check if it's an external link (starts with /)
+            const isExternalLink = link.href.startsWith('/');
+            
+            return (
+              <a 
+                key={link.href}
+                href={link.href}
+                className="flex items-center text-lg md:text-base font-semibold text-[#1B2242] dark:text-white 
+                         hover:text-primary hover:bg-secondary/50 rounded-lg p-4 md:p-3 transition-all cursor-pointer"
+                onClick={(e) => {
+                  if (isExternalLink) {
+                    // For external links, just close drawer and let browser navigate
+                    onClose();
+                  } else {
+                    // For anchor links, prevent default and handle scroll
+                    e.preventDefault();
+                    if (link.onClick) link.onClick(e);
+                    onClose();
+                  }
+                }}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
       </div>
 

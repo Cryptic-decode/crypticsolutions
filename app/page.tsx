@@ -32,11 +32,16 @@ import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     // Scroll to top on mount
@@ -56,6 +61,48 @@ export default function Home() {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
+  }, []);
+
+  // Track active section using Intersection Observer
+  useEffect(() => {
+    const sections = ['about', 'services', 'products', 'contact'];
+    const observers: IntersectionObserver[] = [];
+
+    // Clear active section when at top (Hero section)
+    const handleScroll = () => {
+      if (window.scrollY < 100) {
+        setActiveSection("");
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(sectionId);
+            }
+          });
+        },
+        {
+          rootMargin: '-20% 0px -60% 0px', // Trigger when section is in upper portion of viewport
+          threshold: 0.1,
+        }
+      );
+
+      observer.observe(element);
+      observers.push(observer);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observers.forEach((observer) => observer.disconnect());
+    };
   }, []);
 
   const toggleDarkMode = () => {
@@ -126,26 +173,57 @@ export default function Home() {
             </div>
             <div className="hidden md:flex items-center gap-6">
               <a 
+                href="#about" 
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "about"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
+                onClick={(e) => handleNavClick(e, "about")}
+              >
+                About
+              </a>
+              <a 
                 href="#services" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "services"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "services")}
               >
                 Services
               </a>
               <a 
                 href="#products" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "products"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "products")}
               >
                 Products
               </a>
               <a 
                 href="#contact" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "contact"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "contact")}
               >
                 Contact
               </a>
+              {!authLoading && !user && (
+                <Link 
+                  href="/signin"
+                  className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"
@@ -154,9 +232,15 @@ export default function Home() {
                 {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
               <motion.div whileTap={buttonTap}>
-                <Button asChild size="sm">
-                  <a href="#products" onClick={(e) => handleNavClick(e, "products")}>Get Started</a>
-                </Button>
+                {user ? (
+                  <Button asChild size="sm">
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                ) : (
+                  <Button asChild size="sm">
+                    <a href="#products" onClick={(e) => handleNavClick(e, "products")}>Get Started</a>
+                  </Button>
+                )}
               </motion.div>
             </div>
             <button 
@@ -179,6 +263,11 @@ export default function Home() {
               onClose={() => setMobileMenuOpen(false)}
               links={[
                 {
+                  href: "#about",
+                  label: "About",
+                  onClick: (e) => handleNavClick(e, "about")
+                },
+                {
                   href: "#services",
                   label: "Services",
                   onClick: (e) => handleNavClick(e, "services")
@@ -192,15 +281,26 @@ export default function Home() {
                   href: "#contact",
                   label: "Contact",
                   onClick: (e) => handleNavClick(e, "contact")
-                }
+                },
+                ...(!authLoading && !user ? [{
+                  href: "/signin",
+                  label: "Sign In",
+                  onClick: undefined
+                }] : [])
               ]}
               ctaButton={{
-                label: "Get Started",
-                onClick: (e) => {
-                  if (e) {
-                    handleNavClick(e, "products");
+                label: user ? "Dashboard" : "Get Started",
+                onClick: () => {
+                  if (user) {
+                    router.push("/dashboard");
+                  } else {
+                    // Scroll to products section
+                    const el = document.getElementById("products");
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
                   }
-                }
+                },
               }}
             />
           </Drawer>
@@ -319,6 +419,68 @@ export default function Home() {
               </Button>
             </motion.div>
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+        {/* Subtle right accent */}
+        <motion.div
+          className="absolute top-8 right-6 w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/15 hidden md:block pointer-events-none"
+          style={{
+            boxShadow:
+              "0 0 30px rgba(147, 224, 48, 0.12), 0 0 60px rgba(147, 224, 48, 0.08)",
+          }}
+          aria-hidden="true"
+          animate={{
+            y: [0, 10, 0],
+            opacity: [0.35, 0.5, 0.35],
+            scale: [1, 1.08, 1],
+          }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+            <span className="text-[#1B2242] dark:text-white">About</span> <span className="text-primary">Cryptic Solutions</span>
+          </h2>
+          <p className="text-lg text-muted-foreground mb-6">
+            We build innovative digital products and human‑centered solutions that simplify complex workflows,
+            improve productivity, and drive measurable growth. Our approach blends product thinking, clean
+            engineering, and practical UX to deliver secure, scalable, easy‑to‑use software.
+          </p>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-3">
+              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">What we do</h3>
+              <ul className="space-y-2 text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Educational tools that make learning accessible and effective</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Custom digital products tailored to business workflows</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
+                  <span>Web platforms and applications for interaction and automation</span>
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">Why choose us</h3>
+              <p className="text-muted-foreground">
+                We don’t just build features — we connect the right pieces. By focusing on outcomes and user
+                experience, we translate complex challenges into elegant, practical solutions that save time,
+                reduce cost, and unlock new value.
+              </p>
+            </div>
+          </div>
         </motion.div>
       </section>
 

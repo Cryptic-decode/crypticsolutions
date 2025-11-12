@@ -7,7 +7,8 @@ import {
   Moon, 
   Settings,
   Sun,
-  BarChart3
+  BarChart3,
+  X
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,6 +20,7 @@ interface DashboardDrawerProps {
   onSignOut: () => void;
   onClose?: () => void;
   currentPath: string;
+  onSignOutClick: () => void;
 }
 
 export function DashboardDrawer({
@@ -26,7 +28,8 @@ export function DashboardDrawer({
   toggleDarkMode,
   onSignOut,
   onClose,
-  currentPath
+  currentPath,
+  onSignOutClick
 }: DashboardDrawerProps) {
   const links = [
     {
@@ -56,7 +59,7 @@ export function DashboardDrawer({
   return (
     <div className="flex flex-col h-full w-full bg-background/95 backdrop-blur-sm">
       {/* Header with Logo - match app header height */}
-      <div className="h-16 border-b border-border/50 px-6">
+      <div className="h-16 border-b border-border/50 px-6 relative">
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,6 +85,16 @@ export function DashboardDrawer({
             />
           </div>
         </motion.div>
+        {/* Close button - only show on mobile when drawer is used */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-secondary/50 transition-colors lg:hidden"
+            aria-label="Close menu"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
@@ -166,8 +179,8 @@ export function DashboardDrawer({
         >
           <Button 
             variant="outline" 
-            className="w-full border-border/50 hover:border-destructive/50 hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-colors"
-            onClick={onSignOut}
+            className="w-full border-border/50 hover:border-destructive/50 hover:bg-destructive/5 dark:hover:bg-destructive/10 transition-colors cursor-pointer"
+            onClick={onSignOutClick}
           >
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out

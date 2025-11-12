@@ -103,8 +103,8 @@ export async function GET(
       );
     }
 
-    // Read PDF file from public folder
-    const pdfPath = join(process.cwd(), "public", "cryptic-assets", pdfFileName);
+    // Read PDF file from private assets (not publicly accessible)
+    const pdfPath = join(process.cwd(), "assets", "pdfs", pdfFileName);
 
     try {
       const pdfBuffer = readFileSync(pdfPath);
