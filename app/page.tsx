@@ -41,6 +41,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     // Scroll to top on mount
@@ -60,6 +61,56 @@ export default function Home() {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }
+  }, []);
+
+  // Track active section using Intersection Observer
+  useEffect(() => {
+    const sections = ['about', 'services', 'products', 'contact'];
+    const observers: IntersectionObserver[] = [];
+
+    // Check if we're at the top of the page (Hero section)
+    const checkScrollPosition = () => {
+      const scrollY = window.scrollY;
+      // If scrolled less than 100px, we're in Hero section - clear active
+      if (scrollY < 100) {
+        setActiveSection("");
+        return;
+      }
+    };
+
+    // Initial check
+    checkScrollPosition();
+
+    // Listen to scroll events to clear active when at top
+    window.addEventListener('scroll', checkScrollPosition);
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            // Only set active if section is intersecting AND we're not at the top
+            if (entry.isIntersecting && window.scrollY >= 100) {
+              setActiveSection(sectionId);
+            }
+          });
+        },
+        {
+          rootMargin: '-20% 0px -60% 0px', // Trigger when section is in upper portion of viewport
+          threshold: 0.1,
+        }
+      );
+
+      observer.observe(element);
+      observers.push(observer);
+    });
+
+    return () => {
+      window.removeEventListener('scroll', checkScrollPosition);
+      observers.forEach((observer) => observer.disconnect());
+    };
   }, []);
 
   const toggleDarkMode = () => {
@@ -131,28 +182,44 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-6">
               <a 
                 href="#about" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "about"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "about")}
               >
                 About
               </a>
               <a 
                 href="#services" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "services"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "services")}
               >
                 Services
               </a>
               <a 
                 href="#products" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "products"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "products")}
               >
                 Products
               </a>
               <a 
                 href="#contact" 
-                className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
+                className={`text-sm font-bold transition-colors ${
+                  activeSection === "contact"
+                    ? "text-primary"
+                    : "text-[#1B2242] dark:text-white hover:text-primary"
+                }`}
                 onClick={(e) => handleNavClick(e, "contact")}
               >
                 Contact
