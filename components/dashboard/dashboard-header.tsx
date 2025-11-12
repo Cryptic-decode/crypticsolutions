@@ -12,15 +12,25 @@ interface DashboardHeaderProps {
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "My Library",
+  "/progress": "Study Progress",
   "/dashboard/progress": "Study Progress",
-  "/dashboard/settings": "Settings",
+  "/settings": "Settings",
   "/dashboard/support": "Support",
   "/dashboard/updates": "Updates",
 };
 
 export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = {}) {
   const pathname = usePathname();
-  const pageTitle = pageTitles[pathname] || "Dashboard";
+  
+  // Handle dynamic course pages
+  let pageTitle = pageTitles[pathname] || "Dashboard";
+  if (pathname?.startsWith("/course/")) {
+    const productId = pathname.split("/course/")[1];
+    const productNames: Record<string, string> = {
+      'ielts-manual': 'IELTS Manual',
+    };
+    pageTitle = productNames[productId] || "Course";
+  }
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -60,7 +70,7 @@ export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = 
   const isDark = document.documentElement.classList.contains("dark");
 
   return (
-    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6 sticky top-0 z-40">
+    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6">
       <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-semibold">{pageTitle}</h1>
         <div className="flex items-center space-x-4">

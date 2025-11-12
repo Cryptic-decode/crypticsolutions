@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/', '/ielts-manual'],
-        disallow: ['/dashboard/', '/api/', '/login', '/account-created', '/payment/'],
+        disallow: ['/dashboard/', '/api/', '/signin', '/account-created', '/payment/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

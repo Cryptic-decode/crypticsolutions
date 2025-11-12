@@ -32,7 +32,7 @@ export function Sidebar({ className, onSignOut, ...props }: SidebarProps) {
       icon: BarChart,
     },
     {
-      href: "/dashboard/settings",
+      href: "/settings",
       label: "Settings",
       icon: Settings,
     },

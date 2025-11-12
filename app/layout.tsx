@@ -120,10 +120,11 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <OrganizationSchema url={process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutions.com'} />
         <AuthProvider>
-          {children}
+        {children}
         </AuthProvider>
       </body>
     </html>

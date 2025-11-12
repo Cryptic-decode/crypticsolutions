@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (error) {
-      console.error('Database error:', error);
       return NextResponse.json(
         { error: 'Failed to store purchase' },
         { status: 500 }
@@ -47,7 +46,6 @@ export async function POST(request: NextRequest) {
       message: 'Purchase recorded successfully' 
     });
   } catch (error) {
-    console.error('Callback error:', error);
     return NextResponse.json(
       { error: 'Failed to process callback' },
       { status: 500 }

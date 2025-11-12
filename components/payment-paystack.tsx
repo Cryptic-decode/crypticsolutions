@@ -63,7 +63,6 @@ export function PaystackPayment({
       }
       
     } catch (error: any) {
-      console.error('Payment error:', error);
       if (onError) {
         onError(error);
       }

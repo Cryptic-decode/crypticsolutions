@@ -121,3 +121,146 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* PDF Viewer Security - Print Prevention & Download Button */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  
+  body::before {
+    content: "Printing is disabled for security purposes.";
+    display: block;
+    visibility: visible;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.5rem;
+  }
+}
+
+/* Hide download button in PDF viewer */
+.rpv-core__display--block button[aria-label*="Download"],
+.rpv-core__display--block button[title*="Download"],
+.rpv-default-layout__toolbar button[aria-label*="Download"] {
+  display: none !important;
+}
+
+/* Hide Open file tool */
+.rpv-default-layout__toolbar button[aria-label*="Open"],
+.rpv-default-layout__toolbar button[title*="Open file"],
+.rpv-default-layout__toolbar button[title*="Open File"] {
+  display: none !important;
+}
+
+/* Hide Print button */
+.rpv-core__display--block button[aria-label*="Print"],
+.rpv-core__display--block button[title*="Print"],
+.rpv-default-layout__toolbar button[aria-label*="Print"],
+.rpv-default-layout__toolbar button[title*="Print"] {
+  display: none !important;
+}
+
+/* PDF Viewer Toolbar - Light Mode */
+.rpv-default-layout__toolbar {
+  background: oklch(1 0 0 / 0.95) !important; /* White with slight transparency */
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+/* PDF Viewer Toolbar - Dark Mode */
+.dark .rpv-default-layout__toolbar {
+  background: oklch(0.205 0 0 / 0.95) !important; /* Dark card background */
+  backdrop-filter: blur(8px);
+  border-bottom-color: color-mix(in oklab, var(--border), transparent 30%);
+}
+
+/* Toolbar buttons */
+.rpv-core__button {
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s ease;
+}
+
+.rpv-core__button:hover {
+  background: color-mix(in oklab, var(--muted), transparent 20%) !important;
+}
+
+.dark .rpv-core__button:hover {
+  background: color-mix(in oklab, var(--muted), transparent 40%) !important;
+}
+
+/* Toolbar text and icons - Light Mode */
+.rpv-default-layout__toolbar,
+.rpv-default-layout__toolbar * {
+  color: var(--foreground) !important;
+}
+
+/* Toolbar text and icons - Dark Mode */
+.dark .rpv-default-layout__toolbar,
+.dark .rpv-default-layout__toolbar * {
+  color: var(--foreground) !important;
+}
+
+/* Toolbar input fields */
+.rpv-default-layout__toolbar input {
+  background: var(--input) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--foreground) !important;
+  border-radius: var(--radius-md);
+}
+
+.rpv-default-layout__toolbar input:focus {
+  border-color: var(--ring) !important;
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px;
+}
+
+/* Toolbar popovers and dropdowns */
+.rpv-core__popover-body {
+  background: var(--popover) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .rpv-core__popover-body {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.rpv-core__popover-body button {
+  color: var(--foreground) !important;
+}
+
+.rpv-core__popover-body button:hover {
+  background: var(--muted) !important;
+}
+
+/* Sidebar styling */
+.rpv-default-layout__sidebar {
+  border-right: 1px solid var(--border);
+  background: oklch(0.96 0 0) !important; /* Light grey background */
+}
+
+.dark .rpv-default-layout__sidebar {
+  border-right-color: color-mix(in oklab, var(--border), transparent 30%);
+  background: oklch(0.205 0 0) !important; /* Dark background */
+}
+
+/* Disable text selection inside viewer */
+.no-select, .no-select * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+/* PDF Viewer - Let PDF pages display in their natural color */
+/* Don't override PDF page colors - let them display as originally designed */
+
+/* Only style the viewer container background, not the PDF pages */
+.rpv-core__viewer {
+  background-color: var(--secondary) !important;
+}
+
+.dark .rpv-default-layout__body {
+  background-color: var(--secondary) !important;
+}

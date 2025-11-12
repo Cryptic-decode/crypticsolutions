@@ -10,6 +10,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, metadata?: any) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => {},
   signIn: async () => {},
   signOut: async () => {},
+  updatePassword: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -47,20 +49,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${window.location.origin}/login`,
+        emailRedirectTo: `${window.location.origin}/signin`,
       },
     });
 
     if (error) {
-      console.error('Signup error:', error);
       throw error;
     }
 
-    // Log the response to see what we're getting
-    console.log('Signup response:', data);
-
     if (!data?.user?.confirmation_sent_at) {
-      console.error('No confirmation email was sent');
       throw new Error('Failed to send confirmation email. Please contact support.');
     }
 
@@ -74,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      console.error('Supabase sign in error:', error);
       throw error;
     }
     
@@ -91,6 +87,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
+  const updatePassword = async (newPassword: string) => {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+      data: {
+        password_changed: true,
+      },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    // Update local user state to reflect metadata change
+    if (data?.user) {
+      setUser(data.user);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -99,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
+        updatePassword,
       }}
     >
       {children}
