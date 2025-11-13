@@ -195,18 +195,18 @@ export function PDFViewer({
   // Watermark styles - extracted for maintainability
   const watermarkContainerStyle: React.CSSProperties = {
     position: "absolute",
-    top: "1rem",
-    right: "1rem",
+    top: "0.8rem",
+    right: "1.8rem",
     pointerEvents: "none",
     zIndex: 10,
   };
 
   const getWatermarkTextStyle = (scale: number): React.CSSProperties => ({
     fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif",
-    fontSize: `${0.7 * scale}rem`,
+    fontSize: `${0.5 * scale}rem`,
     fontWeight: 700,
     letterSpacing: "0.02em",
-    color: "rgba(0, 0, 0, 0.2)",
+    color: "rgba(0, 0, 0, 0.15)",
     userSelect: "none",
     WebkitUserSelect: "none",
     textAlign: "right",
