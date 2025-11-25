@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/auth";
 import { usePurchases } from "@/lib/hooks/use-purchases";
+import { showSuccess, showError } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
@@ -81,6 +82,7 @@ export default function DashboardPage() {
         if (data.success && data.linked_count > 0) {
           // Refetch purchases after linking
           await refetch();
+          showSuccess(`Successfully linked ${data.linked_count} purchase${data.linked_count > 1 ? 's' : ''}!`);
         }
         
         hasLinkedPurchases.current = true;
@@ -126,28 +128,6 @@ export default function DashboardPage() {
             {user.user_metadata?.full_name || user.email}
           </p> */}
         </div>
-
-        {/* Linking Purchases Indicator - Moved to top */}
-        <AnimatePresence>
-          {linkingPurchases && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="mb-6"
-            >
-              <Card className="p-4 border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10">
-                <div className="flex items-center space-x-3">
-                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                  <p className="text-sm font-medium text-[#1B2242] dark:text-white">
-                    Linking your purchases...
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Security Alert - Password Change */}
         <AnimatePresence>

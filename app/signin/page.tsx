@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth";
-import { getErrorMessage } from "@/lib/utils";
+import { showError, showSuccess } from "@/lib/utils";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
@@ -17,7 +17,6 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const { signIn: signInUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -28,7 +27,6 @@ function SignInForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       await signInUser(formData.email, formData.password.trim());
@@ -36,9 +34,10 @@ function SignInForm() {
       // Wait a bit for session to be established
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      showSuccess("Signed in successfully!");
       router.push('/dashboard');
     } catch (error: any) {
-      setError(getErrorMessage(error, 'auth'));
+      showError(error, 'auth');
     } finally {
       setLoading(false);
     }
@@ -71,12 +70,6 @@ function SignInForm() {
                 Sign in to access your IELTS Manual
               </p>
             </div>
-
-            {error && (
-              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg mb-6">
-                {error}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

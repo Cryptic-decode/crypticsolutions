@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import toast from "react-hot-toast"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -92,4 +93,23 @@ export function getErrorMessage(error: any, context?: 'auth' | 'pdf' | 'password
 
   // General fallback
   return errorStr || 'An unexpected error occurred. Please try again.';
+}
+
+/**
+ * Show a success toast notification
+ * @param message - Success message to display
+ */
+export function showSuccess(message: string) {
+  toast.success(message);
+}
+
+/**
+ * Show an error toast notification
+ * Automatically converts technical errors to user-friendly messages
+ * @param error - Error object or string
+ * @param context - Optional context for context-specific error handling
+ */
+export function showError(error: any, context?: 'auth' | 'pdf' | 'password' | 'payment' | 'general') {
+  const message = getErrorMessage(error, context);
+  toast.error(message);
 }

@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth";
-import { generatePassword, getErrorMessage } from "@/lib/utils";
+import { generatePassword, showError, showSuccess } from "@/lib/utils";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -57,12 +57,10 @@ function PaymentSuccessContent() {
   };
 
   const { signUp, user } = useAuth();
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage("");
 
     try {
       // Generate a secure random password
@@ -100,14 +98,14 @@ function PaymentSuccessContent() {
         sessionStorage.setItem('temp_password', password);
         sessionStorage.setItem('user_email', formData.email);
         
+        showSuccess("Account created successfully!");
         // Redirect to account setup page
         router.push('/account-created');
       } else {
         throw new Error(data.error || 'Failed to process payment');
       }
     } catch (error: any) {
-      const errorMessage = getErrorMessage(error, 'payment') || 'An unexpected error occurred. Please try again or contact support.';
-      setErrorMessage(`${errorMessage} If the issue persists, contact support at crypticsolutions.contact@gmail.com`);
+      showError(error, 'payment');
     } finally {
       setLoading(false);
     }
@@ -139,12 +137,6 @@ function PaymentSuccessContent() {
                 <p className="text-muted-foreground mb-8">
                   Thank you for your purchase. Please complete your account setup below to access your IELTS Manual.
                 </p>
-
-                {errorMessage && (
-                  <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg mb-4">
-                    {errorMessage}
-                  </div>
-                )}
 
                 <form onSubmit={handleSubmit} className="space-y-4 text-left">
                   <div>
