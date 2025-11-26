@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth";
 import { OrganizationSchema } from "@/components/seo/structured-data";
+import { ToastProvider } from "@/components/ui/toast-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -124,7 +125,8 @@ export default function RootLayout({
       >
         <OrganizationSchema url={process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutions.com'} />
         <AuthProvider>
-        {children}
+          <ToastProvider />
+          {children}
         </AuthProvider>
       </body>
     </html>
