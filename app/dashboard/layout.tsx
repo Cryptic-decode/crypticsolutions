@@ -92,7 +92,11 @@ export default function DashboardLayout({
           onSignOut={signOut}
           onClose={() => setDrawerOpen(false)}
           currentPath={pathname}
-          onSignOutClick={() => setShowSignOutModal(true)}
+          onSignOutClick={() => {
+            // Close the drawer first so the confirmation modal is fully visible
+            setDrawerOpen(false);
+            setShowSignOutModal(true);
+          }}
         />
       </Drawer>
 
