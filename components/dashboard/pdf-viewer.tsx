@@ -206,7 +206,7 @@ export function PDFViewer({
     fontSize: `${0.5 * scale}rem`,
     fontWeight: 700,
     letterSpacing: "0.02em",
-    color: "rgba(0, 0, 0, 0.15)",
+    color: "rgba(0, 0, 0, 0.28)",
     userSelect: "none",
     WebkitUserSelect: "none",
     textAlign: "right",
