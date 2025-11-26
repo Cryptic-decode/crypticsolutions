@@ -160,6 +160,34 @@
   display: none !important;
 }
 
+/* Mobile: Hide download/print/open buttons using broader selectors */
+/* The library may use different structures on mobile (menus, popovers, etc.) */
+@media (max-width: 768px) {
+  /* Hide in overflow/more menus */
+  .rpv-core__menu-item[data-testid*="download"],
+  .rpv-core__menu-item[data-testid*="print"],
+  .rpv-core__menu-item[data-testid*="open"],
+  [data-testid="get-file__download-button"],
+  [data-testid="print__button"],
+  [data-testid="open__button"],
+  /* Hide by aria-label in any context */
+  [aria-label*="Download"],
+  [aria-label*="download"],
+  [aria-label*="Print"],
+  [aria-label*="print"],
+  [aria-label*="Open file"],
+  [aria-label*="open file"],
+  /* Hide by title in any context */
+  [title*="Download"],
+  [title*="download"],
+  [title*="Print"],
+  [title*="print"],
+  [title*="Open file"],
+  [title*="Open File"] {
+    display: none !important;
+  }
+}
+
 /* PDF Viewer Toolbar - Light Mode */
 .rpv-default-layout__toolbar {
   background: oklch(1 0 0 / 0.95) !important; /* White with slight transparency */
