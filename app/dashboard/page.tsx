@@ -2,11 +2,12 @@
 
 import { useAuth } from "@/lib/auth";
 import { usePurchases } from "@/lib/hooks/use-purchases";
+import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
 import { showSuccess, showError } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3 } from "lucide-react";
+import { Loader2, BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
@@ -35,16 +36,28 @@ const cardVariants = {
 };
 
 // Product name mapping
-const productNames: Record<string, { name: string; description: string }> = {
+const productNames: Record<string, { name: string; description: string; totalPages: number }> = {
   'ielts-manual': {
     name: 'IELTS Preparation Manual',
     description: 'Complete study guide for IELTS exam',
+    totalPages: 100, // Approximate total pages for progress calculation
   },
 };
+
+// Helper to format reading time
+function formatReadingTime(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  if (mins < 60) return `${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  const remainingMins = mins % 60;
+  return remainingMins > 0 ? `${hrs}h ${remainingMins}m` : `${hrs}h`;
+}
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const { purchases, loading: purchasesLoading, error: purchasesError, refetch } = usePurchases();
+  const { getProgressForProduct } = useReadingProgress();
   const router = useRouter();
   const [linkingPurchases, setLinkingPurchases] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -210,7 +223,12 @@ export default function DashboardPage() {
                 const product = productNames[purchase.product_id] || {
                   name: purchase.product_id,
                   description: 'Product',
+                  totalPages: 100,
                 };
+                const readingProgress = getProgressForProduct(purchase.product_id);
+                const progressPercent = readingProgress
+                  ? Math.min(100, Math.round(((readingProgress.last_page + 1) / product.totalPages) * 100))
+                  : 0;
 
                 return (
                   <motion.div key={purchase.id} variants={itemVariants}>
@@ -238,6 +256,38 @@ export default function DashboardPage() {
                           </p>
                         </div>
                       </div>
+
+                      {/* Reading Progress Indicator */}
+                      {readingProgress && (
+                        <div className="mb-4 p-3 rounded-lg bg-secondary/20 border border-secondary/40">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-[#1B2242] dark:text-white">
+                              Reading Progress
+                            </span>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <BookOpen className="h-3 w-3" />
+                                Page {readingProgress.last_page + 1}
+                              </span>
+                              {readingProgress.total_read_seconds > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {formatReadingTime(readingProgress.total_read_seconds)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary transition-all duration-300"
+                              style={{ width: `${progressPercent}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 text-right">
+                            {progressPercent}% complete
+                          </p>
+                        </div>
+                      )}
 
                       <div className="grid gap-4 md:grid-cols-2 mt-6">
                         <motion.div variants={itemVariants}>
