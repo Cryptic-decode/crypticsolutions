@@ -126,7 +126,7 @@ function SignInForm() {
             <p className="text-center text-sm text-muted-foreground mt-6">
               Need help?{" "}
               <a
-                href="mailto:crypticsolutions.contact@gmail.com"
+                href="mailto:info@crypticsolutionsltd.com"
                 className="text-primary hover:underline"
               >
                 Contact Support

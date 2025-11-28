@@ -20,7 +20,7 @@ export function OrganizationSchema({ url }: OrganizationSchemaProps) {
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'crypticsolutions.contact@gmail.com',
+      email: 'info@crypticsolutionsltd.com',
       contactType: 'Customer Service',
     },
   };

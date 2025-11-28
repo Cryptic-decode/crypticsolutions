@@ -201,11 +201,11 @@ Vercel will automatically detect Next.js and configure the build settings.
 
 ## 🤝 Contributing
 
-This is a private project. For questions or support, contact us at crypticsolutions.contact@gmail.com
+This is a private project. For questions or support, contact us at info@crypticsolutionsltd.com
 
 ## 📞 Support
 
-For support, email crypticsolutions.contact@gmail.com
+For support, email info@crypticsolutionsltd.com
 
 ---
 
