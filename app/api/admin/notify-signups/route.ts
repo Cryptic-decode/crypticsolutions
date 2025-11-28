@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
-    const adminEmail = process.env.ADMIN_EMAIL || 'crypticsolutions.contact@gmail.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'info@crypticsolutionsltd.com';
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return NextResponse.json(

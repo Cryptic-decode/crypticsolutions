@@ -34,6 +34,7 @@ import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 export default function Home() {
   const router = useRouter();
@@ -802,7 +803,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div whileTap={buttonTap}>
                 <Button asChild variant="outline" size="lg">
-                  <a href="mailto:crypticsolutions.contact@gmail.com">
+                  <a href={`mailto:${SUPPORT_EMAIL}`}>
                     <Mail className="mr-2 h-4 w-4" />
                     Email Us
                   </a>
@@ -918,8 +919,8 @@ export default function Home() {
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4" />
-                    <a href="mailto:crypticsolutions.contact@gmail.com" className="hover:text-primary transition-colors">
-                      crypticsolutions.contact@gmail.com
+                    <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-primary transition-colors">
+                      {SUPPORT_EMAIL}
                     </a>
                   </li>
                 </ul>

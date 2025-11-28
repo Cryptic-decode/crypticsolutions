@@ -116,7 +116,7 @@ export function NavigationMenu({
       {/* Footer Links */}
       <div className="mt-auto pt-6 border-t space-y-2">
         <a 
-          href="mailto:crypticsolutions.contact@gmail.com"
+          href="mailto:info@crypticsolutionsltd.com"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors p-3 rounded-lg hover:bg-secondary/50"
         >
           <Mail className="h-4 w-4" />

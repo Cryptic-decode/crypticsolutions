@@ -62,10 +62,8 @@ Confirm your Cryptic Solutions IELTS account
     >
       <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">
         Need help? Contact us at
-        <a
-          href="mailto:crypticsolutions.contact@gmail.com"
-          style="color: #93E030;"
-          >crypticsolutions.contact@gmail.com</a
+        <a href="mailto:info@crypticsolutionsltd.com" style="color: #93E030;"
+          >info@crypticsolutionsltd.com</a
         >
       </p>
       <p style="color: #a0aec0; font-size: 12px; margin: 0;">
@@ -131,10 +129,8 @@ Your Cryptic Solutions sign-in link
     >
       <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">
         Need help? Contact us at
-        <a
-          href="mailto:crypticsolutions.contact@gmail.com"
-          style="color: #93E030;"
-          >crypticsolutions.contact@gmail.com</a
+        <a href="mailto:info@crypticsolutionsltd.com" style="color: #93E030;"
+          >info@crypticsolutionsltd.com</a
         >
       </p>
       <p style="color: #a0aec0; font-size: 12px; margin: 0;">
@@ -201,10 +197,8 @@ Reset your Cryptic Solutions password
     >
       <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">
         Need help? Contact us at
-        <a
-          href="mailto:crypticsolutions.contact@gmail.com"
-          style="color: #93E030;"
-          >crypticsolutions.contact@gmail.com</a
+        <a href="mailto:info@crypticsolutionsltd.com" style="color: #93E030;"
+          >info@crypticsolutionsltd.com</a
         >
       </p>
       <p style="color: #a0aec0; font-size: 12px; margin: 0;">
@@ -270,10 +264,8 @@ Confirm your new email address - Cryptic Solutions
     >
       <p style="color: #718096; font-size: 14px; margin-bottom: 8px;">
         Need help? Contact us at
-        <a
-          href="mailto:crypticsolutions.contact@gmail.com"
-          style="color: #93E030;"
-          >crypticsolutions.contact@gmail.com</a
+        <a href="mailto:info@crypticsolutionsltd.com" style="color: #93E030;"
+          >info@crypticsolutionsltd.com</a
         >
       </p>
       <p style="color: #a0aec0; font-size: 12px; margin: 0;">
@@ -311,4 +303,4 @@ For better deliverability (avoid spam folder), consider setting up custom SMTP:
 1. Go to **Project Settings** → **Auth** → **SMTP Settings**
 2. Enable custom SMTP
 3. Configure with your email provider (e.g., SendGrid, Mailgun, Amazon SES)
-4. Use a sender email like `noreply@crypticsolutions.com` (requires domain verification)
+4. Use a sender email like `info@crypticsolutionsltd.com` (requires domain verification)

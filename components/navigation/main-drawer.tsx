@@ -120,7 +120,7 @@ export function MainDrawer({
         {/* Contact Link */}
         <div className="mt-6 pt-6 border-t">
           <a 
-            href="mailto:crypticsolutions.contact@gmail.com"
+            href="mailto:info@crypticsolutionsltd.com"
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors p-3"
           >
             <Mail className="h-4 w-4" />

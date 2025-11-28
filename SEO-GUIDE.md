@@ -287,7 +287,7 @@ This document outlines the SEO strategies and implementations for Cryptic Soluti
 
 ## Contact & Support
 
-For SEO-related questions or updates, contact: crypticsolutions.contact@gmail.com
+For SEO-related questions or updates, contact: info@crypticsolutionsltd.com
 
 ---
 

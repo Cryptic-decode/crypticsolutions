@@ -715,8 +715,8 @@ export default function IELTSManualPage() {
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4" />
-                    <a href="mailto:crypticsolutions.contact@gmail.com" className="hover:text-primary transition-colors">
-                      crypticsolutions.contact@gmail.com
+                    <a href="mailto:info@crypticsolutionsltd.com" className="hover:text-primary transition-colors">
+                      info@crypticsolutionsltd.com
                     </a>
                   </li>
                 </ul>
