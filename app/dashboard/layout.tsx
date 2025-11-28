@@ -9,6 +9,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SignOutModal } from "@/components/dashboard/sign-out-modal";
 import { Menu, Loader2 } from "lucide-react";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function DashboardLayout({
   children,
@@ -92,7 +93,11 @@ export default function DashboardLayout({
           onSignOut={signOut}
           onClose={() => setDrawerOpen(false)}
           currentPath={pathname}
-          onSignOutClick={() => setShowSignOutModal(true)}
+          onSignOutClick={() => {
+            // Close the drawer first so the confirmation modal is fully visible
+            setDrawerOpen(false);
+            setShowSignOutModal(true);
+          }}
         />
       </Drawer>
 
@@ -127,7 +132,7 @@ export default function DashboardLayout({
           </div>
         </div>
         
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
     </div>
   );

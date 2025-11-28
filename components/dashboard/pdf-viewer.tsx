@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import type React from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,8 +40,46 @@ export function PDFViewer({
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
+  const [initialPage, setInitialPage] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [viewerReady, setViewerReady] = useState(false);
+  const userIdRef = useRef<string | null>(null);
+  const readingStartTimeRef = useRef<number>(Date.now());
+  const initialReadSecondsRef = useRef<number>(0);
+  const currentPageRef = useRef<number>(0);
   // Per library docs: call plugin factory at top-level of component (it uses hooks)
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
+  // Persist reading progress for this user/product
+  const saveProgress = useCallback(
+    async (page: number) => {
+      const userId = userIdRef.current;
+      if (!userId) return;
+
+      try {
+        const now = Date.now();
+        const elapsedSeconds = Math.floor((now - readingStartTimeRef.current) / 1000);
+        const totalSeconds = initialReadSecondsRef.current + elapsedSeconds;
+
+        await supabase
+          .from("reading_progress")
+          .upsert(
+            {
+              user_id: userId,
+              product_id: productId,
+              last_page: page,
+              total_read_seconds: totalSeconds,
+            },
+            {
+              onConflict: "user_id,product_id",
+            }
+          );
+      } catch {
+        // Silently ignore progress save errors so reading isn't disrupted
+      }
+    },
+    [productId]
+  );
 
   // Initialize PDF viewer - extracted for reusability
   const initializeViewer = useCallback(async () => {
@@ -55,7 +94,36 @@ export function PDFViewer({
         setLoading(false);
         return;
       }
+      const userId = session.user?.id as string | undefined;
+      if (userId) {
+        userIdRef.current = userId;
 
+        // Try to load existing reading progress for this user/product
+        const { data: progressRows } = await supabase
+          .from("reading_progress")
+          .select("last_page, total_read_seconds")
+          .eq("user_id", userId)
+          .eq("product_id", productId)
+          .limit(1);
+
+        if (progressRows && progressRows.length > 0) {
+          const progress = progressRows[0] as {
+            last_page: number | null;
+            total_read_seconds: number | null;
+          };
+
+          if (typeof progress.last_page === "number" && progress.last_page >= 0) {
+            setInitialPage(progress.last_page);
+            setCurrentPage(progress.last_page);
+            currentPageRef.current = progress.last_page;
+          }
+          if (typeof progress.total_read_seconds === "number" && progress.total_read_seconds >= 0) {
+            initialReadSecondsRef.current = progress.total_read_seconds;
+          }
+        }
+      }
+
+      readingStartTimeRef.current = Date.now();
       setAuthToken(session.access_token);
 
       // Construct PDF URL with auth token
@@ -137,6 +205,17 @@ export function PDFViewer({
       window.removeEventListener("beforeprint", handleBeforePrint);
     };
   }, [mounted]);
+
+  // Save progress when component unmounts (best-effort)
+  useEffect(() => {
+    return () => {
+      if (userIdRef.current != null) {
+        saveProgress(currentPageRef.current);
+      }
+    };
+    // We intentionally omit dependencies to capture last known page on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle PDF load errors
   const handleDocumentLoadError = (error: any) => {
@@ -239,6 +318,17 @@ export function PDFViewer({
     <div className={`w-full ${isDark ? "dark" : ""}`}>
       <Card className="p-0 overflow-hidden ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
         <div className="h-[calc(100vh-300px)] min-h-[600px] no-select bg-secondary/10 dark:bg-secondary/20 relative">
+          {/* Overlay while the viewer is preparing the correct page */}
+          {!viewerReady && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-secondary/10 dark:bg-secondary/20">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
+                <p className="text-sm text-muted-foreground">
+                  Preparing your last reading position...
+                </p>
+              </div>
+            </div>
+          )}
           <Worker workerUrl={workerUrl}>
             <Viewer
               fileUrl={pdfUrl}
@@ -248,9 +338,20 @@ export function PDFViewer({
               plugins={[defaultLayoutPluginInstance]}
               renderPage={renderPage}
               defaultScale={1.0}
+              initialPage={initialPage ?? 0}
               onDocumentLoad={(e) => {
                 setLoading(false);
                 setError(null);
+                setViewerReady(true);
+              }}
+              onPageChange={(event: any) => {
+                const nextPage =
+                  typeof event.currentPage === "number" && event.currentPage >= 0
+                    ? event.currentPage
+                    : 0;
+                setCurrentPage(nextPage);
+                currentPageRef.current = nextPage;
+                saveProgress(nextPage);
               }}
             />
           </Worker>
