@@ -7,26 +7,47 @@ import { supabase } from './supabase';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isRecoverySession: boolean;
   signUp: (email: string, password: string, metadata?: any) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  isRecoverySession: false,
   signUp: async () => {},
   signIn: async () => {},
   signOut: async () => {},
   updatePassword: async () => {},
+  resetPassword: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRecoverySession, setIsRecoverySession] = useState(false);
 
   useEffect(() => {
+    // Check URL for recovery token indicators
+    const checkRecoverySession = () => {
+      const hash = window.location.hash;
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(hash.substring(1));
+      
+      // Check for recovery indicators in URL
+      if (hash.includes('type=recovery') || 
+          urlParams.get('type') === 'recovery' || 
+          hashParams.get('type') === 'recovery') {
+        setIsRecoverySession(true);
+      }
+    };
+
+    checkRecoverySession();
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -36,8 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      
+      // Detect recovery session from event type
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecoverySession(true);
+      } else if (event === 'SIGNED_OUT' || event === 'PASSWORD_UPDATED') {
+        setIsRecoverySession(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -99,9 +127,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
 
+    // Clear recovery session flag after password update
+    setIsRecoverySession(false);
+
     // Update local user state to reflect metadata change
     if (data?.user) {
       setUser(data.user);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+
+    if (error) {
+      throw error;
     }
   };
 
@@ -110,10 +151,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        isRecoverySession,
         signUp,
         signIn,
         signOut,
         updatePassword,
+        resetPassword,
       }}
     >
       {children}
