@@ -45,6 +45,27 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
+    // Check if user landed here from a password reset link
+    // Supabase adds hash fragments like #access_token=...&type=recovery
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      // Redirect to update-password page to handle the recovery session
+      router.replace('/update-password');
+      return;
+    }
+
+    // Also check if user has a session but is on homepage - might be recovery session
+    // Wait for auth to load before checking
+    if (!authLoading && user) {
+      // Check if this is a recovery session by looking at URL params or hash
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      if (urlParams.get('type') === 'recovery' || hashParams.get('type') === 'recovery') {
+        router.replace('/update-password');
+        return;
+      }
+    }
+
     // Scroll to top on mount
     window.scrollTo(0, 0);
 
