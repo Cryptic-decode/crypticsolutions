@@ -60,10 +60,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       
-      // Detect recovery session from event type
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsRecoverySession(true);
-      } else if (event === 'SIGNED_OUT' || event === 'PASSWORD_UPDATED') {
+      // Clear recovery session on sign out
+      // Note: Password updates are handled directly in updatePassword() function
+      if (event === 'SIGNED_OUT') {
         setIsRecoverySession(false);
       }
     });
