@@ -14,9 +14,9 @@ export function OrganizationSchema({ url }: OrganizationSchemaProps) {
     logo: `${url}/cryptic-assets/logoIconGreen.png`,
     sameAs: [
       // Add your social media URLs here
-      'https://twitter.com/crypticsolutions',
-      'https://linkedin.com/company/crypticsolutions',
-      'https://facebook.com/crypticsolutions',
+      'https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV',
+      'https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4',
+      'https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
