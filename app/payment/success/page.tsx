@@ -80,6 +80,7 @@ function PaymentSuccessContent() {
         body: JSON.stringify({
           ...formData,
           reference,
+          password,
           // Don't pass userId - we'll link it after email confirmation
         }),
       });
@@ -97,6 +98,13 @@ function PaymentSuccessContent() {
         // Store password temporarily in sessionStorage for display
         sessionStorage.setItem('temp_password', password);
         sessionStorage.setItem('user_email', formData.email);
+        
+        // Log email status for debugging
+        if (data.emailSent === false) {
+          console.warn('Credentials email may not have been sent:', data.emailError);
+        } else if (data.emailSent === true) {
+          console.log('Credentials email sent successfully');
+        }
         
         showSuccess("Account created successfully!");
         // Redirect to account setup page

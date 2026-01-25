@@ -15,13 +15,13 @@ import {
   Sun,
   Mail,
   Linkedin,
-  Twitter,
-  Facebook,
+  Instagram,
   Shield,
   ArrowUp,
   Menu,
   X
 } from "lucide-react";
+import { TikTokIcon } from "@/components/ui/tiktok-icon";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -722,31 +722,31 @@ export default function IELTSManualPage() {
                 </ul>
                 <div className="flex items-center gap-3 mt-4">
                   <a 
-                    href="https://linkedin.com/company/cryptic-solutions" 
+                    href="https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="TikTok"
+                  >
+                    <TikTokIcon className="h-5 w-5" />
+                  </a>
+                  <a 
+                    href="https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                  <a 
+                    href="https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href="https://twitter.com/crypticsolutions" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="Twitter"
-                  >
-                    <Twitter className="h-5 w-5" />
-                  </a>
-                  <a
-                    href="https://facebook.com/crypticsolutions" 
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="Facebook"
-                  >
-                    <Facebook className="h-5 w-5" />
                   </a>
                 </div>
               </div>

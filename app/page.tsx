@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
-  ArrowRight, 
-  BookOpen, 
-  CheckCircle2, 
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
   FileText,
   FileCode,
   Code,
@@ -22,9 +22,9 @@ import {
   Sun,
   ArrowUp,
   Linkedin,
-  Twitter,
-  Facebook
+  Instagram
 } from "lucide-react";
+import { TikTokIcon } from "@/components/ui/tiktok-icon";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -71,7 +71,7 @@ export default function Home() {
 
     // Check local storage (client-side only)
     if (typeof window !== 'undefined') {
-      const isDark = localStorage.getItem('theme') === 'dark' || 
+      const isDark = localStorage.getItem('theme') === 'dark' ||
         (!localStorage.getItem('theme'));
       setDarkMode(isDark);
 
@@ -155,7 +155,7 @@ export default function Home() {
 
   const staggerContainer = {
     initial: { opacity: 0 },
-    animate: { 
+    animate: {
       opacity: 1,
       transition: {
         staggerChildren: 0.1
@@ -177,69 +177,65 @@ export default function Home() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <Image
-                src="/cryptic-assets/fullLogo.png" 
-                alt="Cryptic Solutions" 
-                width={180} 
+                src="/cryptic-assets/fullLogo.png"
+                alt="Cryptic Solutions"
+                width={180}
                 height={45}
                 className="h-[45px] w-auto dark:hidden"
                 priority
               />
-        <Image
-                src="/cryptic-assets/fullLogo2.png" 
-                alt="Cryptic Solutions" 
-                width={180} 
+              <Image
+                src="/cryptic-assets/fullLogo2.png"
+                alt="Cryptic Solutions"
+                width={180}
                 height={45}
                 className="h-[45px] w-auto hidden dark:block"
-          priority
-        />
+                priority
+              />
             </div>
             <div className="hidden md:flex items-center gap-6">
-              <a 
-                href="#about" 
-                className={`text-sm font-bold transition-colors ${
-                  activeSection === "about"
-                    ? "text-primary"
-                    : "text-[#1B2242] dark:text-white hover:text-primary"
-                }`}
+              <a
+                href="#about"
+                className={`text-sm font-bold transition-colors ${activeSection === "about"
+                  ? "text-primary"
+                  : "text-[#1B2242] dark:text-white hover:text-primary"
+                  }`}
                 onClick={(e) => handleNavClick(e, "about")}
               >
                 About
               </a>
-              <a 
-                href="#services" 
-                className={`text-sm font-bold transition-colors ${
-                  activeSection === "services"
-                    ? "text-primary"
-                    : "text-[#1B2242] dark:text-white hover:text-primary"
-                }`}
+              <a
+                href="#services"
+                className={`text-sm font-bold transition-colors ${activeSection === "services"
+                  ? "text-primary"
+                  : "text-[#1B2242] dark:text-white hover:text-primary"
+                  }`}
                 onClick={(e) => handleNavClick(e, "services")}
               >
                 Services
               </a>
-              <a 
-                href="#products" 
-                className={`text-sm font-bold transition-colors ${
-                  activeSection === "products"
-                    ? "text-primary"
-                    : "text-[#1B2242] dark:text-white hover:text-primary"
-                }`}
+              <a
+                href="#products"
+                className={`text-sm font-bold transition-colors ${activeSection === "products"
+                  ? "text-primary"
+                  : "text-[#1B2242] dark:text-white hover:text-primary"
+                  }`}
                 onClick={(e) => handleNavClick(e, "products")}
               >
                 Products
               </a>
-              <a 
-                href="#contact" 
-                className={`text-sm font-bold transition-colors ${
-                  activeSection === "contact"
-                    ? "text-primary"
-                    : "text-[#1B2242] dark:text-white hover:text-primary"
-                }`}
+              <a
+                href="#contact"
+                className={`text-sm font-bold transition-colors ${activeSection === "contact"
+                  ? "text-primary"
+                  : "text-[#1B2242] dark:text-white hover:text-primary"
+                  }`}
                 onClick={(e) => handleNavClick(e, "contact")}
               >
                 Contact
               </a>
               {!authLoading && !user && (
-                <Link 
+                <Link
                   href="/signin"
                   className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
                 >
@@ -265,7 +261,7 @@ export default function Home() {
                 )}
               </motion.div>
             </div>
-            <button 
+            <button
               className="md:hidden p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
@@ -330,118 +326,81 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 py-20 md:py-32">
-        {/* Decorative Floating Elements */}
-        <motion.div
-          className="absolute top-16 left-8 w-6 h-6 rounded-full bg-primary/50 dark:bg-primary/45 hidden md:block z-[1] pointer-events-none"
-          style={{
-            boxShadow: '0 0 20px rgba(147, 224, 48, 0.15), 0 0 40px rgba(147, 224, 48, 0.1)'
-          }}
-          aria-hidden="true"
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 0.65, 0.5],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-24 right-8 w-7 h-7 rounded-full bg-emerald-400/45 dark:bg-emerald-300/40 hidden lg:block z-[1] pointer-events-none"
-          style={{
-            boxShadow: '0 0 25px rgba(34, 197, 94, 0.15), 0 0 50px rgba(34, 197, 94, 0.1)'
-          }}
-          aria-hidden="true"
-          animate={{
-            y: [0, 15, 0],
-            opacity: [0.45, 0.6, 0.45],
-            scale: [1, 1.25, 1]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 right-12 w-7 h-7 rounded-full bg-primary/40 dark:bg-primary/35 hidden lg:block z-[1] pointer-events-none"
-          style={{
-            boxShadow: '0 0 20px rgba(147, 224, 48, 0.15), 0 0 40px rgba(147, 224, 48, 0.1)'
-          }}
-          aria-hidden="true"
-          animate={{
-            y: [0, -18, 0],
-            opacity: [0.4, 0.55, 0.4],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-        />
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-16 md:pt-24 pb-20 md:pb-32">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <motion.div
+            className="relative z-10 text-center lg:text-left"
+            initial="initial"
+            animate="animate"
+            variants={fadeInUp}
+          >
+            <motion.div
+              className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-8 backdrop-blur-sm shadow-sm dark:shadow-primary/5"
+              variants={fadeInUp}
+            >
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-primary font-medium">Building Digital Excellence</span>
+            </motion.div>
 
-        <motion.div 
-          className="mx-auto max-w-4xl text-center relative z-10"
-          initial="initial"
-          animate="animate"
-          variants={fadeInUp}
-        >
-          <motion.div 
-            className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-8 backdrop-blur-sm shadow-sm dark:shadow-primary/5"
-            variants={fadeInUp}
-          >
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <span className="text-primary font-medium">Building Digital Excellence</span>
-          </motion.div>
-          
-          <motion.h1 
-            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
-            variants={fadeInUp}
-          >
-            <span className="text-[#1B2242] dark:text-white">Digital Products That</span>
-            <span className="block mt-2 text-primary">Connect Brands to Customers</span>
-          </motion.h1>
-          
-          <motion.p 
-            className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
-            variants={fadeInUp}
-          >
-            We create innovative digital products and solutions that empower businesses and individuals 
-            to achieve their goals. From educational tools to web platforms, we're building the future of digital excellence.
-          </motion.p>
-          
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            variants={fadeInUp}
-          >
-            <motion.div 
-              whileTap={buttonTap}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
+            <motion.h1
+              className="text-4xl md:text-6xl lg:text-6xl font-bold tracking-tight mb-6"
+              variants={fadeInUp}
             >
-              <Button asChild size="lg" className="w-full sm:w-auto shadow-lg hover:shadow-primary/20 transition-shadow">
-                <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
-                  Explore Products
-                </a>
-              </Button>
-            </motion.div>
-            <motion.div 
-              whileTap={buttonTap}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
+              <span className="text-[#1B2242] dark:text-white">Digital Products That</span>
+              <span className="block mt-2 text-primary">Connect Brands to Customers</span>
+            </motion.h1>
+
+            <motion.p
+              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl lg:max-w-none"
+              variants={fadeInUp}
             >
-              <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-primary/5 hover:border-primary/30 transition-colors">
-                <a href="#services" onClick={(e) => handleNavClick(e, "services")}>Learn More</a>
-              </Button>
+              We create innovative digital products and solutions that empower businesses and individuals
+              to achieve their goals. From educational tools to web platforms, we're building the future of digital excellence.
+            </motion.p>
+
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center lg:items-start"
+              variants={fadeInUp}
+            >
+              <motion.div
+                whileTap={buttonTap}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button asChild size="lg" className="w-full sm:w-auto shadow-lg hover:shadow-primary/20 transition-shadow">
+                  <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
+                    Explore Products
+                  </a>
+                </Button>
+              </motion.div>
+              <motion.div
+                whileTap={buttonTap}
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-primary/5 hover:border-primary/30 transition-colors">
+                  <a href="#services" onClick={(e) => handleNavClick(e, "services")}>Learn More</a>
+                </Button>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
+
+          <motion.div
+            className="relative hidden lg:flex justify-end"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          >
+            <Image
+              src="/undraw-assets/undraw_designing-components_kb05.svg"
+              alt="Illustration of designing components"
+              width={720}
+              height={520}
+              priority
+              className="w-full max-w-md h-auto"
+            />
+          </motion.div>
+        </div>
       </section>
 
       {/* About Section */}
@@ -511,21 +470,21 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                <span className="text-[#1B2242] dark:text-white">What</span> <span className="text-primary">We Do</span>
+              <span className="text-[#1B2242] dark:text-white">What</span> <span className="text-primary">We Do</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Innovative solutions that transform ideas into impactful digital products
-          </p>
-        </div>
-          
-          <motion.div 
+            </p>
+          </div>
+
+          <motion.div
             className="grid md:grid-cols-3 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true, margin: "-100px" }}
           >
-            <motion.div 
+            <motion.div
               variants={fadeInUp}
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -541,7 +500,7 @@ export default function Home() {
               </Card>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               variants={fadeInUp}
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -557,7 +516,7 @@ export default function Home() {
               </Card>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               variants={fadeInUp}
               whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -597,18 +556,18 @@ export default function Home() {
                     <Award className="h-4 w-4" />
                     <span>Ready Now</span>
                   </div>
-                  
+
                   <h3 className="text-3xl md:text-4xl font-bold mb-4">
                     <span className="text-[#1B2242] dark:text-white">IELTS Preparation</span> <span className="text-primary">Manual</span>
                   </h3>
-                  
+
                   <p className="text-lg text-muted-foreground mb-6">
-                    Comprehensive preparation guide designed to help you achieve your IELTS goals. 
+                    Comprehensive preparation guide designed to help you achieve your IELTS goals.
                     Master all four sections with proven strategies and practice materials.
                   </p>
 
                   <div className="space-y-3 mb-8">
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -618,7 +577,7 @@ export default function Home() {
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Complete coverage of all IELTS sections</span>
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -628,7 +587,7 @@ export default function Home() {
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Proven test-taking strategies</span>
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -638,7 +597,7 @@ export default function Home() {
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>Practice questions and examples</span>
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -660,19 +619,19 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center justify-center">
-                  <motion.div 
+                  <motion.div
                     className="relative w-full max-w-md"
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                   >
-                    <motion.div 
+                    <motion.div
                       className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Image 
+                      <Image
                         src="/undraw-assets/undraw_transfer-files_anat.svg"
                         alt="IELTS Preparation Manual"
                         width={300}
@@ -680,7 +639,7 @@ export default function Home() {
                         className="w-full h-auto"
                       />
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="absolute -top-4 -right-4 bg-primary p-4 rounded-xl shadow-lg"
                       initial={{ rotate: -20 }}
                       animate={{ rotate: [-20, 10, -20] }}
@@ -699,12 +658,12 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div className="order-2 md:order-1">
                   <div className="relative w-full max-w-md">
-                    <motion.div 
+                    <motion.div
                       className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Image 
+                      <Image
                         src="/undraw-assets/undraw_building-blocks_h5jb.svg"
                         alt="Quickland Website Builder"
                         width={260}
@@ -712,7 +671,7 @@ export default function Home() {
                         className="w-full h-auto"
                       />
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="absolute -top-4 -right-4 bg-primary p-3 rounded-full shadow-lg"
                       whileHover={{ scale: 1.1, rotate: 15 }}
                       transition={{ duration: 0.3 }}
@@ -727,19 +686,19 @@ export default function Home() {
                     <Lightbulb className="h-4 w-4 text-primary" />
                     <span className="text-primary font-medium">Coming Soon</span>
                   </div>
-                  
+
                   <h3 className="text-2xl md:text-3xl font-bold mb-4 text-[#1B2242] dark:text-white">
                     Quickland
                   </h3>
-                  
+
                   <p className="text-muted-foreground mb-6">
-                    A revolutionary user input website creator that empowers you to build 
-                    stunning websites without writing a single line of code. Simply provide 
+                    A revolutionary user input website creator that empowers you to build
+                    stunning websites without writing a single line of code. Simply provide
                     your content and watch it come to life.
                   </p>
 
                   <div className="space-y-3 mb-6">
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -749,7 +708,7 @@ export default function Home() {
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>No coding required</span>
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -759,7 +718,7 @@ export default function Home() {
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       <span>AI-powered design suggestions</span>
                     </motion.div>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-3"
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -789,7 +748,7 @@ export default function Home() {
               <span className="text-[#1B2242] dark:text-white">Ready to</span> <span className="text-primary">Get Started?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get your IELTS preparation manual today and take the first step towards your 
+              Get your IELTS preparation manual today and take the first step towards your
               IELTS success. Or reach out to discuss how we can help with your digital product needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -818,7 +777,7 @@ export default function Home() {
               <span className="text-[#1B2242] dark:text-white">Get in</span> <span className="text-primary">Touch</span>
             </h2>
             <p className="text-muted-foreground mb-8">
-              Have questions about our products or need custom digital solutions? 
+              Have questions about our products or need custom digital solutions?
               We'd love to hear from you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -845,9 +804,8 @@ export default function Home() {
       {/* Back to Top Button */}
       <motion.button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${
-          showBackToTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`fixed bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${showBackToTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
         initial={{ scale: 0 }}
         animate={{ scale: showBackToTop ? 1 : 0 }}
         whileHover={{ scale: 1.1 }}
@@ -866,17 +824,17 @@ export default function Home() {
               {/* Brand Column */}
               <div className="md:col-span-1">
                 <div className="flex items-center cursor-pointer mb-4" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                  <Image 
-                    src="/cryptic-assets/fullLogo.png" 
-                    alt="Cryptic Solutions" 
-                    width={160} 
+                  <Image
+                    src="/cryptic-assets/fullLogo.png"
+                    alt="Cryptic Solutions"
+                    width={160}
                     height={40}
                     className="h-[40px] w-auto dark:hidden"
                   />
-            <Image
-                    src="/cryptic-assets/fullLogo2.png" 
-                    alt="Cryptic Solutions" 
-                    width={160} 
+                  <Image
+                    src="/cryptic-assets/fullLogo2.png"
+                    alt="Cryptic Solutions"
+                    width={160}
                     height={40}
                     className="h-[40px] w-auto hidden dark:block"
                   />
@@ -891,8 +849,8 @@ export default function Home() {
                 <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Quick Links</h4>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <a 
-                      href="#services" 
+                    <a
+                      href="#services"
                       className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={(e) => handleNavClick(e, "services")}
                     >
@@ -900,8 +858,8 @@ export default function Home() {
                     </a>
                   </li>
                   <li>
-                    <a 
-                      href="#products" 
+                    <a
+                      href="#products"
                       className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={(e) => handleNavClick(e, "products")}
                     >
@@ -909,8 +867,8 @@ export default function Home() {
                     </a>
                   </li>
                   <li>
-                    <a 
-                      href="#contact" 
+                    <a
+                      href="#contact"
                       className="text-muted-foreground hover:text-primary transition-colors"
                       onClick={(e) => handleNavClick(e, "contact")}
                     >
@@ -946,32 +904,32 @@ export default function Home() {
                   </li>
                 </ul>
                 <div className="flex items-center gap-3 mt-4">
-                  <a 
-                    href="https://linkedin.com/company/cryptic-solutions" 
-                    target="_blank" 
+                  <a
+                    href="https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="TikTok"
+                  >
+                    <TikTokIcon className="h-5 w-5" />
+                  </a>
+                  <a
+                    href="https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href="https://twitter.com/crypticsolutions" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="Twitter"
-                  >
-                    <Twitter className="h-5 w-5" />
-          </a>
-          <a
-                    href="https://facebook.com/crypticsolutions" 
-            target="_blank"
-            rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="Facebook"
-                  >
-                    <Facebook className="h-5 w-5" />
                   </a>
                 </div>
               </div>
