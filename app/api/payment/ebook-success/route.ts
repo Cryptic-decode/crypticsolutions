@@ -43,15 +43,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate amount (required by schema)
+    const purchaseAmount = amount ? parseFloat(amount) : null;
+    if (purchaseAmount === null || isNaN(purchaseAmount) || purchaseAmount <= 0) {
+      console.error('Invalid amount:', amount);
+      return NextResponse.json(
+        { error: 'Valid amount is required' },
+        { status: 400 }
+      );
+    }
+
     // Store purchase in database
     try {
       const purchaseData = {
         transaction_id: reference,
         product_id: 'talk-to-ai-like-a-pro',
-        product_name: 'Talk to AI like a Pro',
-        buyer_email: email,
-        buyer_name: name || null,
-        amount: amount || null,
+        email: email,
+        name: name || 'Customer',
+        amount: purchaseAmount,
         currency: currency || 'NGN',
         status: 'completed',
         // No user_id for ebook purchases (direct download, no account required)
@@ -59,6 +68,8 @@ export async function POST(request: NextRequest) {
       };
 
       // Check if purchase already exists (idempotency)
+      // Note: For access checks in Phase 5, we'll query by transaction_id + product_id + status='completed'
+      // Since transaction_id is unique, the existing index on transaction_id is sufficient
       const { data: existingPurchase } = await supabaseAdmin
         .from('purchases')
         .select('id')

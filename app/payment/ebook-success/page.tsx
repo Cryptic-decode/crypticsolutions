@@ -49,13 +49,12 @@ function EbookSuccessContent() {
 
       setVerified(true);
 
-      // Step 2: Store purchase in Supabase (we'll implement this in Phase 4)
-      // For now, we'll prepare the structure
+      // Step 2: Store purchase in Supabase
       const transaction = verifyData.transaction;
       const email = transaction.customer?.email || '';
       const name = transaction.customer?.name || '';
 
-      // Store purchase (Phase 4 will implement this fully)
+      // Store purchase for access verification and manual follow-up
       const storeResponse = await fetch('/api/payment/ebook-success', {
         method: 'POST',
         headers: {
