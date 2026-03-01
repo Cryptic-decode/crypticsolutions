@@ -326,7 +326,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-16 md:pt-24 pb-20 md:pb-32">
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-20 md:pt-28 pb-20 md:pb-32">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <motion.div
             className="relative z-10 text-center lg:text-left"
@@ -548,20 +548,21 @@ export default function Home() {
               </p>
             </div>
 
-            {/* IELTS Manual - Featured */}
-            <Card className="p-8 md:p-12 mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Available Products - Horizontal Layout */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* IELTS Manual */}
+              <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm mb-4">
                     <Award className="h-4 w-4" />
                     <span>Ready Now</span>
                   </div>
 
-                  <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
                     <span className="text-[#1B2242] dark:text-white">IELTS Preparation</span> <span className="text-primary">Manual</span>
                   </h3>
 
-                  <p className="text-lg text-muted-foreground mb-6">
+                  <p className="text-muted-foreground mb-6">
                     Comprehensive preparation guide designed to help you achieve your IELTS goals.
                     Master all four sections with proven strategies and practice materials.
                   </p>
@@ -574,8 +575,8 @@ export default function Home() {
                       transition={{ duration: 0.3 }}
                       viewport={{ once: true }}
                     >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>Complete coverage of all IELTS sections</span>
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Complete coverage of all IELTS sections</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-3"
@@ -584,8 +585,8 @@ export default function Home() {
                       transition={{ duration: 0.3, delay: 0.1 }}
                       viewport={{ once: true }}
                     >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>Proven test-taking strategies</span>
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Proven test-taking strategies</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-3"
@@ -594,8 +595,8 @@ export default function Home() {
                       transition={{ duration: 0.3, delay: 0.2 }}
                       viewport={{ once: true }}
                     >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>Practice questions and examples</span>
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Practice questions and examples</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-3"
@@ -604,18 +605,156 @@ export default function Home() {
                       transition={{ duration: 0.3, delay: 0.3 }}
                       viewport={{ once: true }}
                     >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>Expert tips and insights</span>
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Expert tips and insights</span>
                     </motion.div>
                   </div>
 
-                  <motion.div whileTap={buttonTap} className="w-full sm:w-auto">
-                    <Button asChild size="lg" className="w-fit">
+                  <motion.div whileTap={buttonTap} className="w-full">
+                    <Button asChild size="lg" className="w-full">
                       <a href="/ielts-manual">
-                        Get Your Manual Now
+                        Start Learning Now
                       </a>
                     </Button>
                   </motion.div>
+                </div>
+              </Card>
+
+              {/* Prompt Engineering Ebook */}
+              <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm mb-4">
+                    <BookOpen className="h-4 w-4" />
+                    <span>Ready Now</span>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    <span className="text-[#1B2242] dark:text-white">Talk to AI</span> <span className="text-primary">like a Pro</span>
+                  </h3>
+
+                  <p className="text-muted-foreground mb-6">
+                    Master the art of writing effective AI prompts. Learn proven structures, ready-to-use templates, and strategies that transform your AI interactions.
+                  </p>
+
+                  <div className="space-y-3 mb-8">
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">4 comprehensive chapters</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Plug-and-play prompt templates</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Quick read format</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Avoid common prompting pitfalls</span>
+                    </motion.div>
+                  </div>
+
+                  <motion.div whileTap={buttonTap} className="w-full">
+                    <Button asChild size="lg" variant="outline" className="w-full hover:bg-primary/5 hover:border-primary/30">
+                      <a href="/prompt-engineering-ebook">
+                        Get Instant Access
+                      </a>
+                    </Button>
+                  </motion.div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Quickland - Coming Soon */}
+            <Card className="p-8 md:p-12 mt-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-4">
+                    <Lightbulb className="h-4 w-4 text-primary" />
+                    <span className="text-primary font-medium">Coming Soon</span>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    <span className="text-[#1B2242] dark:text-white">Quickland</span>
+                  </h3>
+
+                  <p className="text-muted-foreground mb-6">
+                    A revolutionary user input website creator that empowers you to build
+                    stunning websites without writing a single line of code. Simply provide
+                    your content and watch it come to life.
+                  </p>
+
+                  <div className="space-y-3 mb-8">
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">No coding required</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">AI-powered design suggestions</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Responsive and modern layouts</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Fast deployment</span>
+                    </motion.div>
+                  </div>
+
+                  <Button variant="outline" size="lg" disabled className="w-full sm:w-auto">
+                    Coming Soon
+                  </Button>
                 </div>
 
                 <div className="flex items-center justify-center">
@@ -632,38 +771,6 @@ export default function Home() {
                       transition={{ duration: 0.3 }}
                     >
                       <Image
-                        src="/undraw-assets/undraw_transfer-files_anat.svg"
-                        alt="IELTS Preparation Manual"
-                        width={300}
-                        height={220}
-                        className="w-full h-auto"
-                      />
-                    </motion.div>
-                    <motion.div
-                      className="absolute -top-4 -right-4 bg-primary p-4 rounded-xl shadow-lg"
-                      initial={{ rotate: -20 }}
-                      animate={{ rotate: [-20, 10, -20] }}
-                      transition={{ duration: 3, ease: "easeInOut" }}
-                      whileHover={{ scale: 1.2, rotate: 0 }}
-                    >
-                      <Zap className="h-8 w-8 text-primary-foreground" />
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Quickland */}
-            <Card className="p-8 hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="order-2 md:order-1">
-                  <div className="relative w-full max-w-md">
-                    <motion.div
-                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Image
                         src="/undraw-assets/undraw_building-blocks_h5jb.svg"
                         alt="Quickland Website Builder"
                         width={260}
@@ -671,68 +778,7 @@ export default function Home() {
                         className="w-full h-auto"
                       />
                     </motion.div>
-                    <motion.div
-                      className="absolute -top-4 -right-4 bg-primary p-3 rounded-full shadow-lg"
-                      whileHover={{ scale: 1.1, rotate: 15 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Lightbulb className="h-6 w-6 text-primary-foreground" />
-                    </motion.div>
-                  </div>
-                </div>
-
-                <div className="order-1 md:order-2">
-                  <div className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-4">
-                    <Lightbulb className="h-4 w-4 text-primary" />
-                    <span className="text-primary font-medium">Coming Soon</span>
-                  </div>
-
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4 text-[#1B2242] dark:text-white">
-                    Quickland
-                  </h3>
-
-                  <p className="text-muted-foreground mb-6">
-                    A revolutionary user input website creator that empowers you to build
-                    stunning websites without writing a single line of code. Simply provide
-                    your content and watch it come to life.
-                  </p>
-
-                  <div className="space-y-3 mb-6">
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>No coding required</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>AI-powered design suggestions</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                      <span>Responsive and modern layouts</span>
-                    </motion.div>
-                  </div>
-
-                  <Button variant="outline" size="lg" disabled className="w-full sm:w-auto">
-                    Coming Soon
-                  </Button>
+                  </motion.div>
                 </div>
               </div>
             </Card>
@@ -748,14 +794,20 @@ export default function Home() {
               <span className="text-[#1B2242] dark:text-white">Ready to</span> <span className="text-primary">Get Started?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get your IELTS preparation manual today and take the first step towards your
-              IELTS success. Or reach out to discuss how we can help with your digital product needs.
+              Explore our digital products and take the next step in your journey. Or reach out to discuss how we can help with your digital product needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div whileTap={buttonTap}>
                 <Button asChild size="lg">
                   <a href="/ielts-manual">
                     Get IELTS Manual
+                  </a>
+                </Button>
+              </motion.div>
+              <motion.div whileTap={buttonTap}>
+                <Button asChild size="lg" variant="outline">
+                  <a href="/prompt-engineering-ebook">
+                    Get Prompt Engineering Ebook
                   </a>
                 </Button>
               </motion.div>
@@ -883,7 +935,14 @@ export default function Home() {
                 <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Products</h4>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <span className="text-muted-foreground">IELTS Manual</span>
+                    <Link href="/ielts-manual" className="text-muted-foreground hover:text-primary transition-colors">
+                      IELTS Manual
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/prompt-engineering-ebook" className="text-muted-foreground hover:text-primary transition-colors">
+                      Prompt Engineering Ebook
+                    </Link>
                   </li>
                   <li>
                     <span className="text-muted-foreground">Quickland</span>

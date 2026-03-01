@@ -8,6 +8,9 @@ import { useRouter } from 'next/navigation';
 interface PaystackPaymentProps {
   email: string;
   amount: number;
+  productId: string;
+  productName: string;
+  successPath?: string; // Optional: defaults to '/payment/success' for IELTS flow
   metadata?: Record<string, any>;
   onSuccess?: (response: any) => void;
   onError?: (error: any) => void;
@@ -16,7 +19,10 @@ interface PaystackPaymentProps {
 
 export function PaystackPayment({ 
   email, 
-  amount, 
+  amount,
+  productId,
+  productName,
+  successPath = '/payment/success', // Default to IELTS flow
   metadata, 
   onSuccess, 
   onError,
@@ -38,10 +44,13 @@ export function PaystackPayment({
         body: JSON.stringify({
           email,
           amount,
+          productId,
+          productName,
+          successPath,
           metadata: {
             ...metadata,
-            product_id: 'ielts-manual',
-            product_name: 'IELTS Preparation Manual'
+            product_id: productId,
+            product_name: productName
           }
         }),
       });

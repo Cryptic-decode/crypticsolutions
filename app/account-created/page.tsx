@@ -100,9 +100,6 @@ export default function AccountCreatedPage() {
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">
                   <strong>Important:</strong> Please save this password securely. You'll need it to access your IELTS Manual. You can change it after logging in.
                 </p>
-                <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-2">
-                  <strong>Backup:</strong> We've also sent these credentials to {email} in case you need to retrieve them later.
-                </p>
               </div>
 
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-left">
