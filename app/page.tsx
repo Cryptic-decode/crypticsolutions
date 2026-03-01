@@ -22,8 +22,7 @@ import {
   Sun,
   ArrowUp,
   Linkedin,
-  Instagram,
-  BookOpen
+  Instagram
 } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/tiktok-icon";
 import Image from "next/image";
@@ -614,7 +613,7 @@ export default function Home() {
                   <motion.div whileTap={buttonTap} className="w-full">
                     <Button asChild size="lg" className="w-full">
                       <a href="/ielts-manual">
-                        Get Your Manual Now
+                        Start Learning Now
                       </a>
                     </Button>
                   </motion.div>
@@ -681,15 +680,108 @@ export default function Home() {
                   </div>
 
                   <motion.div whileTap={buttonTap} className="w-full">
-                    <Button asChild size="lg" className="w-full">
+                    <Button asChild size="lg" variant="outline" className="w-full hover:bg-primary/5 hover:border-primary/30">
                       <a href="/prompt-engineering-ebook">
-                        Get Your Ebook Now – ₦1,500
+                        Get Instant Access
                       </a>
                     </Button>
                   </motion.div>
                 </div>
               </Card>
             </div>
+
+            {/* Quickland - Coming Soon */}
+            <Card className="p-8 md:p-12 mt-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-4">
+                    <Lightbulb className="h-4 w-4 text-primary" />
+                    <span className="text-primary font-medium">Coming Soon</span>
+                  </div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    <span className="text-[#1B2242] dark:text-white">Quickland</span>
+                  </h3>
+
+                  <p className="text-muted-foreground mb-6">
+                    A revolutionary user input website creator that empowers you to build
+                    stunning websites without writing a single line of code. Simply provide
+                    your content and watch it come to life.
+                  </p>
+
+                  <div className="space-y-3 mb-8">
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">No coding required</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">AI-powered design suggestions</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Responsive and modern layouts</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm">Fast deployment</span>
+                    </motion.div>
+                  </div>
+
+                  <Button variant="outline" size="lg" disabled className="w-full sm:w-auto">
+                    Coming Soon
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-center">
+                  <motion.div
+                    className="relative w-full max-w-md"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div
+                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Image
+                        src="/undraw-assets/undraw_building-blocks_h5jb.svg"
+                        alt="Quickland Website Builder"
+                        width={260}
+                        height={180}
+                        className="w-full h-auto"
+                      />
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>

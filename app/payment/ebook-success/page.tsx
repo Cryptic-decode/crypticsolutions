@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, Download, Loader2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, Download, Loader2, Home } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
@@ -149,7 +149,6 @@ function EbookSuccessContent() {
                     <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                       <li>Click the download button below to get your ebook</li>
                       <li>Save the file to your device for offline reading</li>
-                      <li>You can download again anytime using this page</li>
                     </ul>
                   </div>
                 </div>
@@ -166,11 +165,11 @@ function EbookSuccessContent() {
                 </motion.div>
 
                 <Link 
-                  href="/prompt-engineering-ebook"
+                  href="/"
                   className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Ebook Page
+                  <Home className="h-4 w-4" />
+                  Back to Home
                 </Link>
               </>
             )}
