@@ -95,10 +95,16 @@ function EbookSuccessContent() {
   const handleDownload = () => {
     if (!reference) return;
     
-    // Phase 5 will implement the actual download API
-    // For now, we'll prepare the download link structure
+    // Download ebook via secure API route
     const downloadUrl = `/api/download/ebook?reference=${encodeURIComponent(reference)}`;
-    window.open(downloadUrl, '_blank');
+    
+    // Use a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'Talk to AI like a PRO.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
