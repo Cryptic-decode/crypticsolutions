@@ -326,7 +326,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-16 md:pt-24 pb-20 md:pb-32">
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-20 md:pt-28 pb-20 md:pb-32">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <motion.div
             className="relative z-10 text-center lg:text-left"

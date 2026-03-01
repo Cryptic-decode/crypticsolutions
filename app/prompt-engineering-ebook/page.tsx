@@ -210,7 +210,7 @@ export default function PromptEngineeringEbookPage() {
                 Most people struggle with AI because they don't understand how to communicate with it effectively. You might spend hours refining prompts, only to get mediocre results that don't match what you envisioned.
               </p>
               <p className="mb-4">
-                The problem isn't the AI—it's how you're asking. Most prompts fail because they're too vague, too complex, or missing critical context.
+                The problem isn't the AI, it's how you're asking. Most prompts fail because they're too vague, too complex, or missing critical context.
               </p>
               <p className="mb-4">
                 This ebook changes that.
