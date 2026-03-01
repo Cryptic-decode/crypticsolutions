@@ -6,12 +6,12 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, amount, metadata } = body;
+    const { email, amount, productId, productName, successPath = '/payment/success', metadata } = body;
 
     // Validate input
-    if (!email || !amount) {
+    if (!email || !amount || !productId || !productName) {
       return NextResponse.json(
-        { error: 'Email and amount are required' },
+        { error: 'Email, amount, productId, and productName are required' },
         { status: 400 }
       );
     }
@@ -26,6 +26,10 @@ export async function POST(request: NextRequest) {
     // Generate reference
     const reference = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+    // Build callback URL dynamically based on product
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutions.com';
+    const callbackUrl = `${baseUrl}${successPath}?reference=${reference}`;
+
     // Call Paystack API to initialize transaction
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',
@@ -33,7 +37,7 @@ export async function POST(request: NextRequest) {
         email,
         amount: amount * 100, // Convert to kobo (lowest currency unit)
         reference,
-        callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?reference=${reference}`,
+        callback_url: callbackUrl,
         metadata
       },
       {

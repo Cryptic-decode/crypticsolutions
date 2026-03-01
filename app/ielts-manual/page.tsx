@@ -526,6 +526,9 @@ export default function IELTSManualPage() {
                   <PaystackPayment 
                     email={email}
                     amount={5000}
+                    productId="ielts-manual"
+                    productName="IELTS Preparation Manual"
+                    successPath="/payment/success"
                     metadata={{
                       product: "IELTS Manual",
                       currency: "NGN"

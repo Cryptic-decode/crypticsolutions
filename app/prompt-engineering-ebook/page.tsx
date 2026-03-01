@@ -482,6 +482,9 @@ export default function PromptEngineeringEbookPage() {
                       <PaystackPayment 
                         email={email}
                         amount={1500}
+                        productId="talk-to-ai-like-a-pro"
+                        productName="Talk to AI like a Pro"
+                        successPath="/payment/ebook-success"
                         metadata={{
                           product: "Prompt Engineering Ebook",
                           currency: "NGN"
