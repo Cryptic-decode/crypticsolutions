@@ -22,7 +22,8 @@ import {
   Sun,
   ArrowUp,
   Linkedin,
-  Instagram
+  Instagram,
+  Sparkles
 } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/tiktok-icon";
 import Image from "next/image";
@@ -653,6 +654,110 @@ export default function Home() {
               </div>
             </Card>
 
+            {/* Prompt Engineering Ebook */}
+            <Card className="p-8 md:p-12 mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm mb-4">
+                    <Award className="h-4 w-4" />
+                    <span>Ready Now</span>
+                  </div>
+
+                  <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                    <span className="text-[#1B2242] dark:text-white">Talk to AI</span> <span className="text-primary">like a Pro</span>
+                  </h3>
+
+                  <p className="text-lg text-muted-foreground mb-6">
+                    Master the art of writing effective AI prompts. Learn proven structures, ready-to-use templates, and strategies that transform your AI interactions and deliver better results.
+                  </p>
+
+                  <div className="space-y-3 mb-8">
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                      <span>4 comprehensive chapters covering fundamentals to advanced techniques</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                      <span>Plug-and-play prompt templates you can use immediately</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                      <span>Quick read format - finish in one sitting</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                      <span>Learn to avoid common prompting pitfalls</span>
+                    </motion.div>
+                  </div>
+
+                  <motion.div whileTap={buttonTap} className="w-full sm:w-auto">
+                    <Button asChild size="lg" className="w-fit">
+                      <a href="/prompt-engineering-ebook">
+                        Get Your Ebook Now – ₦1,500
+                      </a>
+                    </Button>
+                  </motion.div>
+                </div>
+
+                <div className="flex items-center justify-center">
+                  <motion.div
+                    className="relative w-full max-w-md"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div
+                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Image
+                        src="/undraw-assets/undraw_designing-components_kb05.svg"
+                        alt="Prompt Engineering Ebook"
+                        width={300}
+                        height={220}
+                        className="w-full h-auto"
+                      />
+                    </motion.div>
+                    <motion.div
+                      className="absolute -top-4 -right-4 bg-primary p-4 rounded-xl shadow-lg"
+                      initial={{ rotate: -20 }}
+                      animate={{ rotate: [-20, 10, -20] }}
+                      transition={{ duration: 3, ease: "easeInOut" }}
+                      whileHover={{ scale: 1.2, rotate: 0 }}
+                    >
+                      <Sparkles className="h-8 w-8 text-primary-foreground" />
+                    </motion.div>
+                  </motion.div>
+                </div>
+              </div>
+            </Card>
+
             {/* Quickland */}
             <Card className="p-8 hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700">
               <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -748,14 +853,20 @@ export default function Home() {
               <span className="text-[#1B2242] dark:text-white">Ready to</span> <span className="text-primary">Get Started?</span>
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Get your IELTS preparation manual today and take the first step towards your
-              IELTS success. Or reach out to discuss how we can help with your digital product needs.
+              Explore our digital products and take the next step in your journey. Or reach out to discuss how we can help with your digital product needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.div whileTap={buttonTap}>
                 <Button asChild size="lg">
                   <a href="/ielts-manual">
                     Get IELTS Manual
+                  </a>
+                </Button>
+              </motion.div>
+              <motion.div whileTap={buttonTap}>
+                <Button asChild size="lg" variant="outline">
+                  <a href="/prompt-engineering-ebook">
+                    Get Prompt Engineering Ebook
                   </a>
                 </Button>
               </motion.div>
@@ -883,7 +994,14 @@ export default function Home() {
                 <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Products</h4>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <span className="text-muted-foreground">IELTS Manual</span>
+                    <Link href="/ielts-manual" className="text-muted-foreground hover:text-primary transition-colors">
+                      IELTS Manual
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/prompt-engineering-ebook" className="text-muted-foreground hover:text-primary transition-colors">
+                      Prompt Engineering Ebook
+                    </Link>
                   </li>
                   <li>
                     <span className="text-muted-foreground">Quickland</span>
