@@ -11,8 +11,6 @@ import {
   Instagram,
   LayoutGrid,
   MessageCircle,
-  Moon,
-  Sun,
   Menu,
   X,
 } from "lucide-react";
@@ -21,7 +19,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
-import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 const INSTAGRAM_HREF = "https://www.instagram.com/lydeisbakes";
@@ -33,33 +30,23 @@ function getWhatsAppHref(): string | null {
 }
 
 export default function FromKitchenToCashPage() {
-  const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const whatsappHref = getWhatsAppHref();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const isDark =
-      localStorage.getItem("theme") === "dark" || !localStorage.getItem("theme");
-    setDarkMode(isDark);
+    const html = document.documentElement;
+    const hadDark = html.classList.contains("dark");
+    html.classList.remove("dark");
 
     const handleScroll = () => setShowBackToTop(window.scrollY > 300);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (hadDark) html.classList.add("dark");
+    };
   }, []);
-
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
 
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
@@ -68,7 +55,7 @@ export default function FromKitchenToCashPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-orange-100 via-amber-50 to-orange-200 relative overflow-hidden">
       <ScrollBackdrop />
       <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
@@ -80,7 +67,7 @@ export default function FromKitchenToCashPage() {
               aria-label="Scroll to top"
             >
               <Image
-                src="/LydeisLogo.jpg"
+                src="/lydei-assets/LydeisLogo.jpg"
                 alt="Lydeis Bakes"
                 width={160}
                 height={160}
@@ -88,19 +75,7 @@ export default function FromKitchenToCashPage() {
                 priority
               />
             </button>
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={toggleDarkMode}
-                className="hidden md:block p-2 rounded-lg hover:bg-secondary/50 transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {darkMode ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </button>
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 className="md:hidden p-2"
@@ -117,25 +92,33 @@ export default function FromKitchenToCashPage() {
           </div>
 
           <Drawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
-            <MainDrawer
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-              onClose={() => setMobileMenuOpen(false)}
-              links={[{ href: "/", label: "Back to Cryptic Solutions" }]}
-              ctaButton={{
-                label: "View on Instagram",
-                onClick: () => {
+            <div className="p-6 space-y-5">
+              <Link
+                href="/"
+                className="block text-lg font-semibold text-orange-900"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Back to Cryptic Solutions
+              </Link>
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={() => {
                   window.open(INSTAGRAM_HREF, "_blank", "noopener,noreferrer");
-                },
-              }}
-            />
+                  setMobileMenuOpen(false);
+                }}
+              >
+                View on Instagram
+              </Button>
+            </div>
           </Drawer>
         </div>
       </nav>
 
       <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-24 pb-16 md:pt-32 md:pb-24">
+        <div className="absolute inset-x-4 md:inset-x-6 lg:inset-x-8 top-16 h-[88%] rounded-3xl bg-gradient-to-br from-orange-300/80 via-amber-200/75 to-orange-400/70 -z-10 shadow-[0_20px_80px_rgba(194,65,12,0.20)]" />
         <motion.div
-          className="max-w-3xl mx-auto text-center"
+          className="max-w-4xl mx-auto text-center rounded-3xl px-6 py-8 md:px-10 md:py-12 bg-white/80 border border-orange-300/80 shadow-xl"
           initial="initial"
           animate="animate"
           variants={fadeInUp}
@@ -155,7 +138,7 @@ export default function FromKitchenToCashPage() {
             transition={{ delay: 0.05 }}
           >
             <Image
-              src="/LydeisLogo.jpg"
+              src="/lydei-assets/LydeisLogo.jpg"
               alt="Lydeis Bakes — From Kitchen to Cash"
               width={280}
               height={280}
@@ -165,7 +148,7 @@ export default function FromKitchenToCashPage() {
           </motion.div>
 
           <motion.h1
-            className="text-4xl md:text-5xl font-bold mb-4 text-[#1B2242] dark:text-white"
+            className="text-4xl md:text-5xl font-bold mb-4 text-orange-900"
             variants={fadeInUp}
           >
             From Kitchen to Cash
@@ -193,15 +176,38 @@ export default function FromKitchenToCashPage() {
               </Button>
             ) : null}
           </div>
+
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+              <Image
+                src="/lydei-assets/pastryStore-front.jpeg"
+                alt="Lydeis pastry display"
+                width={900}
+                height={700}
+                className="h-56 w-full object-cover"
+                priority
+              />
+            </div>
+            <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+              <Image
+                src="/lydei-assets/pastryPresentation.jpeg"
+                alt="Pastry presentation from Lydeis Bakes"
+                width={900}
+                height={700}
+                className="h-56 w-full object-cover"
+                priority
+              />
+            </div>
+          </div>
         </motion.div>
       </section>
 
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-[#1B2242] dark:text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-orange-900">
             Who this is for
           </h2>
-          <Card className="p-8 text-muted-foreground text-lg leading-relaxed">
+          <Card className="p-8 text-muted-foreground text-lg leading-relaxed border-orange-300 bg-orange-50 shadow-[0_10px_40px_rgba(194,65,12,0.20)]">
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
@@ -224,7 +230,7 @@ export default function FromKitchenToCashPage() {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
+      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 rounded-3xl bg-gradient-to-b from-orange-100 to-amber-100">
         <div className="max-w-4xl mx-auto space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -233,14 +239,14 @@ export default function FromKitchenToCashPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <ChefHat className="h-6 w-6 text-primary" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
+                <ChefHat className="h-6 w-6 text-orange-700" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1B2242] dark:text-white">
+              <h2 className="text-3xl md:text-4xl font-bold text-orange-900">
                 Part One — Foundations &amp; intro
               </h2>
             </div>
-            <Card className="p-8 space-y-4 text-muted-foreground">
+            <Card className="p-8 space-y-4 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(180,83,9,0.18)]">
               <p>
                 <strong className="text-foreground">Introduction</strong> — How to use both parts together
                 and what makes this different from vague “grow your hustle” fluff.
@@ -260,7 +266,7 @@ export default function FromKitchenToCashPage() {
               </p>
               <p className="pt-2 border-t border-border">
                 <strong className="text-foreground flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-primary shrink-0" />
+                  <ClipboardList className="h-4 w-4 text-orange-700 shrink-0" />
                   Takeaway Pack (PDF)
                 </strong>{" "}
                 Summary of Part One reflections + workbook-style exercises aligned with{" "}
@@ -276,14 +282,14 @@ export default function FromKitchenToCashPage() {
             transition={{ duration: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <LayoutGrid className="h-6 w-6 text-primary" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
+                <LayoutGrid className="h-6 w-6 text-orange-700" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-[#1B2242] dark:text-white">
+              <h2 className="text-3xl md:text-4xl font-bold text-orange-900">
                 Part Two — Menu, maths &amp; takeaway tools
               </h2>
             </div>
-            <Card className="p-8 space-y-3 text-muted-foreground">
+            <Card className="p-8 space-y-3 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(194,65,12,0.18)]">
               <ul className="space-y-3 list-none">
                 {[
                   "Menu planning + design fundamentals",
@@ -310,7 +316,7 @@ export default function FromKitchenToCashPage() {
 
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-16 pb-28">
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#1B2242] dark:text-white">
+          <h2 className="text-2xl md:text-3xl font-bold text-orange-900">
             Ready when you are
           </h2>
           <p className="text-muted-foreground text-lg">
@@ -352,7 +358,7 @@ export default function FromKitchenToCashPage() {
         <ArrowUp className="h-6 w-6" />
       </motion.button>
 
-      <footer className="border-t bg-secondary/30 py-10">
+      <footer className="border-t bg-orange-100/60 py-10">
         <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center text-sm text-muted-foreground space-y-2">
           <p>
             <strong className="text-foreground">Lydeis Bakes</strong> ×{" "}
