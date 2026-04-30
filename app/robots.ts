@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/ielts-manual'],
+        allow: ['/', '/ielts-manual', '/prompt-engineering-ebook', '/from-kitchen-to-cash'],
         disallow: ['/dashboard/', '/api/', '/signin', '/account-created', '/payment/'],
       },
     ],
