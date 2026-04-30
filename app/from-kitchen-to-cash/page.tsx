@@ -21,7 +21,7 @@ import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
-const INSTAGRAM_HREF = "https://www.instagram.com/lydeisbakes";
+const INSTAGRAM_HREF = "https://www.instagram.com/lydeis_kitchenandevents";
 
 function getWhatsAppHref(): string | null {
   const raw = process.env.NEXT_PUBLIC_FROM_KITCHEN_TO_CASH_WHATSAPP;
@@ -163,7 +163,7 @@ export default function FromKitchenToCashPage() {
             <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
               <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 mr-2" aria-hidden />
-                @lydeisbakes — Get yours
+                Buy Ebook Now on Instagram
               </a>
             </Button>
             {whatsappHref ? (
@@ -176,27 +176,15 @@ export default function FromKitchenToCashPage() {
             ) : null}
           </div>
 
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
-              <Image
-                src="/lydei-assets/pastryStore-front.jpeg"
-                alt="Lydeis pastry display"
-                width={900}
-                height={700}
-                className="h-56 w-full object-cover"
-                priority
-              />
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
-              <Image
-                src="/lydei-assets/pastryPresentation.jpeg"
-                alt="Pastry presentation from Lydeis Bakes"
-                width={900}
-                height={700}
-                className="h-56 w-full object-cover"
-                priority
-              />
-            </div>
+          <div className="mt-10 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+            <Image
+              src="/lydei-assets/pastryPresentation.jpeg"
+              alt="Pastry presentation from Lydeis Bakes"
+              width={1200}
+              height={700}
+              className="h-56 md:h-72 w-full object-cover"
+              priority
+            />
           </div>
         </motion.div>
       </section>
@@ -206,26 +194,37 @@ export default function FromKitchenToCashPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-orange-900">
             Who this is for
           </h2>
-          <Card className="p-8 text-muted-foreground text-lg leading-relaxed border-orange-300 bg-orange-50 shadow-[0_10px_40px_rgba(194,65,12,0.20)]">
-            <ul className="space-y-4">
-              <li className="flex gap-3">
-                <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                Nigerians dreaming of—or already growing—a catering hustle.
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                Caterers tired of guessing prices and losing money quietly.
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                Entrepreneurs wanting straight talk on costs and pitfalls before pretty menus.
-              </li>
-              <li className="flex gap-3">
-                <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
-                Anyone who prefers structure, summaries, exercises, and templates over vibes alone.
-              </li>
-            </ul>
-          </Card>
+          <div className="grid gap-6 md:grid-cols-2 md:items-stretch">
+            <Card className="p-8 text-muted-foreground text-lg leading-relaxed border-orange-300 bg-orange-50 shadow-[0_10px_40px_rgba(194,65,12,0.20)]">
+              <ul className="space-y-4">
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  Nigerians dreaming of—or already growing—a catering hustle.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  Caterers tired of being busy but unsure of real profit.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  Entrepreneurs who want clear systems for pricing and costing.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  Anyone who prefers practical templates over guesswork.
+                </li>
+              </ul>
+            </Card>
+            <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+              <Image
+                src="/lydei-assets/pastryStore-front.jpeg"
+                alt="Lydeis pastry display"
+                width={1200}
+                height={900}
+                className="h-full min-h-64 w-full object-cover"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -246,32 +245,42 @@ export default function FromKitchenToCashPage() {
               </h2>
             </div>
             <Card className="p-8 space-y-4 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(180,83,9,0.18)]">
-              <p>
-                <strong className="text-foreground">Introduction</strong> — How to use both parts together
-                and what makes this different from vague “grow your hustle” fluff.
-              </p>
-              <p>
-                <strong className="text-foreground">Foundations before menu design</strong> — Reality check on
-                what running a catering business actually costs (time, ingredient volatility, staffing,
-                overheads)—without sugarcoating. Understand common pitfalls{" "}
-                <em>before</em> you spend money on menus and flyers.
-              </p>
-              <p>
-                Saves you costly trial-and-error: you&apos;ll know what&apos;s realistic and what bites back.
-              </p>
-              <p>
-                Built-in takeaway exercises along the journey: apply as you read, so you aren&apos;t just
-                collecting theory.
-              </p>
+              <p className="text-foreground font-semibold">What Part One helps you fix first:</p>
+              <ul className="space-y-3">
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
+                  Understand the real costs behind every order before setting prices.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
+                  Spot common mistakes that quietly kill catering profit.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
+                  Build the right business mindset before expanding your menu.
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
+                  Apply practical mini-exercises so learning turns into action quickly.
+                </li>
+              </ul>
               <p className="pt-2 border-t border-border">
                 <strong className="text-foreground flex items-center gap-2">
                   <ClipboardList className="h-4 w-4 text-orange-700 shrink-0" />
                   Takeaway Pack (PDF)
                 </strong>{" "}
-                Summary of Part One reflections + workbook-style exercises aligned with{" "}
-                <strong className="text-foreground">Part Two&apos;s takeaway exercise book</strong>.
+                Summary checkpoints plus workbook exercises that connect directly into Part Two.
               </p>
             </Card>
+            <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+              <Image
+                src="/lydei-assets/pastryPresentation2.jpeg"
+                alt="Lydeis pastry presentation setup"
+                width={1200}
+                height={700}
+                className="h-56 md:h-64 w-full object-cover"
+              />
+            </div>
           </motion.div>
 
           <motion.div
@@ -291,13 +300,12 @@ export default function FromKitchenToCashPage() {
             <Card className="p-8 space-y-3 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(194,65,12,0.18)]">
               <ul className="space-y-3 list-none">
                 {[
-                  "Menu planning + design fundamentals",
-                  "Pricing that matches your realities (not TikTok guesses)",
-                  "Recipe costing essentials",
-                  "Detailed costing walkthrough—you see the maths, step by step",
-                  "Practice costing exercises to lock it in",
-                  "Printable/copy-paste takeaway costing sheets",
-                  "Standalone takeaway costing exercise workbook",
+                  "Design practical menus that are easier to produce and sell",
+                  "Set prices with confidence using your actual business numbers",
+                  "Master recipe costing with a clear, repeatable method",
+                  "Follow a full costing example from start to finish",
+                  "Practice with guided exercises and answer-friendly worksheets",
+                  "Use printable takeaway costing sheets in your daily workflow",
                 ].map((line) => (
                   <li key={line} className="flex gap-3">
                     <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
@@ -309,6 +317,15 @@ export default function FromKitchenToCashPage() {
                 Part Two is where the spreadsheets meet the plates—after your mindset is right.
               </p>
             </Card>
+            <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
+              <Image
+                src="/lydei-assets/pastryStore-front2.jpeg"
+                alt="Lydeis pastry store setup"
+                width={1200}
+                height={700}
+                className="h-56 md:h-64 w-full object-cover"
+              />
+            </div>
           </motion.div>
         </div>
       </section>
@@ -319,14 +336,17 @@ export default function FromKitchenToCashPage() {
             Ready when you are
           </h2>
           <p className="text-muted-foreground text-lg">
-            Purchases happen through Lydeis Bakes — reach out on Instagram (or WhatsApp when
-            configured) for access.
+            Checkout for this ebook will be available directly on this page soon with Paystack.
+            Until then, place your order on Instagram (or WhatsApp when configured).
+          </p>
+          <p className="text-sm font-medium text-orange-800 bg-orange-100 border border-orange-200 rounded-lg px-4 py-2 inline-block">
+            Purchase CTA: tap below to order your copy now.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
               <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 mr-2" aria-hidden />
-                Message on Instagram
+                Buy Ebook Now on Instagram
               </a>
             </Button>
             {whatsappHref ? (
