@@ -98,11 +98,11 @@ export default function FromKitchenToCashPage() {
                 className="block text-lg font-semibold text-orange-900"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Back to Cryptic Solutions
+                Back to Home
               </Link>
               <Button
                 size="lg"
-                className="w-full"
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
                 onClick={() => {
                   window.open(INSTAGRAM_HREF, "_blank", "noopener,noreferrer");
                   setMobileMenuOpen(false);
@@ -128,7 +128,7 @@ export default function FromKitchenToCashPage() {
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back to Cryptic Solutions</span>
+            <span>Back to Home</span>
           </Link>
 
           <motion.div
@@ -154,21 +154,20 @@ export default function FromKitchenToCashPage() {
             From Kitchen to Cash
           </motion.h1>
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
-            A two-part Nigerian catering ebook—in partnership between{" "}
-            <strong>Lydeis Bakes</strong> and <strong>Cryptic Solutions</strong>. Foundations
+            A two-part Nigerian catering ebook by <strong>Lydeis Bakes</strong>. Foundations
             before the fancy menu magic: honesty about costs and pitfalls, then menus, costing,
             and templates you can use right away.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch">
-            <Button size="lg" className="h-12" asChild>
+            <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
               <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 mr-2" aria-hidden />
                 @lydeisbakes — Get yours
               </a>
             </Button>
             {whatsappHref ? (
-              <Button size="lg" variant="outline" className="h-12 hover:bg-primary/5" asChild>
+              <Button size="lg" variant="outline" className="h-12 border-orange-600 text-orange-700 hover:bg-orange-50" asChild>
                 <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="h-5 w-5 mr-2" aria-hidden />
                   WhatsApp
@@ -324,14 +323,14 @@ export default function FromKitchenToCashPage() {
             configured) for access.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" className="h-12" asChild>
+            <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
               <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 mr-2" aria-hidden />
                 Message on Instagram
               </a>
             </Button>
             {whatsappHref ? (
-              <Button size="lg" variant="outline" className="h-12" asChild>
+              <Button size="lg" variant="outline" className="h-12 border-orange-600 text-orange-700 hover:bg-orange-50" asChild>
                 <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="h-5 w-5 mr-2" aria-hidden />
                   WhatsApp
