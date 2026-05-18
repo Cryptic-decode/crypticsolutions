@@ -133,7 +133,7 @@ export default function FromKitchenToCashPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5E6D3] relative overflow-hidden">
+    <div className="min-h-screen bg-[#F5E6D3] relative overflow-hidden pb-24 md:pb-0">
       <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -198,7 +198,7 @@ export default function FromKitchenToCashPage() {
             width={1672}
             height={941}
             sizes="(min-width: 1024px) 1100px, 100vw"
-            className="h-[560px] w-full object-cover object-center"
+            className="h-[520px] sm:h-[560px] md:h-[600px] w-full object-cover object-center"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-r from-orange-950/95 via-orange-950/70 to-orange-950/20" />
@@ -622,7 +622,7 @@ export default function FromKitchenToCashPage() {
       <motion.button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-8 right-8 z-40 p-4 bg-orange-700 text-white rounded-full shadow-lg hover:bg-orange-800 transition-colors ${
+        className={`hidden md:flex fixed bottom-8 right-8 z-40 p-4 bg-orange-700 text-white rounded-full shadow-lg hover:bg-orange-800 transition-colors ${
           showBackToTop ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         initial={{ scale: 0 }}
@@ -634,6 +634,33 @@ export default function FromKitchenToCashPage() {
       >
         <ArrowUp className="h-6 w-6" />
       </motion.button>
+
+      <div
+        className={`fixed inset-x-0 bottom-0 z-50 md:hidden transition-all ${
+          showBackToTop ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="mx-auto max-w-6xl px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
+          <div className="rounded-2xl border border-orange-950/15 bg-white/85 backdrop-blur shadow-xl p-3 flex items-center gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-orange-950 leading-tight truncate">
+                From Kitchen to Cash
+              </p>
+              <p className="text-xs text-orange-950/70 leading-tight truncate">
+                Get the ebook in 2 minutes
+              </p>
+            </div>
+            <Button
+              size="lg"
+              className="ml-auto h-11 px-5 bg-orange-700 hover:bg-orange-800 text-white"
+              onClick={scrollToGetEbook}
+            >
+              <ShoppingBag className="h-5 w-5 mr-2" />
+              Get it
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <footer className="border-t bg-orange-100/60 py-10">
         <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center text-sm text-muted-foreground space-y-2">
