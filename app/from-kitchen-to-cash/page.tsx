@@ -3,15 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  ArrowLeft,
   ArrowUp,
   ChefHat,
   CheckCircle2,
-  ClipboardList,
   Instagram,
   LayoutGrid,
   MessageCircle,
   Menu,
+  ShoppingBag,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -19,9 +18,37 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
-import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 
 const INSTAGRAM_HREF = "https://www.instagram.com/lydeis_kitchenandevents";
+
+const HERO_BENEFITS = [
+  "Foundations before menu design — costs, pitfalls, and mindset",
+  "Menu planning and pricing that matches your real numbers",
+  "Recipe costing with templates and practice exercises",
+  "Two-part PDF guide built for Nigerian caterers",
+] as const;
+
+const PROOF_GALLERY = [
+  {
+    src: "/lydei-assets/proof-display-case-pastries.png",
+    alt: "Premium pastry display case",
+    caption: "Premium variety",
+  },
+  {
+    src: "/lydei-assets/proof-artisan-pastry-set.png",
+    alt: "Artisan pastry set",
+    caption: "Handmade quality",
+  },
+  {
+    src: "/lydei-assets/proof-event-dessert-table.png",
+    alt: "Dessert table for an event",
+    caption: "Event-ready setup",
+  },
+] as const;
+
+function scrollToGetEbook() {
+  document.getElementById("checkout")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 function getWhatsAppHref(): string | null {
   const raw = process.env.NEXT_PUBLIC_FROM_KITCHEN_TO_CASH_WHATSAPP;
@@ -32,6 +59,7 @@ function getWhatsAppHref(): string | null {
 export default function FromKitchenToCashPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [email, setEmail] = useState("");
   const whatsappHref = getWhatsAppHref();
 
   useEffect(() => {
@@ -55,8 +83,7 @@ export default function FromKitchenToCashPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-100 via-amber-50 to-orange-200 relative overflow-hidden">
-      <ScrollBackdrop />
+    <div className="min-h-screen bg-[#F5E6D3] relative overflow-hidden">
       <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -93,100 +120,214 @@ export default function FromKitchenToCashPage() {
 
           <Drawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
             <div className="p-6 space-y-5">
-              <Link
-                href="/"
-                className="block text-lg font-semibold text-orange-900"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Back to Home
-              </Link>
               <Button
                 size="lg"
                 className="w-full bg-orange-600 hover:bg-orange-700 text-white"
                 onClick={() => {
-                  window.open(INSTAGRAM_HREF, "_blank", "noopener,noreferrer");
+                  scrollToGetEbook();
                   setMobileMenuOpen(false);
                 }}
               >
-                View on Instagram
+                Get the Ebook
               </Button>
             </div>
           </Drawer>
         </div>
       </nav>
 
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-24 pb-16 md:pt-32 md:pb-24">
-        <div className="absolute inset-x-4 md:inset-x-6 lg:inset-x-8 top-16 h-[88%] rounded-3xl bg-gradient-to-br from-orange-300/80 via-amber-200/75 to-orange-400/70 -z-10 shadow-[0_20px_80px_rgba(194,65,12,0.20)]" />
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-20 pb-10 md:pt-28 md:pb-14">
         <motion.div
-          className="max-w-4xl mx-auto text-center rounded-3xl px-6 py-8 md:px-10 md:py-12 bg-white/80 border border-orange-300/80 shadow-xl"
+          className="relative max-w-6xl mx-auto overflow-hidden rounded-3xl border border-orange-950/20 shadow-2xl"
           initial="initial"
           animate="animate"
           variants={fadeInUp}
         >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Home</span>
-          </Link>
+          <Image
+            src="/lydei-assets/hero-pastry-abundance.png"
+            alt="Premium pastry spread from Lydeis Kitchen and Events"
+            width={1672}
+            height={941}
+            sizes="(min-width: 1024px) 1100px, 100vw"
+            className="h-[560px] w-full object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-950/95 via-orange-950/70 to-orange-950/20" />
 
-          <motion.div
-            className="flex justify-center mb-8"
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.05 }}
-          >
-            <Image
-              src="/lydei-assets/LydeisLogo.jpg"
-              alt="Lydeis Bakes — From Kitchen to Cash"
-              width={280}
-              height={280}
-              className="h-40 md:h-48 w-auto rounded-xl border border-border shadow-sm object-contain bg-card"
-              priority
-            />
-          </motion.div>
+          <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
+            <div className="max-w-2xl space-y-5">
+              <p className="text-xs md:text-sm font-semibold uppercase tracking-wide text-orange-100/90">
+                Lydei&apos;s Kitchen &amp; Event
+              </p>
+              <h1 className="text-4xl md:text-6xl font-bold text-orange-50 leading-tight">
+                From Kitchen to Cash
+              </h1>
+              <p className="text-base md:text-lg text-orange-50/90 leading-relaxed">
+                The catering business ebook that helps you price with confidence, cost properly,
+                and build a profitable menu — before the fancy branding.
+              </p>
 
-          <motion.h1
-            className="text-4xl md:text-5xl font-bold mb-4 text-orange-900"
-            variants={fadeInUp}
-          >
-            From Kitchen to Cash
-          </motion.h1>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-8">
-            A two-part Nigerian catering ebook by <strong>Lydeis Bakes</strong>. Foundations
-            before the fancy menu magic: honesty about costs and pitfalls, then menus, costing,
-            and templates you can use right away.
-          </p>
+              <ul className="grid gap-2.5">
+                {HERO_BENEFITS.slice(0, 3).map((benefit) => (
+                  <li key={benefit} className="flex gap-2.5 text-sm md:text-base text-orange-50/90">
+                    <CheckCircle2 className="h-5 w-5 text-orange-200 shrink-0 mt-0.5" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-stretch">
-            <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
-              <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
-                <Instagram className="h-5 w-5 mr-2" aria-hidden />
-                Buy Ebook Now on Instagram
-              </a>
-            </Button>
-            {whatsappHref ? (
-              <Button size="lg" variant="outline" className="h-12 border-orange-600 text-orange-700 hover:bg-orange-50" asChild>
-                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="h-5 w-5 mr-2" aria-hidden />
-                  WhatsApp
-                </a>
-              </Button>
-            ) : null}
-          </div>
+              <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                <Button
+                  size="lg"
+                  className="h-12 bg-orange-500 text-white hover:bg-orange-400 shadow-md shadow-orange-950/20"
+                  onClick={scrollToGetEbook}
+                >
+                  <ShoppingBag className="h-5 w-5 mr-2" />
+                  Get the Ebook
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 bg-transparent border-orange-50/60 text-orange-50 hover:bg-orange-50/15 hover:text-orange-50 shadow-sm shadow-orange-950/10"
+                  asChild
+                >
+                  <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-5 w-5 mr-2" aria-hidden />
+                    See our work on Instagram
+                  </a>
+                </Button>
+              </div>
 
-          <div className="mt-10 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
-            <Image
-              src="/lydei-assets/pastryPresentation.jpeg"
-              alt="Pastry presentation from Lydeis Bakes"
-              width={1200}
-              height={700}
-              className="h-56 md:h-72 w-full object-cover"
-              priority
-            />
+              <div className="pt-2">
+                <div className="inline-flex items-center gap-3 rounded-xl bg-orange-50/10 border border-orange-50/20 px-3 py-2">
+                  <Image
+                    src="/lydei-assets/product-ebook-mockup.png"
+                    alt="From Kitchen to Cash ebook"
+                    width={800}
+                    height={500}
+                    className="h-10 w-auto object-contain"
+                  />
+                  <span className="text-xs md:text-sm text-orange-50/85">
+                    Two-part PDF + takeaway exercises and costing templates.
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </motion.div>
+      </section>
+
+      <section id="checkout" className="container mx-auto px-4 md:px-6 lg:px-8 pb-6">
+        <Card className="max-w-4xl mx-auto p-6 md:p-8 border-orange-500 bg-gradient-to-br from-orange-100 to-amber-100 shadow-[0_10px_40px_rgba(154,52,18,0.25)]">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <p className="text-sm font-semibold text-orange-800 mb-2">On-page checkout</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-orange-950">Buy your ebook here</h2>
+              <p className="text-orange-900/80 mt-2">
+                Enter your email and continue to secure checkout on this page.
+              </p>
+              <div className="mt-4">
+                <label htmlFor="checkout-email" className="text-sm font-medium text-orange-900">
+                  Email
+                </label>
+                <input
+                  id="checkout-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="mt-2 h-12 w-full rounded-md border border-orange-400 bg-white px-3 text-base outline-none focus:border-orange-600"
+                />
+              </div>
+            </div>
+            <Button size="lg" className="h-12 bg-orange-700 hover:bg-orange-800 text-white w-full md:w-auto" disabled={!email.includes("@")}>
+              Buy Ebook on This Page
+            </Button>
+          </div>
+          <p className="text-xs text-orange-900/70 mt-4">
+            Instagram is for brand proof only. Checkout happens on this landing page.
+          </p>
+        </Card>
+      </section>
+
+      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-14">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-6 mb-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-orange-950">Proof of the craft</h2>
+              <p className="text-orange-950/70 mt-1">
+                A quick look at the quality and presentation behind the brand.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="hidden md:inline-flex border-orange-800/30 text-orange-950 hover:bg-orange-100"
+              asChild
+            >
+              <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
+                <Instagram className="h-4 w-4 mr-2" aria-hidden />
+                View Instagram
+              </a>
+            </Button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {PROOF_GALLERY.map((item) => (
+              <div
+                key={item.src}
+                className="group relative overflow-hidden rounded-2xl border border-orange-950/10 bg-white shadow-md"
+              >
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={1600}
+                  height={900}
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="h-56 md:h-64 w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-orange-950/55 via-orange-950/10 to-transparent opacity-90" />
+                <p className="absolute bottom-3 left-3 right-3 text-sm font-semibold text-orange-50">
+                  {item.caption}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full py-10 md:py-14">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="relative h-[360px] md:h-[420px] overflow-hidden rounded-3xl border border-orange-950/15 shadow-2xl">
+              <Image
+                src="/lydei-assets/proof-kitchen-hands-prep.png"
+                alt="Kitchen prep in action"
+                fill
+                sizes="(min-width: 1024px) 1100px, 100vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-950/85 via-orange-950/55 to-orange-950/10" />
+              <div className="absolute inset-0 flex items-end">
+                <div className="p-6 md:p-10 max-w-2xl space-y-4">
+                  <h3 className="text-2xl md:text-3xl font-bold text-orange-50">
+                    Built for real work, not guesswork
+                  </h3>
+                  <p className="text-orange-50/85">
+                    The ebook is practical: costing, pricing, and templates you can apply to real
+                    orders — fast.
+                  </p>
+                  <Button
+                    size="lg"
+                    className="h-12 bg-orange-50 text-orange-950 hover:bg-orange-100"
+                    onClick={scrollToGetEbook}
+                  >
+                    <ShoppingBag className="h-5 w-5 mr-2" />
+                    Get the Ebook
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
@@ -228,7 +369,7 @@ export default function FromKitchenToCashPage() {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 rounded-3xl bg-gradient-to-b from-orange-100 to-amber-100">
+      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 rounded-3xl bg-gradient-to-b from-orange-300/70 to-amber-300/70">
         <div className="max-w-4xl mx-auto space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -245,7 +386,7 @@ export default function FromKitchenToCashPage() {
               </h2>
             </div>
             <Card className="p-8 space-y-4 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(180,83,9,0.18)]">
-              <p className="text-foreground font-semibold">What Part One helps you fix first:</p>
+              <p className="text-orange-950 font-semibold">Part One gives you a strong business foundation:</p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
                   <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
@@ -264,12 +405,8 @@ export default function FromKitchenToCashPage() {
                   Apply practical mini-exercises so learning turns into action quickly.
                 </li>
               </ul>
-              <p className="pt-2 border-t border-border">
-                <strong className="text-foreground flex items-center gap-2">
-                  <ClipboardList className="h-4 w-4 text-orange-700 shrink-0" />
-                  Takeaway Pack (PDF)
-                </strong>{" "}
-                Summary checkpoints plus workbook exercises that connect directly into Part Two.
+              <p className="pt-2 border-t border-orange-200 text-orange-900/80">
+                Outcome: you stop underpricing, reduce silent losses, and prepare your business for profitable growth.
               </p>
             </Card>
             <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
@@ -313,8 +450,8 @@ export default function FromKitchenToCashPage() {
                   </li>
                 ))}
               </ul>
-              <p className="text-sm pt-4 border-t border-border">
-                Part Two is where the spreadsheets meet the plates—after your mindset is right.
+              <p className="text-sm pt-4 border-t border-orange-200 text-orange-900/80">
+                Outcome: you get a practical costing system you can use every day for real orders.
               </p>
             </Card>
             <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
@@ -333,20 +470,24 @@ export default function FromKitchenToCashPage() {
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-16 pb-28">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold text-orange-900">
-            Ready when you are
+            Ready to get your copy?
           </h2>
-          <p className="text-muted-foreground text-lg">
-            Checkout for this ebook will be available directly on this page soon with Paystack.
-            Until then, place your order on Instagram (or WhatsApp when configured).
-          </p>
-          <p className="text-sm font-medium text-orange-800 bg-orange-100 border border-orange-200 rounded-lg px-4 py-2 inline-block">
-            Purchase CTA: tap below to order your copy now.
+          <p className="text-orange-900/80 text-lg">
+            Use the checkout section above to complete your purchase on this page.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg" className="h-12 bg-orange-600 hover:bg-orange-700 text-white" asChild>
+            <Button
+              size="lg"
+              className="h-12 bg-orange-700 hover:bg-orange-800 text-white"
+              onClick={() => document.getElementById("checkout")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <ShoppingBag className="h-5 w-5 mr-2" />
+              Go to Checkout
+            </Button>
+            <Button size="lg" variant="outline" className="h-12 border-orange-700 text-orange-800 hover:bg-orange-100" asChild>
               <a href={INSTAGRAM_HREF} target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 mr-2" aria-hidden />
-                Buy Ebook Now on Instagram
+                View Instagram
               </a>
             </Button>
             {whatsappHref ? (
