@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   ArrowUp,
+  Calculator,
   ChefHat,
   CheckCircle2,
+  ClipboardList,
+  FileText,
   Instagram,
   LayoutGrid,
+  Layers,
   MessageCircle,
   Menu,
   ShoppingBag,
@@ -43,6 +47,52 @@ const PROOF_GALLERY = [
     src: "/lydei-assets/proof-event-dessert-table.png",
     alt: "Dessert table for an event",
     caption: "Event-ready setup",
+  },
+] as const;
+
+const WHAT_YOU_GET = [
+  {
+    title: "Two-part PDF ebook",
+    description: "Foundations, pricing, menus, pitfalls, and practical guidance you can use immediately.",
+    icon: FileText,
+  },
+  {
+    title: "Costing templates",
+    description: "Simple sheets you can reuse to calculate food cost, margins, and pricing with confidence.",
+    icon: Calculator,
+  },
+  {
+    title: "Takeaway exercises",
+    description: "Short, guided exercises that help you apply what you learn to your own catering business.",
+    icon: ClipboardList,
+  },
+  {
+    title: "A repeatable system",
+    description: "A step-by-step approach you can use for new menus, new recipes, and new orders.",
+    icon: Layers,
+  },
+] as const;
+
+const FAQS = [
+  {
+    q: "Is this ebook only for pastries?",
+    a: "No. The examples lean catering-forward: pricing, costing, menus, and running the business side of catering. The principles apply whether you focus on pastries, small chops, or full event menus.",
+  },
+  {
+    q: "What format will I receive?",
+    a: "A PDF ebook (two parts), plus templates and exercises included with the guide.",
+  },
+  {
+    q: "Do I need Excel to use the templates?",
+    a: "No. You can use them in any spreadsheet app (Excel, Google Sheets) or even print and fill as you learn. The goal is clarity, not complicated formulas.",
+  },
+  {
+    q: "Is it beginner-friendly?",
+    a: "Yes. It starts with foundations and common pitfalls, then moves into a simple pricing and costing structure you can build on as you grow.",
+  },
+  {
+    q: "Can I read it on my phone?",
+    a: "Yes. The PDF is designed to be readable on mobile, and it’s easy to save for offline access.",
   },
 ] as const;
 
@@ -331,6 +381,39 @@ export default function FromKitchenToCashPage() {
       </section>
 
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-orange-950">What you get</h2>
+            <p className="text-orange-950/70 mt-2">
+              Everything is structured to help you price better, cost properly, and run catering with confidence.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {WHAT_YOU_GET.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Card
+                  key={item.title}
+                  className="p-6 border-orange-950/10 bg-white shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 border border-orange-200">
+                      <Icon className="h-6 w-6 text-orange-800" aria-hidden />
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-orange-950">{item.title}</h3>
+                      <p className="text-sm text-orange-950/70">{item.description}</p>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-orange-900">
             Who this is for
@@ -339,19 +422,19 @@ export default function FromKitchenToCashPage() {
             <Card className="p-8 text-muted-foreground text-lg leading-relaxed border-orange-300 bg-orange-50 shadow-[0_10px_40px_rgba(194,65,12,0.20)]">
               <ul className="space-y-4">
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-1 shrink-0" />
                   Nigerians dreaming of—or already growing—a catering hustle.
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-1 shrink-0" />
                   Caterers tired of being busy but unsure of real profit.
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-1 shrink-0" />
                   Entrepreneurs who want clear systems for pricing and costing.
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-1 shrink-0" />
+                  <CheckCircle2 className="h-5 w-5 text-orange-700 mt-1 shrink-0" />
                   Anyone who prefers practical templates over guesswork.
                 </li>
               </ul>
@@ -370,7 +453,15 @@ export default function FromKitchenToCashPage() {
       </section>
 
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12 rounded-3xl bg-gradient-to-b from-orange-300/70 to-amber-300/70">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-orange-950">What’s inside</h2>
+            <p className="text-orange-950/70 mt-2">
+              Two parts, one goal: help you build a catering business that’s priced right and runs profitably.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -381,9 +472,9 @@ export default function FromKitchenToCashPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
                 <ChefHat className="h-6 w-6 text-orange-700" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-orange-900">
+              <h3 className="text-2xl md:text-3xl font-bold text-orange-950">
                 Part One — Foundations &amp; intro
-              </h2>
+              </h3>
             </div>
             <Card className="p-8 space-y-4 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(180,83,9,0.18)]">
               <p className="text-orange-950 font-semibold">Part One gives you a strong business foundation:</p>
@@ -430,9 +521,9 @@ export default function FromKitchenToCashPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
                 <LayoutGrid className="h-6 w-6 text-orange-700" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-orange-900">
+              <h3 className="text-2xl md:text-3xl font-bold text-orange-950">
                 Part Two — Menu, maths &amp; takeaway tools
-              </h2>
+              </h3>
             </div>
             <Card className="p-8 space-y-3 text-muted-foreground border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-[0_10px_40px_rgba(194,65,12,0.18)]">
               <ul className="space-y-3 list-none">
@@ -445,7 +536,7 @@ export default function FromKitchenToCashPage() {
                   "Use printable takeaway costing sheets in your daily workflow",
                 ].map((line) => (
                   <li key={line} className="flex gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <CheckCircle2 className="h-5 w-5 text-orange-700 mt-0.5 shrink-0" />
                     <span>{line}</span>
                   </li>
                 ))}
@@ -464,6 +555,32 @@ export default function FromKitchenToCashPage() {
               />
             </div>
           </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-orange-950">FAQ</h2>
+            <p className="text-orange-950/70 mt-2">Quick answers before you grab your copy.</p>
+          </div>
+
+          <div className="rounded-2xl border border-orange-950/10 bg-white shadow-md overflow-hidden">
+            {FAQS.map((item) => (
+              <details key={item.q} className="group border-b border-orange-950/10 last:border-b-0">
+                <summary className="cursor-pointer list-none px-6 py-4 flex items-center justify-between gap-4">
+                  <span className="font-semibold text-orange-950">{item.q}</span>
+                  <span className="text-orange-700 group-open:rotate-45 transition-transform select-none text-xl leading-none">
+                    +
+                  </span>
+                </summary>
+                <div className="px-6 pb-5 text-orange-950/75">
+                  <p>{item.a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -505,7 +622,7 @@ export default function FromKitchenToCashPage() {
       <motion.button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${
+        className={`fixed bottom-8 right-8 z-40 p-4 bg-orange-700 text-white rounded-full shadow-lg hover:bg-orange-800 transition-colors ${
           showBackToTop ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         initial={{ scale: 0 }}
@@ -522,7 +639,7 @@ export default function FromKitchenToCashPage() {
         <div className="container mx-auto px-4 md:px-6 lg:px-8 text-center text-sm text-muted-foreground space-y-2">
           <p>
             <strong className="text-foreground">Lydeis Bakes</strong> ×{" "}
-            <Link href="/" className="text-primary hover:underline">
+            <Link href="/" className="text-orange-800 hover:underline">
               Cryptic Solutions
             </Link>
           </p>
