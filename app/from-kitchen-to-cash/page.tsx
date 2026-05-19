@@ -101,7 +101,7 @@ const FAQS = [
   },
   {
     q: "What format will I receive?",
-    a: "PDF downloads — buy Part One or Part Two for ₦3,000 each, or both together for ₦5,000 (save ₦1,000). Templates and exercises are included with the parts you purchase.",
+    a: "PDF downloads - buy Part One or Part Two for ₦3,000 each, or both together for ₦5,000 (save ₦1,000). Templates and exercises are included with the parts you purchase.",
   },
   {
     q: "Can I buy just one part?",
@@ -267,7 +267,7 @@ export default function FromKitchenToCashPage() {
                   <ShoppingBag className="h-5 w-5 mr-2" />
                   Get the Ebook
                 </Button>
-                <Button
+                {/* <Button
                   size="lg"
                   variant="outline"
                   className="h-12 bg-transparent border-orange-50/60 text-orange-50 hover:bg-orange-50/15 hover:text-orange-50 shadow-sm shadow-orange-950/10"
@@ -277,7 +277,7 @@ export default function FromKitchenToCashPage() {
                     <Instagram className="h-5 w-5 mr-2" aria-hidden />
                     See our work on Instagram
                   </a>
-                </Button>
+                </Button> */}
               </div>
 
               <div className="pt-2">
@@ -635,7 +635,7 @@ export default function FromKitchenToCashPage() {
               <motion.div>
                 <p className="text-sm font-semibold text-orange-950">Selected</p>
                 <p className="text-orange-950/80">
-                  <span className="font-semibold">{selectedProduct.name}</span> — ₦
+                  <span className="font-semibold">{selectedProduct.name}</span> : ₦
                   {selectedProduct.amount.toLocaleString()}
                 </p>
                 <p className="text-xs text-orange-950/65 mt-1">

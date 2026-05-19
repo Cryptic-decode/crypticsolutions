@@ -131,7 +131,7 @@ function KitchenEbookSuccessContent() {
           <>
             <div className="mx-auto w-16 h-16 bg-orange-200 rounded-full flex items-center justify-center mb-4">
               <CheckCircle2 className="h-8 w-8 text-orange-700" />
-            </motion.div>
+            </div>
             <h1 className="text-2xl font-bold text-orange-950 mb-2">Payment successful</h1>
             <p className="text-orange-900/80 mb-6">
               Thank you for purchasing <strong>{product.name}</strong>. Your PDF

@@ -18,7 +18,7 @@ function servePdfRange(request: NextRequest, pdfBuffer: Buffer, fileName: string
   const fileSize = pdfBuffer.length;
 
   if (!range) {
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${fileName}"`,
@@ -45,7 +45,7 @@ function servePdfRange(request: NextRequest, pdfBuffer: Buffer, fileName: string
 
   const chunk = pdfBuffer.subarray(start, end + 1);
 
-  return new NextResponse(chunk, {
+  return new NextResponse(new Uint8Array(chunk), {
     status: 206,
     headers: {
       "Content-Type": "application/pdf",

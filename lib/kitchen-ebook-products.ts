@@ -21,21 +21,21 @@ export const KITCHEN_EBOOK_PRODUCTS: Record<
   }
 > = {
   "from-kitchen-to-cash-part-one": {
-    name: "From Kitchen to Cash — Part One",
+    name: "From Kitchen to Cash - Part One",
     amount: 3000,
     parts: ["part-one"],
     checkoutLabel: "Part One only",
     checkoutDescription: "Foundations, pitfalls, mindset, and intro exercises.",
   },
   "from-kitchen-to-cash-part-two": {
-    name: "From Kitchen to Cash — Part Two",
+    name: "From Kitchen to Cash - Part Two",
     amount: 3000,
     parts: ["part-two"],
     checkoutLabel: "Part Two only",
     checkoutDescription: "Menus, costing, templates, and takeaway worksheets.",
   },
   "from-kitchen-to-cash-bundle": {
-    name: "From Kitchen to Cash — Complete Bundle",
+    name: "From Kitchen to Cash - Complete Bundle",
     amount: 5000,
     parts: ["part-one", "part-two"],
     checkoutLabel: "Both parts (best value)",

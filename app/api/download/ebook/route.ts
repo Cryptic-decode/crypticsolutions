@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
         const chunk = pdfBuffer.subarray(start, end + 1);
         const contentLength = chunk.length.toString();
 
-        return new NextResponse(chunk, {
+        return new NextResponse(new Uint8Array(chunk), {
           status: 206,
           headers: {
             "Content-Type": "application/pdf",
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Full content response
-      return new NextResponse(pdfBuffer, {
+      return new NextResponse(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${pdfFileName}"`,
