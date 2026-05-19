@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
+function isCheckoutEmailValid(email: string): boolean {
+  const trimmed = email.trim();
+  return trimmed.length > 0 && trimmed.includes("@") && trimmed.includes(".");
+}
 
 interface PaystackPaymentProps {
   email: string;
@@ -17,6 +22,7 @@ interface PaystackPaymentProps {
   disabled?: boolean;
   className?: string;
   buttonLabel?: string;
+  requireEmail?: boolean;
 }
 
 export function PaystackPayment({ 
@@ -31,11 +37,15 @@ export function PaystackPayment({
   disabled = false,
   className,
   buttonLabel,
+  requireEmail = true,
 }: PaystackPaymentProps) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const checkoutEmail = email.trim();
+  const emailValid = !requireEmail || isCheckoutEmailValid(checkoutEmail);
 
   const initializePayment = async () => {
+    if (!emailValid) return;
+
     setLoading(true);
     
     try {
@@ -46,7 +56,7 @@ export function PaystackPayment({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
+          email: checkoutEmail,
           amount,
           productId,
           productName,
@@ -68,7 +78,8 @@ export function PaystackPayment({
       if (data.success && data.authorization_url) {
         // Store reference in localStorage for verification after redirect
         localStorage.setItem('paystack_reference', data.reference);
-        
+        localStorage.setItem('paystack_kitchen_product_id', productId);
+
         // Redirect to Paystack checkout
         window.location.href = data.authorization_url;
       } else {
@@ -83,14 +94,19 @@ export function PaystackPayment({
     }
   };
 
-  const isDisabled = disabled || loading || !email || !email.includes('@');
+  const isDisabled = disabled || loading || !emailValid;
 
   return (
     <Button
+      type="button"
       onClick={initializePayment}
       disabled={isDisabled}
       size="lg"
-      className={className ?? "w-full cursor-pointer"}
+      className={cn(
+        "w-full",
+        className,
+        isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+      )}
     >
       {loading ? (
         <>
