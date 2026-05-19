@@ -15,6 +15,8 @@ interface PaystackPaymentProps {
   onSuccess?: (response: any) => void;
   onError?: (error: any) => void;
   disabled?: boolean;
+  className?: string;
+  buttonLabel?: string;
 }
 
 export function PaystackPayment({ 
@@ -26,7 +28,9 @@ export function PaystackPayment({
   metadata, 
   onSuccess, 
   onError,
-  disabled = false
+  disabled = false,
+  className,
+  buttonLabel,
 }: PaystackPaymentProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -82,11 +86,11 @@ export function PaystackPayment({
   const isDisabled = disabled || loading || !email || !email.includes('@');
 
   return (
-    <Button 
-      onClick={initializePayment} 
+    <Button
+      onClick={initializePayment}
       disabled={isDisabled}
       size="lg"
-      className="w-full cursor-pointer"
+      className={className ?? "w-full cursor-pointer"}
     >
       {loading ? (
         <>
@@ -94,9 +98,7 @@ export function PaystackPayment({
           Processing...
         </>
       ) : (
-        <>
-          Buy for ₦{amount.toLocaleString()}
-        </>
+        <>{buttonLabel ?? `Buy for ₦${amount.toLocaleString()}`}</>
       )}
     </Button>
   );

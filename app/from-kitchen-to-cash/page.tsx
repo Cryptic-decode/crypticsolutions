@@ -22,6 +22,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Drawer } from "@/components/ui/drawer";
+import { PaystackPayment } from "@/components/payment-paystack";
+import {
+  KITCHEN_EBOOK_PRODUCT_IDS,
+  KITCHEN_EBOOK_PRODUCTS,
+  type KitchenEbookProductId,
+} from "@/lib/kitchen-ebook-products";
 
 const INSTAGRAM_HREF = "https://www.instagram.com/lydeis_kitchenandevents";
 
@@ -80,7 +86,11 @@ const FAQS = [
   },
   {
     q: "What format will I receive?",
-    a: "A PDF ebook (two parts), plus templates and exercises included with the guide.",
+    a: "PDF downloads — buy Part One or Part Two for ₦3,000 each, or both together for ₦5,000 (save ₦1,000). Templates and exercises are included with the parts you purchase.",
+  },
+  {
+    q: "Can I buy just one part?",
+    a: "Yes. Part One and Part Two are ₦3,000 each. If you want the full guide, the bundle is ₦5,000 and includes both PDFs.",
   },
   {
     q: "Do I need Excel to use the templates?",
@@ -266,39 +276,6 @@ export default function FromKitchenToCashPage() {
         </motion.div>
       </section>
 
-      <section id="checkout" className="container mx-auto px-4 md:px-6 lg:px-8 pb-6">
-        <Card className="max-w-4xl mx-auto p-6 md:p-8 border-orange-500 bg-gradient-to-br from-orange-100 to-amber-100 shadow-[0_10px_40px_rgba(154,52,18,0.25)]">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <p className="text-sm font-semibold text-orange-800 mb-2">On-page checkout</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-orange-950">Buy your ebook here</h2>
-              <p className="text-orange-900/80 mt-2">
-                Enter your email and continue to secure checkout on this page.
-              </p>
-              <div className="mt-4">
-                <label htmlFor="checkout-email" className="text-sm font-medium text-orange-900">
-                  Email
-                </label>
-                <input
-                  id="checkout-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="mt-2 h-12 w-full rounded-md border border-orange-400 bg-white px-3 text-base outline-none focus:border-orange-600"
-                />
-              </div>
-            </div>
-            <Button size="lg" className="h-12 bg-orange-700 hover:bg-orange-800 text-white w-full md:w-auto" disabled={!email.includes("@")}>
-              Buy Ebook on This Page
-            </Button>
-          </div>
-          <p className="text-xs text-orange-900/70 mt-4">
-            Instagram is for brand proof only. Checkout happens on this landing page.
-          </p>
-        </Card>
-      </section>
-
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-14">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-end justify-between gap-6 mb-6">
@@ -462,12 +439,12 @@ export default function FromKitchenToCashPage() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
                 <ChefHat className="h-6 w-6 text-orange-700" />
@@ -500,23 +477,14 @@ export default function FromKitchenToCashPage() {
                 Outcome: you stop underpricing, reduce silent losses, and prepare your business for profitable growth.
               </p>
             </Card>
-            <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
-              <Image
-                src="/lydei-assets/pastryPresentation2.jpeg"
-                alt="Lydeis pastry presentation setup"
-                width={1200}
-                height={700}
-                className="h-56 md:h-64 w-full object-cover"
-              />
-            </div>
-          </motion.div>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-200">
                 <LayoutGrid className="h-6 w-6 text-orange-700" />
@@ -545,16 +513,7 @@ export default function FromKitchenToCashPage() {
                 Outcome: you get a practical costing system you can use every day for real orders.
               </p>
             </Card>
-            <div className="mt-6 rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
-              <Image
-                src="/lydei-assets/pastryStore-front2.jpeg"
-                alt="Lydeis pastry store setup"
-                width={1200}
-                height={700}
-                className="h-56 md:h-64 w-full object-cover"
-              />
-            </div>
-          </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -581,6 +540,81 @@ export default function FromKitchenToCashPage() {
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="checkout" className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div>
+            <p className="text-sm font-semibold text-orange-800 mb-2">On-page checkout</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-orange-950">Choose your ebook</h2>
+            <p className="text-orange-900/80 mt-2 max-w-2xl">
+              Each part is ₦3,000. Get both for ₦5,000 and save ₦1,000. Secure payment via Paystack.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="checkout-email" className="text-sm font-medium text-orange-900">
+              Email for your download
+            </label>
+            <input
+              id="checkout-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="mt-2 h-12 w-full max-w-md rounded-md border border-orange-400 bg-white px-3 text-base outline-none focus:border-orange-600"
+            />
+            {email && !email.includes("@") && (
+              <p className="text-xs text-red-700 mt-1">Please enter a valid email address.</p>
+            )}
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {KITCHEN_EBOOK_PRODUCT_IDS.map((id: KitchenEbookProductId) => {
+              const product = KITCHEN_EBOOK_PRODUCTS[id];
+              const isBundle = id === "from-kitchen-to-cash-bundle";
+              return (
+                <Card
+                  key={id}
+                  className={`p-5 md:p-6 flex flex-col border-orange-300 bg-gradient-to-br from-orange-50 to-amber-100 shadow-md ${
+                    isBundle ? "ring-2 ring-orange-500 md:scale-[1.02]" : ""
+                  }`}
+                >
+                  {isBundle && (
+                    <span className="inline-flex self-start rounded-full bg-orange-600 text-white text-xs font-semibold px-2.5 py-0.5 mb-3">
+                      Save ₦1,000
+                    </span>
+                  )}
+                  <h3 className="text-lg font-bold text-orange-950">{product.checkoutLabel}</h3>
+                  <p className="text-3xl font-bold text-orange-800 mt-1">
+                    ₦{product.amount.toLocaleString()}
+                  </p>
+                  {isBundle && (
+                    <p className="text-xs text-orange-800/70 line-through mt-0.5">₦6,000 separately</p>
+                  )}
+                  <p className="text-sm text-orange-900/80 mt-3 flex-1">{product.checkoutDescription}</p>
+                  <div className="mt-5">
+                    <PaystackPayment
+                      email={email}
+                      amount={product.amount}
+                      productId={id}
+                      productName={product.name}
+                      successPath="/payment/kitchen-ebook-success"
+                      metadata={{ product: "From Kitchen to Cash", currency: "NGN" }}
+                      buttonLabel={`Pay ₦${product.amount.toLocaleString()}`}
+                      className="w-full h-11 bg-orange-700 hover:bg-orange-800 text-white cursor-pointer"
+                      onError={(error) => console.error("Payment failed:", error)}
+                    />
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+
+          <p className="text-xs text-orange-900/70">
+            Instagram is for brand proof only. Checkout and downloads happen on this page.
+          </p>
         </div>
       </section>
 
