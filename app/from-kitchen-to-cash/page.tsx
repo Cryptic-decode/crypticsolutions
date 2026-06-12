@@ -55,7 +55,7 @@ const PROOF_GALLERY = [
     caption: "Handmade quality",
   },
   {
-    src: "/lydei-assets/proof-event-dessert-table.png",
+    src: "/lydei-assets/proof-event-dessert-table(naija).png",
     alt: "Dessert table for an event",
     caption: "Event-ready setup",
   },
@@ -65,7 +65,7 @@ const PROOF_GALLERY = [
     caption: "Bakery-style finishing",
   },
   {
-    src: "/lydei-assets/proof-kitchen-hands-prep.png",
+    src: "/lydei-assets/proof-kitchen-hands-prep(naija).png",
     alt: "Kitchen prep in action",
     caption: "Behind the scenes",
   },
@@ -339,7 +339,7 @@ export default function FromKitchenToCashPage() {
           <div className="max-w-6xl mx-auto">
             <div className="relative h-[360px] md:h-[420px] overflow-hidden rounded-3xl border border-orange-950/15 shadow-2xl">
               <Image
-                src="/lydei-assets/proof-kitchen-hands-prep.png"
+                src="/lydei-assets/proof-kitchen-hands-prep(naija).png"
                 alt="Kitchen prep in action"
                 fill
                 sizes="(min-width: 1024px) 1100px, 100vw"
