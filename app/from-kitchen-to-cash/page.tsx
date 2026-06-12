@@ -283,7 +283,7 @@ export default function FromKitchenToCashPage() {
               <div className="pt-2">
                 <div className="inline-flex items-center gap-3 rounded-xl bg-orange-50/10 border border-orange-50/20 px-3 py-2">
                   <Image
-                    src="/lydei-assets/product-ebook-mockup.png"
+                    src="/lydei-assets/product-ebook-mockup(naija).png"
                     alt="From Kitchen to Cash ebook"
                     width={800}
                     height={500}
@@ -431,7 +431,7 @@ export default function FromKitchenToCashPage() {
             </Card>
             <div className="rounded-2xl overflow-hidden border border-orange-300/70 shadow-md">
               <Image
-                src="/lydei-assets/pastryStore-front.jpeg"
+                src="/lydei-assets/pastryStore-front(naija).png"
                 alt="Lydeis pastry display"
                 width={1200}
                 height={900}
