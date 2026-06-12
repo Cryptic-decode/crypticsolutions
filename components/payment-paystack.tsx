@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getPaystackAccountForProductId } from '@/lib/paystack-accounts';
 
 function isCheckoutEmailValid(email: string): boolean {
   const trimmed = email.trim();
@@ -47,6 +48,8 @@ export function PaystackPayment({
     if (!emailValid) return;
 
     setLoading(true);
+
+    const paystackAccount = getPaystackAccountForProductId(productId);
     
     try {
       // Call our API to initialize payment
@@ -61,6 +64,7 @@ export function PaystackPayment({
           productId,
           productName,
           successPath,
+          paystackAccount,
           metadata: {
             ...metadata,
             product_id: productId,
@@ -78,6 +82,7 @@ export function PaystackPayment({
       if (data.success && data.authorization_url) {
         // Store reference in localStorage for verification after redirect
         localStorage.setItem('paystack_reference', data.reference);
+        localStorage.setItem('paystack_account', paystackAccount);
         localStorage.setItem('paystack_kitchen_product_id', productId);
 
         // Redirect to Paystack checkout

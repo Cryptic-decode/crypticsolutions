@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+import {
+  getPaystackSecretKey,
+  resolvePaystackAccount,
+} from '@/lib/paystack-accounts';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, amount, productId, productName, successPath = '/payment/success', metadata } = body;
+    const {
+      email,
+      amount,
+      productId,
+      productName,
+      successPath = '/payment/success',
+      metadata,
+      paystackAccount,
+    } = body;
 
     // Validate input
     if (!email || !amount || !productId || !productName) {
@@ -16,9 +26,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!PAYSTACK_SECRET_KEY) {
+    const account = resolvePaystackAccount(productId, paystackAccount);
+    const secretKey = getPaystackSecretKey(account);
+
+    if (!secretKey) {
       return NextResponse.json(
-        { error: 'Paystack secret key is not configured' },
+        {
+          error:
+            account === 'lydei'
+              ? 'Lydei Paystack secret key is not configured'
+              : 'Paystack secret key is not configured',
+        },
         { status: 500 }
       );
     }
@@ -38,11 +56,14 @@ export async function POST(request: NextRequest) {
         amount: amount * 100, // Convert to kobo (lowest currency unit)
         reference,
         callback_url: callbackUrl,
-        metadata
+        metadata: {
+          ...metadata,
+          paystack_account: account,
+        },
       },
       {
         headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${secretKey}`,
           'Content-Type': 'application/json',
         },
       }

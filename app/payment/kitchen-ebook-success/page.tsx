@@ -48,10 +48,15 @@ function KitchenEbookSuccessContent() {
     try {
       setLoading(true);
 
+      const paystackAccount =
+        typeof window !== "undefined"
+          ? localStorage.getItem("paystack_account") || "lydei"
+          : "lydei";
+
       const verifyResponse = await fetch("/api/payment/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference: ref }),
+        body: JSON.stringify({ reference: ref, paystackAccount }),
       });
 
       const verifyData = await verifyResponse.json();
