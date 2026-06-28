@@ -40,15 +40,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Pass through Next.js static assets so they aren't caught by the subdomain rewrite
+        // Pass through Next.js static assets so they aren't caught by the subdomain rewrite.
+        // No host condition: this is a harmless no-op for all domains but ensures _next paths
+        // are matched before the catch-all rewrite on the subdomain.
         {
           source: '/_next/:path*',
-          has: [
-            {
-              type: 'host',
-              value: SUBDOMAIN_HOST,
-            },
-          ],
           destination: '/_next/:path*',
         },
         // Rewrite all other paths on the subdomain to the kitchen-to-cash page
