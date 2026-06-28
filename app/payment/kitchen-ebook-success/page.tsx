@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, Download, Home, Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -40,7 +39,7 @@ function KitchenEbookSuccessContent() {
     if (reference) {
       handlePaymentSuccess(reference);
     } else {
-      router.push("/from-kitchen-to-cash");
+      window.location.href = process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com';
     }
   }, [reference, router]);
 
@@ -105,7 +104,9 @@ function KitchenEbookSuccessContent() {
     } catch (error: unknown) {
       console.error("Kitchen ebook payment success error:", error);
       showError(error, "payment");
-      setTimeout(() => router.push("/from-kitchen-to-cash#checkout"), 3000);
+      setTimeout(() => {
+        window.location.href = (process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com') + '#checkout';
+      }, 3000);
     } finally {
       setLoading(false);
     }
@@ -185,13 +186,13 @@ function KitchenEbookSuccessContent() {
               )}
             </motion.div>
 
-            <Link
-              href="/from-kitchen-to-cash"
+            <a
+              href={process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com'}
               className="inline-flex items-center gap-2 text-sm text-orange-800/80 hover:text-orange-900 mt-6"
             >
               <Home className="h-4 w-4" />
               Back to ebook page
-            </Link>
+            </a>
           </>
         )}
       </Card>

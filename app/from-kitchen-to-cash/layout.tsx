@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
 import { BreadcrumbSchema } from '@/components/seo/structured-data';
 
-const path = '/from-kitchen-to-cash';
+const kitchenCashUrl =
+  process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(kitchenCashUrl),
   title: 'From Kitchen to Cash — Catering Ebook',
   description:
     'Two-part ebook for Nigerian entrepreneurs and caterers-in-the-making: foundations, mindset, pitfalls, costing, menus, templates, and practical exercises—with takeaway packs.',
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
     description:
       'Mindset before math. Foundations, pitfalls, costing, menus, and printable templates—from Lydeis Bakes × Cryptic Solutions.',
     type: 'website',
-    url: path,
+    url: kitchenCashUrl,
     images: [
       {
         url: '/LydeisLogo.jpg',
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
     images: ['/LydeisLogo.jpg'],
   },
   alternates: {
-    canonical: path,
+    canonical: kitchenCashUrl,
   },
 };
 
@@ -48,14 +50,13 @@ export default function FromKitchenToCashLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutions.com';
-  const pageUrl = `${baseUrl}${path}`;
+  const pageUrl = kitchenCashUrl;
 
   return (
     <>
       <BreadcrumbSchema
         items={[
-          { name: 'Home', url: baseUrl },
+          { name: 'Home', url: kitchenCashUrl },
           { name: 'From Kitchen to Cash', url: pageUrl },
         ]}
       />

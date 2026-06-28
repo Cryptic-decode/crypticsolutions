@@ -34,7 +34,39 @@ const securityHeaders = [
   },
 ];
 
+const SUBDOMAIN_HOST = 'lydei.crypticsolutionsltd.com';
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/:path*',
+          has: [
+            {
+              type: 'host',
+              value: SUBDOMAIN_HOST,
+            },
+          ],
+          destination: '/from-kitchen-to-cash/:path*',
+        },
+      ],
+    };
+  },
+  async redirects() {
+    return [
+      {
+        source: '/from-kitchen-to-cash',
+        destination: `https://${SUBDOMAIN_HOST}`,
+        permanent: true,
+      },
+      {
+        source: '/from-kitchen-to-cash/:path*',
+        destination: `https://${SUBDOMAIN_HOST}/:path*`,
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       // Global security headers for all routes (pages, assets, APIs)

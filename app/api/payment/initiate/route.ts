@@ -4,6 +4,7 @@ import {
   getPaystackSecretKey,
   resolvePaystackAccount,
 } from '@/lib/paystack-accounts';
+import { isKitchenEbookProductId } from '@/lib/kitchen-ebook-products';
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +46,10 @@ export async function POST(request: NextRequest) {
     const reference = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Build callback URL dynamically based on product
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutions.com';
+    const isKitchenEbook = isKitchenEbookProductId(productId);
+    const baseUrl = isKitchenEbook
+      ? (process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com')
+      : (process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutionsltd.com');
     const callbackUrl = `${baseUrl}${successPath}?reference=${reference}`;
 
     // Call Paystack API to initialize transaction
