@@ -6,8 +6,8 @@ export type KitchenEbookProductId =
   | "from-kitchen-to-cash-bundle";
 
 export const KITCHEN_EBOOK_PDF_FILES: Record<KitchenEbookPart, string> = {
-  "part-one": "From Kitchen to Cash - Part One.pdf",
-  "part-two": "From Kitchen to Cash - Part Two.pdf",
+  "part-one": "From_Kitchen_To_Cash_Starter_Blueprint.pdf",
+  "part-two": "From_Kitchen_To_Cash_Growth_Formula.pdf",
 };
 
 export const KITCHEN_EBOOK_PRODUCTS: Record<
