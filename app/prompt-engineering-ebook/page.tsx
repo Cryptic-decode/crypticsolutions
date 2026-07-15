@@ -129,7 +129,7 @@ export default function PromptEngineeringEbookPage() {
                 }
               ]}
               ctaButton={{
-                label: "Get the Ebook – ₦1,500",
+                label: "Get the Ebook – ₦2,000",
                 onClick: () => {
                   const element = document.getElementById('pricing');
                   if (element) {
@@ -185,7 +185,7 @@ export default function PromptEngineeringEbookPage() {
                     }
                   }}
                 >
-                  Get the Ebook – ₦1,500
+                  Get the Ebook – ₦2,000
                 </Button>
               </motion.div>
             </motion.div>
@@ -439,7 +439,7 @@ export default function PromptEngineeringEbookPage() {
                   <div className="mb-6">
                     <p className="text-sm font-medium text-primary mb-2">Special Launch Price</p>
                     <div className="flex items-baseline gap-2 justify-center md:justify-start">
-                      <span className="text-4xl font-bold text-[#1B2242] dark:text-white">₦1,500</span>
+                      <span className="text-4xl font-bold text-[#1B2242] dark:text-white">₦2,000</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">One-time payment</p>
                   </div>
@@ -481,7 +481,7 @@ export default function PromptEngineeringEbookPage() {
                     <motion.div whileHover={email && email.includes('@') ? { scale: 1.02 } : {}} whileTap={{ scale: 0.98 }}>
                       <PaystackPayment 
                         email={email}
-                        amount={1500}
+                        amount={2000}
                         productId="talk-to-ai-like-a-pro"
                         productName="Talk to AI like a Pro"
                         successPath="/payment/ebook-success"
@@ -575,7 +575,7 @@ export default function PromptEngineeringEbookPage() {
                   }
                 }}
               >
-                Get the Ebook Now – ₦1,500
+                Get the Ebook Now – ₦2,000
               </Button>
             </motion.div>
           </motion.div>

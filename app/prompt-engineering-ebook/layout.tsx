@@ -55,7 +55,7 @@ export default function PromptEngineeringEbookLayout({
       <ProductSchema
         name="Talk to AI like a Pro"
         description="Comprehensive guide to writing effective AI prompts. Learn the structure, templates, and strategies that actually work."
-        price="1500"
+        price="2000"
         currency="NGN"
         url={`${baseUrl}/prompt-engineering-ebook`}
       />

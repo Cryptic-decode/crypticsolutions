@@ -2,8 +2,6 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutionsltd.com';
-  const kitchenCashUrl =
-    process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com';
 
   return [
     {
@@ -23,12 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
-    },
-    {
-      url: kitchenCashUrl,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.85,
     },
     {
       url: `${baseUrl}/signin`,

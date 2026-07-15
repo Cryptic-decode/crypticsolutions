@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import {
-  getPaystackSecretKey,
-  resolvePaystackAccount,
-} from '@/lib/paystack-accounts';
-import { isKitchenEbookProductId } from '@/lib/kitchen-ebook-products';
+import { getPaystackSecretKey } from '@/lib/paystack-accounts';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +12,6 @@ export async function POST(request: NextRequest) {
       productName,
       successPath = '/payment/success',
       metadata,
-      paystackAccount,
     } = body;
 
     // Validate input
@@ -27,17 +22,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const account = resolvePaystackAccount(productId, paystackAccount);
-    const secretKey = getPaystackSecretKey(account);
+    const secretKey = getPaystackSecretKey();
 
     if (!secretKey) {
       return NextResponse.json(
-        {
-          error:
-            account === 'lydei'
-              ? 'Lydei Paystack secret key is not configured'
-              : 'Paystack secret key is not configured',
-        },
+        { error: 'Paystack secret key is not configured' },
         { status: 500 }
       );
     }
@@ -45,11 +34,9 @@ export async function POST(request: NextRequest) {
     // Generate reference
     const reference = `ref_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // Build callback URL dynamically based on product
-    const isKitchenEbook = isKitchenEbookProductId(productId);
-    const baseUrl = isKitchenEbook
-      ? (process.env.NEXT_PUBLIC_KITCHEN_CASH_DOMAIN || 'https://lydei.crypticsolutionsltd.com')
-      : (process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutionsltd.com');
+    // Build callback URL
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutionsltd.com';
     const callbackUrl = `${baseUrl}${successPath}?reference=${reference}`;
 
     // Call Paystack API to initialize transaction
@@ -62,7 +49,8 @@ export async function POST(request: NextRequest) {
         callback_url: callbackUrl,
         metadata: {
           ...metadata,
-          paystack_account: account,
+          product_id: productId,
+          product_name: productName,
         },
       },
       {
