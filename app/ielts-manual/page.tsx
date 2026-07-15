@@ -2,47 +2,29 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { 
+import {
   ArrowLeft,
-  ArrowRight,
   CheckCircle2,
-  Award,
   FileText,
-  Users,
-  Target,
   BookOpen,
-  Moon,
-  Sun,
-  Mail,
-  Linkedin,
-  Instagram,
   Shield,
-  ArrowUp,
-  Menu,
-  X
+  ArrowUp
 } from "lucide-react";
-import { TikTokIcon } from "@/components/ui/tiktok-icon";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Drawer } from "@/components/ui/drawer";
-import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 import { PaystackPayment } from '@/components/payment-paystack';
+import { ProductNav } from "@/components/layout/product-nav";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { fadeInUp, buttonTap } from "@/lib/animations";
 
 export default function IELTSManualPage() {
-  const [darkMode, setDarkMode] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [email, setEmail] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const isDark = localStorage.getItem('theme') === 'dark' || 
-        (!localStorage.getItem('theme'));
-      setDarkMode(isDark);
-
       const handleScroll = () => {
         setShowBackToTop(window.scrollY > 300);
       };
@@ -52,99 +34,28 @@ export default function IELTSManualPage() {
     }
   }, []);
 
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+  const scrollToPricing = () => {
+    const element = document.getElementById('pricing');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
-
-  const fadeInUp = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6, ease: "easeOut" }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
       <ScrollBackdrop />
-      {/* Navigation */}
-      <nav className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center">
-              <Image 
-                src="/cryptic-assets/fullLogo.png" 
-                alt="Cryptic Solutions" 
-                width={180} 
-                height={45}
-                className="h-[45px] w-auto dark:hidden"
-                priority
-              />
-              <Image 
-                src="/cryptic-assets/fullLogo2.png" 
-                alt="Cryptic Solutions" 
-                width={180} 
-                height={45}
-                className="h-[45px] w-auto hidden dark:block"
-                priority
-              />
-            </Link>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={toggleDarkMode}
-                className="hidden md:block p-2 rounded-lg hover:bg-secondary/50 transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
-              <button 
-                className="md:hidden p-2"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
 
-          {/* Mobile Menu */}
-          <Drawer
-            isOpen={mobileMenuOpen}
-            onClose={() => setMobileMenuOpen(false)}
-          >
-            <MainDrawer
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-              onClose={() => setMobileMenuOpen(false)}
-              links={[
-                {
-                  href: "/",
-                  label: "Back to Home"
-                }
-              ]}
-              ctaButton={{
-                label: "Get the Manual – ₦5,000",
-                onClick: () => {
-                  const element = document.getElementById('pricing');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }
-              }}
-            />
-          </Drawer>
-        </div>
-      </nav>
+      <ProductNav
+        ctaLabel="Get the Manual – ₦5,000"
+        onCtaClick={scrollToPricing}
+      />
+
+      {/* Spacer for fixed nav */}
+      <div className="h-16" />
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-24 pb-16 md:pt-32 md:pb-24">
-        <motion.div 
+      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-12 pb-16 md:pt-20 md:pb-24">
+        <motion.div
           className="max-w-4xl mx-auto"
           initial="initial"
           animate="animate"
@@ -156,34 +67,29 @@ export default function IELTSManualPage() {
           </Link>
 
           <div className="text-center">
-            <motion.h1 
+            <motion.h1
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
               variants={fadeInUp}
             >
               <span className="text-[#1B2242] dark:text-white">Crack the IELTS with Confidence</span> <br />
               <span className="text-primary">Study Smarter, Not Harder</span>
             </motion.h1>
-            
+
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-8">
               Don't just prepare for IELTS, <em>understand it.</em> Our <strong>IELTS Preparation Manual</strong> is your step-by-step guide to mastering the test. Built from real strategies that help you think like the examiner and perform like a top scorer.
             </p>
 
-            <motion.div 
+            <motion.div
               className="flex justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="w-full sm:w-auto text-lg h-14 px-8 cursor-pointer"
-                  onClick={() => {
-                    const element = document.getElementById('pricing');
-                    if (element) {
-                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
+                  onClick={scrollToPricing}
                 >
                   Get the Complete Manual – ₦5,000
                 </Button>
@@ -313,7 +219,7 @@ export default function IELTSManualPage() {
             </div>
           </Card>
 
-          <motion.p 
+          <motion.p
             className="text-center mt-8 text-lg font-semibold text-primary"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -338,7 +244,7 @@ export default function IELTSManualPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
               <span className="text-[#1B2242] dark:text-white">Who This Manual</span> <span className="text-primary">Is For</span>
             </h2>
-            
+
             <Card className="p-8">
               <p className="text-lg mb-2">This guide is perfect for you if:</p>
               <ul className="space-y-3">
@@ -470,11 +376,6 @@ export default function IELTSManualPage() {
                       </div>
                     </li>
                   </ul>
-
-                  {/* <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                    <p className="font-medium text-[#1B2242] dark:text-white mb-1">Community Access</p>
-                    <p className="text-sm text-muted-foreground">Join our IELTS Success Community, share progress and get support</p>
-                  </div> */}
                 </div>
 
                 {/* Right Column - Pricing */}
@@ -503,43 +404,42 @@ export default function IELTSManualPage() {
                     </li>
                   </ul>
 
-              <div className="space-y-4">
-                <div className="flex flex-col space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-muted-foreground">
-                    Enter your email to continue
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
-                    required
-                  />
-                  {email && !email.includes('@') && (
-                    <p className="text-xs text-destructive">Please enter a valid email address</p>
-                  )}
-                </div>
+                  <div className="space-y-4">
+                    <div className="flex flex-col space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium text-muted-foreground">
+                        Enter your email to continue
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+                        required
+                      />
+                      {email && !email.includes('@') && (
+                        <p className="text-xs text-destructive">Please enter a valid email address</p>
+                      )}
+                    </div>
 
-                <motion.div whileHover={email && email.includes('@') ? { scale: 1.02 } : {}} whileTap={{ scale: 0.98 }}>
-                  <PaystackPayment 
-                    email={email}
-                    amount={5000}
-                    productId="ielts-manual"
-                    productName="IELTS Preparation Manual"
-                    successPath="/payment/success"
-                    metadata={{
-                      product: "IELTS Manual",
-                      currency: "NGN"
-                    }}
-                    onError={(error) => {
-                      console.error('Payment failed:', error);
-                      // You might want to show a toast notification here
-                    }}
-                  />
-                </motion.div>
-              </div>
+                    <motion.div whileHover={email && email.includes('@') ? { scale: 1.02 } : {}} whileTap={{ scale: 0.98 }}>
+                      <PaystackPayment
+                        email={email}
+                        amount={5000}
+                        productId="ielts-manual"
+                        productName="IELTS Preparation Manual"
+                        successPath="/payment/success"
+                        metadata={{
+                          product: "IELTS Manual",
+                          currency: "NGN"
+                        }}
+                        onError={(error) => {
+                          console.error('Payment failed:', error);
+                        }}
+                      />
+                    </motion.div>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -610,15 +510,10 @@ export default function IELTSManualPage() {
               This manual gives you that strategy. So before you spend months guessing what works, learn from something designed to help you <strong>win the test, not just write it.</strong>
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="w-full md:w-auto text-lg h-14 px-12 cursor-pointer"
-                onClick={() => {
-                  const element = document.getElementById('pricing');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
+                onClick={scrollToPricing}
               >
                 I'm Ready – Get the Manual
               </Button>
@@ -630,7 +525,7 @@ export default function IELTSManualPage() {
       {/* Back to Top Button */}
       <motion.button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${
+        className={`fixed bottom-24 md:bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${
           showBackToTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         initial={{ scale: 0 }}
@@ -643,132 +538,7 @@ export default function IELTSManualPage() {
         <ArrowUp className="h-6 w-6" />
       </motion.button>
 
-      {/* Footer */}
-      <footer className="border-t bg-secondary/30 py-16">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-              {/* Brand Column */}
-              <div className="md:col-span-1">
-                <div className="flex items-center cursor-pointer mb-4" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                  <Image 
-                    src="/cryptic-assets/fullLogo.png" 
-                    alt="Cryptic Solutions" 
-                    width={160} 
-                    height={40}
-                    className="h-[40px] w-auto dark:hidden"
-                  />
-                  <Image 
-                    src="/cryptic-assets/fullLogo2.png" 
-                    alt="Cryptic Solutions" 
-                    width={160} 
-                    height={40}
-                    className="h-[40px] w-auto hidden dark:block"
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Building digital excellence, one product at a time.
-                </p>
-              </div>
-
-              {/* Quick Links */}
-              <div>
-                <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Quick Links</h4>
-                <ul className="space-y-3 text-sm">
-                  <li>
-                    <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/#services" className="text-muted-foreground hover:text-primary transition-colors">
-                      Our Services
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/#products" className="text-muted-foreground hover:text-primary transition-colors">
-                      Our Products
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/#contact" className="text-muted-foreground hover:text-primary transition-colors">
-                      Contact Us
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Products */}
-              <div>
-                <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Products</h4>
-                <ul className="space-y-3 text-sm">
-                  <li>
-                    <span className="text-muted-foreground">IELTS Manual</span>
-                  </li>
-                  <li>
-                    <span className="text-muted-foreground">Quickland</span>
-                    <span className="ml-2 text-xs text-primary">Coming Soon</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Contact */}
-              <div>
-                <h4 className="font-bold text-[#1B2242] dark:text-white mb-4">Get in Touch</h4>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <a href="mailto:info@crypticsolutionsltd.com" className="hover:text-primary transition-colors">
-                      info@crypticsolutionsltd.com
-                    </a>
-                  </li>
-                </ul>
-                <div className="flex items-center gap-3 mt-4">
-                  <a 
-                    href="https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="TikTok"
-                  >
-                    <TikTokIcon className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href="https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="Instagram"
-                  >
-                    <Instagram className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href="https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                    aria-label="LinkedIn"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="pt-8 border-t">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-sm text-muted-foreground text-center md:text-left">
-                  © {new Date().getFullYear()} Cryptic Solutions. All rights reserved.
-                </p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span>Building Digital Excellence</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

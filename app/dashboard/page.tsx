@@ -201,12 +201,20 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   You haven't purchased any products yet. Explore our products to get started.
                 </p>
-                <Button asChild size="lg" className="mt-4">
-                  <Link href="/ielts-manual" className="inline-flex items-center gap-2">
-                    Browse Products
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button asChild size="lg">
+                    <Link href="/ielts-manual" className="inline-flex items-center gap-2">
+                      IELTS Manual
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/prompt-engineering-ebook" className="inline-flex items-center gap-2">
+                      Prompt Engineering Ebook
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </Card>
           )}
