@@ -144,33 +144,25 @@ export default function CourseViewPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl"
       >
         {/* Back Button */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Link>
 
         {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
-              <p className="text-muted-foreground">{product.description}</p>
-            </div>
-          </div>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-1">{product.name}</h1>
+          <p className="text-sm text-muted-foreground">{product.description}</p>
         </div>
 
         <motion.div
@@ -184,7 +176,6 @@ export default function CourseViewPage() {
             <PDFViewer
               productId={productId}
               userEmail={user?.email || ""}
-              productName={product.name}
               userName={user?.user_metadata?.full_name || (user?.email ? user.email.split("@")[0] : "User")}
             />
           </motion.div>

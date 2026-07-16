@@ -288,10 +288,7 @@
   user-select: none !important;
 }
 
-/* PDF Viewer - Let PDF pages display in their natural color */
-/* Don't override PDF page colors - let them display as originally designed */
-
-/* Only style the viewer container background, not the PDF pages */
+/* PDF Viewer base container */
 .rpv-core__viewer {
   background-color: var(--secondary) !important;
 }

@@ -68,7 +68,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative">
       <ScrollBackdrop intensity={0.8} />
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r bg-background">
@@ -109,9 +109,9 @@ export default function DashboardLayout({
       />
 
       {/* Main Content */}
-      <main className="lg:pl-80 pt-16 lg:pt-0">
-        {/* Desktop Header */}
-        <div className="hidden lg:block">
+      <main className="lg:pl-80 pt-16 lg:pt-16">
+        {/* Desktop Header — fixed so it stays visible on scroll */}
+        <div className="hidden lg:block fixed top-0 left-80 right-0 z-40">
           <DashboardHeader 
             userName={user.user_metadata?.full_name}
             userEmail={user.email}

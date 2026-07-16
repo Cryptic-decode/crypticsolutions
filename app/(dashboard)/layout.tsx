@@ -68,7 +68,7 @@ export default function DashboardGroupLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative">
       <ScrollBackdrop intensity={0.8} />
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r border-border/50 bg-background z-30">
