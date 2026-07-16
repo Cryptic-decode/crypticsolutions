@@ -2,13 +2,20 @@
 
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, BarChart3, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { BookOpen, BarChart3, TrendingUp, Clock, CheckCircle2, Flame } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
+import {
+  getCourseProductIds,
+  getProductInfo,
+  formatReadingTime,
+} from "@/lib/products";
+import { useStudyStreak } from "@/lib/hooks/use-study-streak";
+import { Skeleton, SkeletonCard, SkeletonStatCard } from "@/components/ui/skeleton";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -26,29 +33,14 @@ const itemVariants = {
   animate: { opacity: 1, y: 0 },
 };
 
-// Product name mapping
-const productNames: Record<string, { name: string; description: string; totalPages: number }> = {
-  'ielts-manual': {
-    name: 'IELTS Preparation Manual',
-    description: 'Complete study guide for IELTS exam',
-    totalPages: 100,
-  },
-};
-
-// Helper to format reading time
-function formatReadingTime(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-  const mins = Math.floor(seconds / 60);
-  if (mins < 60) return `${mins} min`;
-  const hrs = Math.floor(mins / 60);
-  const remainingMins = mins % 60;
-  return remainingMins > 0 ? `${hrs}h ${remainingMins}m` : `${hrs}h`;
-}
+// Only show course-type purchases on the progress page.
+const courseProductIds = getCourseProductIds();
 
 export default function ProgressPage() {
   const { user, loading: authLoading } = useAuth();
   const { purchases, loading: purchasesLoading } = usePurchases();
   const { progress, loading: progressLoading, getProgressForProduct } = useReadingProgress();
+  const { currentStreak, longestStreak, totalStudyDays, loading: streakLoading } = useStudyStreak();
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +49,15 @@ export default function ProgressPage() {
     }
   }, [user, authLoading, router]);
 
+  // Compute derived data (placed before early returns to respect Rules of Hooks)
+  const completedPurchases = useMemo(
+    () => purchases.filter((p) => p.status === 'completed'),
+    [purchases]
+  );
+  const coursePurchases = useMemo(
+    () => completedPurchases.filter((p) => courseProductIds.has(p.product_id)),
+    [completedPurchases]
+  );
   // Calculate total study time across all courses
   const totalStudySeconds = progress.reduce((sum, p) => sum + p.total_read_seconds, 0);
   // Count courses with any progress
@@ -64,10 +65,31 @@ export default function ProgressPage() {
 
   if (authLoading || purchasesLoading || progressLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3 mb-8">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+
+          {/* Stat grid skeleton */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+          </div>
+
+          {/* Course cards skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-40" />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
         </div>
       </div>
     );
@@ -76,8 +98,6 @@ export default function ProgressPage() {
   if (!user) {
     return null; // Will redirect
   }
-
-  const completedPurchases = purchases.filter(p => p.status === 'completed');
 
   return (
     <div className="p-8">
@@ -108,7 +128,7 @@ export default function ProgressPage() {
         >
           {/* Summary Stats */}
           <motion.div variants={itemVariants}>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <Card className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -117,7 +137,7 @@ export default function ProgressPage() {
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Total Courses</p>
                     <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
-                      {completedPurchases.length}
+                      {coursePurchases.length}
                     </p>
                   </div>
                 </div>
@@ -150,11 +170,57 @@ export default function ProgressPage() {
                   </div>
                 </div>
               </Card>
+
+              {/* Streak Card */}
+              <Card className={`p-6 ${currentStreak > 0 ? 'bg-gradient-to-br from-orange-50/70 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10' : ''}`}>
+                <div className="flex items-center gap-4">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    currentStreak > 0
+                      ? 'bg-gradient-to-br from-orange-400 to-amber-500'
+                      : 'bg-secondary/40'
+                  }`}>
+                    <Flame className={`h-6 w-6 ${currentStreak > 0 ? 'text-white' : 'text-muted-foreground'}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {currentStreak > 0 ? 'Current Streak' : 'Streak'}
+                    </p>
+                    <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
+                      {currentStreak > 0
+                        ? `${currentStreak} ${currentStreak === 1 ? 'day' : 'days'}`
+                        : totalStudyDays > 0
+                        ? `${totalStudyDays} study days`
+                        : 'Not started'}
+                    </p>
+                    {longestStreak > currentStreak && currentStreak > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Best: {longestStreak} days
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Card>
             </div>
           </motion.div>
 
+          {/* Streak Details (loads independently so stats aren't blocked) */}
+          {!streakLoading && currentStreak === 0 && totalStudyDays === 0 && (
+            <motion.div variants={itemVariants}>
+              <Card className="p-5 border-2 border-dashed border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-full bg-secondary/40 flex items-center justify-center flex-shrink-0">
+                    <Flame className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    No study days yet. Open your course and start reading to begin tracking your streak.
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Course Progress */}
-          {completedPurchases.length === 0 ? (
+          {coursePurchases.length === 0 ? (
             <motion.div variants={itemVariants}>
               <Card className="p-8 text-center">
                 <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -175,19 +241,22 @@ export default function ProgressPage() {
               <Card className="p-6">
                 <h2 className="text-2xl font-semibold mb-6">Your Courses</h2>
                 <div className="space-y-4">
-                  {completedPurchases.map((purchase) => {
-                    const product = productNames[purchase.product_id] || {
-                      name: purchase.product_id,
-                      description: 'Course',
-                      totalPages: 100,
-                    };
-                    const readingProgress = getProgressForProduct(purchase.product_id);
-                    const progressPercent = readingProgress
-                      ? Math.min(100, Math.round(((readingProgress.last_page + 1) / product.totalPages) * 100))
-                      : 0;
-                    const hasProgress = readingProgress && (readingProgress.last_page > 0 || readingProgress.total_read_seconds > 0);
+                  {coursePurchases.map((purchase) => {
+                      const product = getProductInfo(purchase.product_id) ?? {
+                        id: purchase.product_id,
+                        name: purchase.product_id,
+                        description: 'Course',
+                        type: 'course' as const,
+                        totalPages: 100,
+                      };
+                      const totalPages = product.totalPages ?? 100;
+                      const readingProgress = getProgressForProduct(purchase.product_id);
+                      const progressPercent = readingProgress
+                        ? Math.min(100, Math.round(((readingProgress.last_page + 1) / totalPages) * 100))
+                        : 0;
+                      const hasProgress = readingProgress && (readingProgress.last_page > 0 || readingProgress.total_read_seconds > 0);
 
-                    return (
+                      return (
                       <div
                         key={purchase.id}
                         className="p-4 rounded-lg bg-secondary/20 border border-secondary/40"

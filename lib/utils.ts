@@ -113,3 +113,16 @@ export function showError(error: any, context?: 'auth' | 'pdf' | 'password' | 'p
   const message = getErrorMessage(error, context);
   toast.error(message);
 }
+
+/**
+ * Return a YYYY-MM-DD string in the **local** time zone.
+ * Used consistently by the study streak hook and PDF viewer so that
+ * session dates are stored and queried with the same timezone logic.
+ */
+export function toLocalDateStr(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}

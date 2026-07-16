@@ -3,15 +3,22 @@
 import { useAuth } from "@/lib/auth";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
-import { showSuccess, showError } from "@/lib/utils";
+import { useStudyStreak } from "@/lib/hooks/use-study-streak";
+import { showSuccess } from "@/lib/utils";
+import {
+  getCourseProductIds,
+  getProductInfo,
+  formatReadingTime,
+} from "@/lib/products";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3, Clock } from "lucide-react";
+import { BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3, Clock, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
 import { Button } from "@/components/ui/button";
+import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -35,33 +42,25 @@ const cardVariants = {
   hover: { scale: 1.02, y: -2 },
 };
 
-// Product name mapping
-const productNames: Record<string, { name: string; description: string; totalPages: number }> = {
-  'ielts-manual': {
-    name: 'IELTS Preparation Manual',
-    description: 'Complete study guide for IELTS exam',
-    totalPages: 100, // Approximate total pages for progress calculation
-  },
-};
-
-// Helper to format reading time
-function formatReadingTime(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-  const mins = Math.floor(seconds / 60);
-  if (mins < 60) return `${mins} min`;
-  const hrs = Math.floor(mins / 60);
-  const remainingMins = mins % 60;
-  return remainingMins > 0 ? `${hrs}h ${remainingMins}m` : `${hrs}h`;
-}
+// Only show course-type purchases on the dashboard (instant-download products
+// like ebooks don't need progress tracking or a course card).
+const courseProductIds = getCourseProductIds();
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const { purchases, loading: purchasesLoading, error: purchasesError, refetch } = usePurchases();
   const { getProgressForProduct } = useReadingProgress();
+  const { currentStreak, longestStreak, todayStudied, loading: streakLoading } = useStudyStreak();
   const router = useRouter();
   const [linkingPurchases, setLinkingPurchases] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const hasLinkedPurchases = useRef(false);
+
+  // Filter purchases to only course products
+  const coursePurchases = useMemo(
+    () => purchases.filter((p) => courseProductIds.has(p.product_id)),
+    [purchases]
+  );
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -113,10 +112,28 @@ export default function DashboardPage() {
 
   if (authLoading || purchasesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Title skeleton */}
+          <Skeleton className="h-10 w-48 mb-8" />
+
+          {/* Streak widget skeleton */}
+          <Skeleton className="h-24 w-full rounded-xl p-5">
+            <div className="flex items-center gap-5">
+              <Skeleton className="h-14 w-14 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-6 w-3/5" />
+                <Skeleton className="h-4 w-2/5" />
+              </div>
+            </div>
+          </Skeleton>
+
+          {/* Library heading */}
+          <Skeleton className="h-8 w-32" />
+
+          {/* Course cards */}
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       </div>
     );
@@ -141,6 +158,26 @@ export default function DashboardPage() {
             {user.user_metadata?.full_name || user.email}
           </p> */}
         </div>
+
+        {/* Study Streak — subtle stat line */}
+        {!streakLoading && currentStreak > 0 && (
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5"
+          >
+            <Flame className="h-3.5 w-3.5 text-orange-500" />
+            <span>
+              <strong className="text-foreground">{currentStreak}</strong> day streak
+              {!todayStudied && (
+                <span className="text-muted-foreground ml-1">
+                  — study today to keep it going
+                </span>
+              )}
+            </span>
+          </motion.p>
+        )}
 
         {/* Security Alert - Password Change */}
         <AnimatePresence>
@@ -192,14 +229,16 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* Empty State */}
-          {!purchasesLoading && !purchasesError && purchases.length === 0 && (
+          {/* Empty State — no course purchases found */}
+          {!purchasesLoading && !purchasesError && coursePurchases.length === 0 && (
             <Card className="p-6 border-gray-200 dark:border-gray-700">
               <div className="text-center py-8">
                 <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Purchases Yet</h3>
+                <h3 className="text-lg font-semibold mb-2">No Courses Yet</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  You haven't purchased any products yet. Explore our products to get started.
+                  {purchases.length > 0
+                    ? "You have purchases but no course products. Only courses with progress tracking appear here."
+                    : "You haven't purchased any products yet. Explore our products to get started."}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button asChild size="lg">
@@ -219,23 +258,26 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* Purchases List */}
-          {!purchasesLoading && !purchasesError && purchases.length > 0 && (
+          {/* Purchases List — Only course products */}
+          {!purchasesLoading && !purchasesError && coursePurchases.length > 0 && (
             <motion.div
               variants={containerVariants}
               initial="initial"
               animate="animate"
               className="space-y-4"
             >
-              {purchases.map((purchase) => {
-                const product = productNames[purchase.product_id] || {
+              {coursePurchases.map((purchase) => {
+                const product = getProductInfo(purchase.product_id) ?? {
+                  id: purchase.product_id,
                   name: purchase.product_id,
                   description: 'Product',
+                  type: 'course' as const,
                   totalPages: 100,
                 };
+                const totalPages = product.totalPages ?? 100;
                 const readingProgress = getProgressForProduct(purchase.product_id);
                 const progressPercent = readingProgress
-                  ? Math.min(100, Math.round(((readingProgress.last_page + 1) / product.totalPages) * 100))
+                  ? Math.min(100, Math.round(((readingProgress.last_page + 1) / totalPages) * 100))
                   : 0;
 
                 return (
@@ -400,4 +442,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

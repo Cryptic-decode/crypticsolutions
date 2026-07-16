@@ -4,11 +4,12 @@ import { useAuth } from "@/lib/auth";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
+import { BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { PDFViewer } from "@/components/dashboard/pdf-viewer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -59,10 +60,38 @@ export default function CourseViewPage() {
 
   if (authLoading || purchasesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Back button skeleton */}
+          <Skeleton className="h-5 w-32" />
+
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3 mb-8">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+
+          {/* PDF viewer skeleton */}
+          <Skeleton className="h-[600px] w-full rounded-xl p-8">
+            <div className="h-full flex flex-col items-center justify-center space-y-6">
+              <div className="flex items-center gap-2 px-4 py-3 border-b w-full">
+                <Skeleton className="h-8 w-24 rounded-md" />
+                <Skeleton className="h-8 w-16 rounded-md" />
+                <Skeleton className="h-8 w-16 rounded-md" />
+                <div className="flex-1" />
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+              <div className="flex items-center justify-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-[350px] w-[280px] rounded-lg" />
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </Skeleton>
         </div>
       </div>
     );

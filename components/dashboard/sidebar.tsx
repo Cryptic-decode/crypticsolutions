@@ -27,7 +27,7 @@ export function Sidebar({ className, onSignOut, ...props }: SidebarProps) {
       icon: BookOpen,
     },
     {
-      href: "/dashboard/progress",
+      href: "/progress",
       label: "Study Progress",
       icon: BarChart,
     },

@@ -122,6 +122,13 @@
   }
 }
 
+/* ── Skeleton shimmer animation ──────────────────────────────── */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* PDF Viewer Security - Print Prevention & Download Button */
 @media print {
   body * {
