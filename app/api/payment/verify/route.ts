@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import { getPaystackSecretKey, type PaystackAccount } from '@/lib/paystack-accounts';
+import { getPaystackSecretKey } from '@/lib/paystack-accounts';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { reference, paystackAccount } = body;
+    const { reference } = body;
 
     if (!reference) {
       return NextResponse.json(
@@ -14,20 +14,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const account: PaystackAccount =
-      paystackAccount === 'lydei' || paystackAccount === 'default'
-        ? paystackAccount
-        : 'default';
-    const secretKey = getPaystackSecretKey(account);
+    const secretKey = getPaystackSecretKey();
 
     if (!secretKey) {
       return NextResponse.json(
-        {
-          error:
-            account === 'lydei'
-              ? 'Lydei Paystack secret key is not configured'
-              : 'Paystack secret key is not configured',
-        },
+        { error: 'Paystack secret key is not configured' },
         { status: 500 }
       );
     }

@@ -3,11 +3,10 @@
 import type React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
-import { getErrorMessage } from "@/lib/utils";
+import { toLocalDateStr } from "@/lib/utils";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import { Worker } from "@react-pdf-viewer/core";
 
@@ -15,23 +14,24 @@ import { Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
+// ─── Constants ──────────────────────────────────────────────────────────────
+const SAVE_DEBOUNCE_MS = 2_000;
+const IDLE_SAVE_INTERVAL_MS = 15_000;
+
 interface PDFViewerProps {
   productId: string;
   userEmail: string;
-  productName: string;
   userName?: string;
 }
 
-// Dynamically import PDF viewer (client-side only)
 const Viewer = dynamic(
   () => import("@react-pdf-viewer/core").then((mod) => mod.Viewer),
-  { ssr: false }
+  { ssr: false },
 );
 
 export function PDFViewer({
   productId,
   userEmail,
-  productName,
   userName,
 }: PDFViewerProps) {
   const [mounted, setMounted] = useState(false);
@@ -41,64 +41,138 @@ export function PDFViewer({
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
   const [initialPage, setInitialPage] = useState<number | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [viewerReady, setViewerReady] = useState(false);
+
   const userIdRef = useRef<string | null>(null);
   const readingStartTimeRef = useRef<number>(Date.now());
   const initialReadSecondsRef = useRef<number>(0);
   const currentPageRef = useRef<number>(0);
-  // Per library docs: call plugin factory at top-level of component (it uses hooks)
-  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+  const idleSaveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const defaultLayoutPluginInstance = useRef(defaultLayoutPlugin()).current;
 
-  // Persist reading progress for this user/product
-  const saveProgress = useCallback(
+  // ── Study session ────────────────────────────────────────────────────────
+
+  const upsertStudySession = useCallback(
+    async (durationSeconds: number) => {
+      const userId = userIdRef.current;
+      if (!userId) return;
+      try {
+        const todayLocal = toLocalDateStr(new Date());
+        await supabase.from("study_sessions").upsert(
+          {
+            user_id: userId,
+            product_id: productId,
+            session_date: todayLocal,
+            duration_seconds: durationSeconds,
+          },
+          { onConflict: "user_id,product_id,session_date", ignoreDuplicates: false },
+        );
+      } catch { /* non-critical */ }
+    },
+    [productId],
+  );
+
+  // ── Progress persistence ─────────────────────────────────────────────────
+
+  const persistProgress = useCallback(
     async (page: number) => {
       const userId = userIdRef.current;
       if (!userId) return;
-
       try {
         const now = Date.now();
-        const elapsedSeconds = Math.floor((now - readingStartTimeRef.current) / 1000);
+        const elapsedSeconds = Math.max(0, Math.floor((now - readingStartTimeRef.current) / 1000));
         const totalSeconds = initialReadSecondsRef.current + elapsedSeconds;
 
         await supabase
           .from("reading_progress")
           .upsert(
-            {
-              user_id: userId,
-              product_id: productId,
-              last_page: page,
-              total_read_seconds: totalSeconds,
-            },
-            {
-              onConflict: "user_id,product_id",
-            }
+            { user_id: userId, product_id: productId, last_page: page, total_read_seconds: totalSeconds },
+            { onConflict: "user_id,product_id" },
           );
-      } catch {
-        // Silently ignore progress save errors so reading isn't disrupted
-      }
+
+        await upsertStudySession(elapsedSeconds);
+      } catch { /* silent */ }
     },
-    [productId]
+    [productId, upsertStudySession],
   );
 
-  // Initialize PDF viewer - extracted for reusability
+  // ── Debounced save ───────────────────────────────────────────────────────
+
+  const debouncedSaveRef = useRef<((page: number) => void) | null>(null);
+
+  useEffect(() => {
+    let lastSaveTime = 0;
+    let pendingPage: number | null = null;
+    let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+
+    debouncedSaveRef.current = (page: number) => {
+      pendingPage = page;
+      const now = Date.now();
+      const timeSinceLastSave = now - lastSaveTime;
+
+      if (timeSinceLastSave >= SAVE_DEBOUNCE_MS) {
+        lastSaveTime = now;
+        persistProgress(page);
+        if (pendingTimer) { clearTimeout(pendingTimer); pendingTimer = null; }
+      } else if (!pendingTimer) {
+        pendingTimer = setTimeout(() => {
+          lastSaveTime = Date.now();
+          if (pendingPage !== null) persistProgress(pendingPage);
+          pendingTimer = null;
+        }, SAVE_DEBOUNCE_MS - timeSinceLastSave);
+      }
+    };
+
+    return () => { if (pendingTimer) clearTimeout(pendingTimer); };
+  }, [persistProgress]);
+
+  // ── Idle save interval ───────────────────────────────────────────────────
+
+  useEffect(() => {
+    idleSaveIntervalRef.current = setInterval(() => {
+      const page = currentPageRef.current;
+      if (userIdRef.current != null) debouncedSaveRef.current?.(page);
+    }, IDLE_SAVE_INTERVAL_MS);
+    return () => { if (idleSaveIntervalRef.current) clearInterval(idleSaveIntervalRef.current); };
+  }, []);
+
+  // ── Keyboard shortcuts ───────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!viewerReady) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+        debouncedSaveRef.current?.(currentPageRef.current);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [viewerReady]);
+
+  // ── Save on unmount ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    return () => {
+      if (userIdRef.current != null) persistProgress(currentPageRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+
   const initializeViewer = useCallback(async () => {
     try {
-      // Get session token for API authentication
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         setError("Authentication required. Please sign in again.");
         setLoading(false);
         return;
       }
+
       const userId = session.user?.id as string | undefined;
       if (userId) {
         userIdRef.current = userId;
-
-        // Try to load existing reading progress for this user/product
         const { data: progressRows } = await supabase
           .from("reading_progress")
           .select("last_page, total_read_seconds")
@@ -107,89 +181,54 @@ export function PDFViewer({
           .limit(1);
 
         if (progressRows && progressRows.length > 0) {
-          const progress = progressRows[0] as {
-            last_page: number | null;
-            total_read_seconds: number | null;
-          };
-
-          if (typeof progress.last_page === "number" && progress.last_page >= 0) {
-            setInitialPage(progress.last_page);
-            setCurrentPage(progress.last_page);
-            currentPageRef.current = progress.last_page;
+          const p = progressRows[0] as { last_page: number | null; total_read_seconds: number | null };
+          if (typeof p.last_page === "number" && p.last_page >= 0) {
+            setInitialPage(p.last_page);
+            currentPageRef.current = p.last_page;
           }
-          if (typeof progress.total_read_seconds === "number" && progress.total_read_seconds >= 0) {
-            initialReadSecondsRef.current = progress.total_read_seconds;
+          if (typeof p.total_read_seconds === "number" && p.total_read_seconds >= 0) {
+            initialReadSecondsRef.current = p.total_read_seconds;
           }
         }
       }
 
       readingStartTimeRef.current = Date.now();
       setAuthToken(session.access_token);
-
-      // Construct PDF URL with auth token
-      const apiUrl = `/api/course/${productId}/pdf`;
-      setPdfUrl(apiUrl);
+      upsertStudySession(0);
+      setPdfUrl(`/api/course/${productId}/pdf`);
       setMounted(true);
       setLoading(false);
-    } catch (err: any) {
-      // Handle initialization errors gracefully
+    } catch {
       setError("Failed to initialize PDF viewer. Please refresh the page.");
       setLoading(false);
     }
-  }, [productId]);
+  }, [productId, upsertStudySession]);
 
-  // Load plugin module and get auth token
-  useEffect(() => {
-    initializeViewer();
-  }, [initializeViewer]);
+  useEffect(() => { initializeViewer(); }, [initializeViewer]);
 
-  // Sync dark theme with dashboard
+  // ── Theme sync ───────────────────────────────────────────────────────────
+
   useEffect(() => {
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"));
-    };
+    const updateTheme = () => setIsDark(document.documentElement.classList.contains("dark"));
     updateTheme();
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
   }, []);
 
-  // Security event handlers - extracted for better organization
-  const handleContextMenu = (e: MouseEvent) => {
-    e.preventDefault();
-    return false;
-  };
+  // ── Security handlers ────────────────────────────────────────────────────
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    // Block Ctrl+P (Print), Ctrl+S (Save), Ctrl+A (Select All)
-    if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "s" || e.key === "a")) {
-      e.preventDefault();
-      return false;
-    }
-    // Block F12 (DevTools), Print Screen
-    if (e.key === "F12" || e.key === "PrintScreen") {
-      e.preventDefault();
-      return false;
-    }
-  };
-
-  const handleCopy = (e: ClipboardEvent) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const handleDragStart = (e: DragEvent) => {
-    e.preventDefault();
-    return false;
-  };
-
-  const handleBeforePrint = (e: BeforeUnloadEvent) => {
-    e.preventDefault();
-  };
-
-  // Security: Disable right-click, keyboard shortcuts, and print
   useEffect(() => {
     if (!mounted) return;
+
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && ["p", "s", "a"].includes(e.key)) e.preventDefault();
+      if (e.key === "F12" || e.key === "PrintScreen") e.preventDefault();
+    };
+    const handleCopy = (e: ClipboardEvent) => e.preventDefault();
+    const handleDragStart = (e: DragEvent) => e.preventDefault();
+    const handleBeforePrint = (e: BeforeUnloadEvent) => e.preventDefault();
 
     document.addEventListener("contextmenu", handleContextMenu);
     document.addEventListener("keydown", handleKeyDown);
@@ -206,25 +245,8 @@ export function PDFViewer({
     };
   }, [mounted]);
 
-  // Save progress when component unmounts (best-effort)
-  useEffect(() => {
-    return () => {
-      if (userIdRef.current != null) {
-        saveProgress(currentPageRef.current);
-      }
-    };
-    // We intentionally omit dependencies to capture last known page on unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // ── Loading state ────────────────────────────────────────────────────────
 
-  // Handle PDF load errors
-  const handleDocumentLoadError = (error: any) => {
-    const errorMessage = getErrorMessage(error, 'pdf') || "Failed to load PDF. Please try again.";
-    setError(errorMessage);
-    setLoading(false);
-  };
-
-  // Show loading state during SSR or initialization
   if (!mounted || loading) {
     return (
       <Card className="p-6">
@@ -238,7 +260,8 @@ export function PDFViewer({
     );
   }
 
-  // Show error state
+  // ── Error state ──────────────────────────────────────────────────────────
+
   if (error) {
     return (
       <Card className="p-6">
@@ -248,36 +271,26 @@ export function PDFViewer({
           <p className="text-sm text-muted-foreground mb-4 text-center">
             If the problem persists, please contact support.
           </p>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setError(null);
-              setLoading(true);
-              initializeViewer();
-            }}
+          <button
+            onClick={() => { setError(null); setLoading(true); initializeViewer(); }}
+            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
             Retry
-          </Button>
+          </button>
         </div>
       </Card>
     );
   }
 
-  // Render PDF viewer
-  if (!pdfUrl || !authToken) {
-    return null;
-  }
+  if (!pdfUrl || !authToken) return null;
 
-  // Worker URL - using CDN for reliability (compatible with @react-pdf-viewer/core v3.12.0)
-  const workerUrl = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+  // ── Render ───────────────────────────────────────────────────────────────
 
-  // Watermark styles - extracted for maintainability
+  const workerUrl = "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js";
+
   const watermarkContainerStyle: React.CSSProperties = {
-    position: "absolute",
-    top: "0.8rem",
-    right: "1.8rem",
-    pointerEvents: "none",
-    zIndex: 10,
+    position: "absolute", top: "0.8rem", right: "1.8rem",
+    pointerEvents: "none", zIndex: 10,
   };
 
   const getWatermarkTextStyle = (scale: number): React.CSSProperties => ({
@@ -286,27 +299,17 @@ export function PDFViewer({
     fontWeight: 700,
     letterSpacing: "0.02em",
     color: "rgba(0, 0, 0, 0.28)",
-    userSelect: "none",
-    WebkitUserSelect: "none",
-    textAlign: "right",
-    lineHeight: "1.4",
+    userSelect: "none", WebkitUserSelect: "none",
+    textAlign: "right", lineHeight: "1.4",
   });
 
-  const watermarkEmailStyle: React.CSSProperties = {
-    fontSize: "0.85em",
-    marginTop: "0.01rem",
-  };
-
-  // Per-page watermark renderer (visible, top-right corner)
   const renderPage = (props: any) => (
     <>
       {props.canvasLayer.children}
       <div style={watermarkContainerStyle}>
         <div style={getWatermarkTextStyle(props.scale || 1)}>
           <div>{userName || "User"}</div>
-          <div style={watermarkEmailStyle}>
-            {userEmail || "Cryptic Solutions"}
-          </div>
+          <div style={{ fontSize: "0.85em", marginTop: "0.01rem" }}>{userEmail || "Cryptic Solutions"}</div>
         </div>
       </div>
       {props.annotationLayer.children}
@@ -316,9 +319,9 @@ export function PDFViewer({
 
   return (
     <div className={`w-full ${isDark ? "dark" : ""}`}>
-      <Card className="p-0 overflow-hidden ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
-        <div className="h-[calc(100vh-300px)] min-h-[600px] no-select bg-secondary/10 dark:bg-secondary/20 relative">
-          {/* Overlay while the viewer is preparing the correct page */}
+      <Card className="p-0 ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
+        <div className="relative h-[calc(100dvh-16rem)] min-h-[500px] no-select bg-secondary/10 dark:bg-secondary/20">
+          {/* Overlay while viewer is preparing */}
           {!viewerReady && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-secondary/10 dark:bg-secondary/20">
               <div className="text-center">
@@ -329,29 +332,25 @@ export function PDFViewer({
               </div>
             </div>
           )}
+
           <Worker workerUrl={workerUrl}>
             <Viewer
               fileUrl={pdfUrl}
-              httpHeaders={{
-                Authorization: `Bearer ${authToken}`,
-              }}
+              httpHeaders={{ Authorization: `Bearer ${authToken}` }}
               plugins={[defaultLayoutPluginInstance]}
               renderPage={renderPage}
               defaultScale={1.0}
               initialPage={initialPage ?? 0}
-              onDocumentLoad={(e) => {
+              onDocumentLoad={() => {
                 setLoading(false);
                 setError(null);
                 setViewerReady(true);
               }}
               onPageChange={(event: any) => {
-                const nextPage =
-                  typeof event.currentPage === "number" && event.currentPage >= 0
-                    ? event.currentPage
-                    : 0;
-                setCurrentPage(nextPage);
+                const nextPage = typeof event.currentPage === "number" && event.currentPage >= 0
+                  ? event.currentPage : 0;
                 currentPageRef.current = nextPage;
-                saveProgress(nextPage);
+                debouncedSaveRef.current?.(nextPage);
               }}
             />
           </Worker>
@@ -360,4 +359,3 @@ export function PDFViewer({
     </div>
   );
 }
-

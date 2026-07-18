@@ -4,11 +4,12 @@ import { useAuth } from "@/lib/auth";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
+import { BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { PDFViewer } from "@/components/dashboard/pdf-viewer";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Animation variants following design guide
 const containerVariants = {
@@ -59,10 +60,38 @@ export default function CourseViewPage() {
 
   if (authLoading || purchasesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Back button skeleton */}
+          <Skeleton className="h-5 w-32" />
+
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3 mb-8">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-4 w-40" />
+            </div>
+          </div>
+
+          {/* PDF viewer skeleton */}
+          <Skeleton className="h-[600px] w-full rounded-xl p-8">
+            <div className="h-full flex flex-col items-center justify-center space-y-6">
+              <div className="flex items-center gap-2 px-4 py-3 border-b w-full">
+                <Skeleton className="h-8 w-24 rounded-md" />
+                <Skeleton className="h-8 w-16 rounded-md" />
+                <Skeleton className="h-8 w-16 rounded-md" />
+                <div className="flex-1" />
+                <Skeleton className="h-8 w-8 rounded-md" />
+              </div>
+              <div className="flex items-center justify-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <Skeleton className="h-[350px] w-[280px] rounded-lg" />
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </Skeleton>
         </div>
       </div>
     );
@@ -115,33 +144,25 @@ export default function CourseViewPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl"
       >
         {/* Back Button */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Link>
 
         {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
-              <p className="text-muted-foreground">{product.description}</p>
-            </div>
-          </div>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-1">{product.name}</h1>
+          <p className="text-sm text-muted-foreground">{product.description}</p>
         </div>
 
         <motion.div
@@ -155,7 +176,6 @@ export default function CourseViewPage() {
             <PDFViewer
               productId={productId}
               userEmail={user?.email || ""}
-              productName={product.name}
               userName={user?.user_metadata?.full_name || (user?.email ? user.email.split("@")[0] : "User")}
             />
           </motion.div>
