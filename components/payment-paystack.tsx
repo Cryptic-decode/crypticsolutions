@@ -24,6 +24,7 @@ interface PaystackPaymentProps {
   className?: string;
   buttonLabel?: string;
   requireEmail?: boolean;
+  referralCode?: string;
 }
 
 export function PaystackPayment({ 
@@ -39,6 +40,7 @@ export function PaystackPayment({
   className,
   buttonLabel,
   requireEmail = true,
+  referralCode,
 }: PaystackPaymentProps) {
   const [loading, setLoading] = useState(false);
   const checkoutEmail = email.trim();
@@ -62,6 +64,7 @@ export function PaystackPayment({
           productId,
           productName,
           successPath,
+          referralCode,
           metadata: {
             ...metadata,
             product_id: productId,
