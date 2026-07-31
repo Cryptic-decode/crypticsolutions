@@ -22,6 +22,7 @@ import { fadeInUp, buttonTap } from "@/lib/animations";
 export default function IELTSManualPage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [email, setEmail] = useState('');
+  const [referralCode, setReferralCode] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -423,6 +424,21 @@ export default function IELTSManualPage() {
                       )}
                     </div>
 
+                    <div className="flex flex-col space-y-2">
+                      <label htmlFor="referral" className="text-sm font-medium text-muted-foreground">
+                        Have a referral code? <span className="text-xs text-muted-foreground/60">(optional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="referral"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                        placeholder="e.g. FRIEND20"
+                        className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+                        maxLength={20}
+                      />
+                    </div>
+
                     <motion.div whileHover={email && email.includes('@') ? { scale: 1.02 } : {}} whileTap={{ scale: 0.98 }}>
                       <PaystackPayment
                         email={email}
@@ -430,6 +446,7 @@ export default function IELTSManualPage() {
                         productId="ielts-manual"
                         productName="IELTS Preparation Manual"
                         successPath="/payment/success"
+                        referralCode={referralCode || undefined}
                         metadata={{
                           product: "IELTS Manual",
                           currency: "NGN"

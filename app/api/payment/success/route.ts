@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields
-    const { name, email, reference, password } = body;
+    const { name, email, reference, password, referralCode } = body;
     if (!name || !email || !reference || !password) {
       console.error('Missing required fields:', { name: !!name, email: !!email, reference: !!reference, password: !!password });
       return NextResponse.json(
@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
         status: 'completed',
         amount: 5000,
         currency: 'NGN',
+        referral_code: referralCode || null,
         // user_id is omitted - will be linked after email confirmation
       };
       

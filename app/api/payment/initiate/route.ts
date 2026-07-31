@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
       productId,
       productName,
       successPath = '/payment/success',
+      referralCode,
       metadata,
     } = body;
 
@@ -37,7 +38,9 @@ export async function POST(request: NextRequest) {
     // Build callback URL
     const baseUrl =
       process.env.NEXT_PUBLIC_APP_URL || 'https://crypticsolutionsltd.com';
-    const callbackUrl = `${baseUrl}${successPath}?reference=${reference}`;
+    const callbackUrl = referralCode
+      ? `${baseUrl}${successPath}?reference=${reference}&referral_code=${encodeURIComponent(referralCode)}`
+      : `${baseUrl}${successPath}?reference=${reference}`;
 
     // Call Paystack API to initialize transaction
     const response = await axios.post(

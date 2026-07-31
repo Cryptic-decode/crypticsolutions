@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS purchases (
   status TEXT NOT NULL CHECK (status IN ('pending', 'completed', 'failed')),
   amount DECIMAL(10, 2) NOT NULL,
   currency TEXT NOT NULL DEFAULT 'NGN',
+  referral_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

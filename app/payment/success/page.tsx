@@ -19,6 +19,7 @@ function PaymentSuccessContent() {
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const reference = searchParams.get('reference');
+  const referralCode = searchParams.get('referral_code');
 
   const [formData, setFormData] = useState({
     name: '',
@@ -81,6 +82,7 @@ function PaymentSuccessContent() {
           ...formData,
           reference,
           password,
+          referralCode: referralCode || undefined,
           // Don't pass userId - we'll link it after email confirmation
         }),
       });
