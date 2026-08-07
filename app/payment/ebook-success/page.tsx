@@ -38,7 +38,7 @@ function EbookSuccessContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reference: ref }),
+        body: JSON.stringify({ reference: ref, productId: 'talk-to-ai-like-a-pro' }),
       });
 
       const verifyData = await verifyResponse.json();
@@ -50,23 +50,13 @@ function EbookSuccessContent() {
       setVerified(true);
 
       // Step 2: Store purchase in Supabase
-      const transaction = verifyData.transaction;
-      const email = transaction.customer?.email || '';
-      const name = transaction.customer?.name || '';
-
       // Store purchase for access verification and manual follow-up
       const storeResponse = await fetch('/api/payment/ebook-success', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          reference: ref,
-          email,
-          name,
-          amount: transaction.amount / 100, // Convert from kobo to NGN
-          currency: transaction.currency || 'NGN',
-        }),
+        body: JSON.stringify({ reference: ref }),
       });
 
       const storeData = await storeResponse.json();
@@ -80,7 +70,7 @@ function EbookSuccessContent() {
       }
 
       setDownloadReady(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Payment success handling error:', error);
       showError(error, 'payment');
       // Redirect back to ebook page on error
@@ -144,7 +134,7 @@ function EbookSuccessContent() {
                 <div className="space-y-4 mb-6">
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 text-left">
                     <p className="text-sm text-muted-foreground mb-2">
-                      <strong className="text-[#1B2242] dark:text-white">What's next?</strong>
+                      <strong className="text-[#1B2242] dark:text-white">What&apos;s next?</strong>
                     </p>
                     <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                       <li>Click the download button below to get your ebook</li>

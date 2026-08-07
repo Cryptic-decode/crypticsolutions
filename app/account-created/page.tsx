@@ -2,43 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight, Copy } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { motion } from "framer-motion";
 
-export default function AccountCreatedPage() {
+function AccountCreatedContent() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [copied, setCopied] = useState(false);
+  const email = useSearchParams().get('email') || '';
 
-  useEffect(() => {
-    const tempPassword = sessionStorage.getItem('temp_password');
-    const userEmail = sessionStorage.getItem('user_email');
-    
-    if (!tempPassword || !userEmail) {
-      router.push('/signin');
-      return;
-    }
-
-    setEmail(userEmail);
-    setPassword(tempPassword);
-
-    // Clean up session storage after 5 minutes
-    setTimeout(() => {
-      sessionStorage.removeItem('temp_password');
-      sessionStorage.removeItem('user_email');
-    }, 5 * 60 * 1000);
-  }, [router]);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(password);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  if (!email || !password) {
+  if (!email) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Loading...</p>
@@ -68,46 +41,25 @@ export default function AccountCreatedPage() {
 
             <h1 className="text-3xl font-bold mb-2">Account Created!</h1>
             <p className="text-muted-foreground mb-8">
-              Your account has been successfully created. Please save your login credentials securely.
+              Your account has been created securely. Confirm your email before signing in.
             </p>
 
             <Card className="p-6 mb-6 bg-primary/5 border-primary/20">
-              <div className="space-y-3 text-left">
+              <div className="text-left">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground mb-1">Email</p>
                   <p className="text-sm">{email}</p>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-medium text-muted-foreground">Temporary Password</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopy}
-                      className="h-6 px-2 text-xs"
-                    >
-                      <Copy className="h-3 w-3 mr-1" />
-                      {copied ? 'Copied!' : 'Copy'}
-                    </Button>
-                  </div>
-                  <p className="text-sm font-mono break-all">{password}</p>
                 </div>
               </div>
             </Card>
 
             <div className="space-y-4 mb-6">
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-left">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  <strong>Important:</strong> Please save this password securely. You'll need it to access your IELTS Manual. You can change it after logging in.
-                </p>
-              </div>
-
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-left">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>Important - Check Your Email:</strong> We've sent a confirmation link to {email}. You must click this link before you can log in.
+                  <strong>Check your email:</strong> We&apos;ve sent a confirmation link to {email}. You must click this link before you can log in.
                 </p>
                 <ul className="mt-2 text-sm text-blue-800 dark:text-blue-200 list-disc list-inside">
-                  <li>Check your spam/junk folder if you don't see it</li>
+                  <li>Check your spam/junk folder if you don&apos;t see it</li>
                   <li>The link expires in 24 hours</li>
                   <li>After confirming, return here to log in</li>
                 </ul>
@@ -124,5 +76,13 @@ export default function AccountCreatedPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function AccountCreatedPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Loading...</p></div>}>
+      <AccountCreatedContent />
+    </Suspense>
   );
 }

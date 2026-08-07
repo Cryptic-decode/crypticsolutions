@@ -5,6 +5,7 @@ import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
 import { useStudyStreak } from "@/lib/hooks/use-study-streak";
 import { showSuccess } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import {
   getCourseProductIds,
   getProductInfo,
@@ -78,15 +79,14 @@ export default function DashboardPage() {
 
       try {
         setLinkingPurchases(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
         const response = await fetch('/api/purchases/link', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({
-            user_id: user.id,
-            email: user.email,
-          }),
         });
 
         const data = await response.json();

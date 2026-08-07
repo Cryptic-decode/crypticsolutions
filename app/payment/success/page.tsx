@@ -8,10 +8,8 @@ import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@/lib/auth";
-import { generatePassword, showError, showSuccess } from "@/lib/utils";
+import { showError, showSuccess } from "@/lib/utils";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -19,11 +17,12 @@ function PaymentSuccessContent() {
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
   const reference = searchParams.get('reference');
-  const referralCode = searchParams.get('referral_code');
 
   const [formData, setFormData] = useState({
     name: '',
-    email: ''
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
 
   useEffect(() => {
@@ -40,50 +39,47 @@ function PaymentSuccessContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reference: ref }),
+        body: JSON.stringify({ reference: ref, productId: 'ielts-manual' }),
       });
 
       const data = await response.json();
 
       if (data.success) {
         setVerified(true);
-        setFormData({
+        setFormData((current) => ({
+          ...current,
           email: data.transaction.customer.email,
           name: data.transaction.customer.name || ''
-        });
+        }));
       }
-    } catch (error) {
+    } catch {
       // Handle verification errors silently - user will see loading state
     }
   };
 
-  const { signUp, user } = useAuth();
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Generate a secure random password
-      const password = generatePassword();
+      if (formData.password.length < 8) {
+        throw new Error('Password must be at least 8 characters');
+      }
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
 
-      // Create user account with Supabase Auth
-      const authData = await signUp(formData.email, password, {
-        full_name: formData.name,
-      });
-
-      // Store purchase details without user_id (will be linked after email confirmation)
+      // Record only after the server independently verifies the Paystack transaction.
       const response = await fetch('/api/payment/success', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          name: formData.name,
           reference,
-          password,
-          referralCode: referralCode || undefined,
-          // Don't pass userId - we'll link it after email confirmation
         }),
       });
 
@@ -92,29 +88,14 @@ function PaymentSuccessContent() {
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const data = await response.json().catch(() => {
+      await response.json().catch(() => {
         throw new Error('Failed to parse success response');
       });
 
-      if (data.success) {
-        // Store password temporarily in sessionStorage for display
-        sessionStorage.setItem('temp_password', password);
-        sessionStorage.setItem('user_email', formData.email);
-        
-        // Log email status for debugging
-        if (data.emailSent === false) {
-          console.warn('Credentials email may not have been sent:', data.emailError);
-        } else if (data.emailSent === true) {
-          console.log('Credentials email sent successfully');
-        }
-        
-        showSuccess("Account created successfully!");
-        // Redirect to account setup page
-        router.push('/account-created');
-      } else {
-        throw new Error(data.error || 'Failed to process payment');
-      }
-    } catch (error: any) {
+      await signUp(formData.email, formData.password, { full_name: formData.name });
+      showSuccess("Account created. Check your email to confirm it.");
+      router.push(`/account-created?email=${encodeURIComponent(formData.email)}`);
+    } catch (error: unknown) {
       showError(error, 'payment');
     } finally {
       setLoading(false);
@@ -168,8 +149,34 @@ function PaymentSuccessContent() {
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      readOnly
                       placeholder="Enter your email"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="password">Choose Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="At least 8 characters"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      required
+                      minLength={8}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      placeholder="Repeat your password"
                     />
                   </div>
 
@@ -219,4 +226,3 @@ export default function PaymentSuccessPage() {
     </Suspense>
   );
 }
-
