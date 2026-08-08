@@ -30,10 +30,10 @@ interface ProductLandingProps {
 }
 
 const reveal = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 28 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.16 },
-  transition: { duration: 0.5, ease: "easeOut" as const },
+  viewport: { once: true, amount: 0.25, margin: "0px 0px -10% 0px" as const },
+  transition: { duration: 0.55, ease: "easeOut" as const },
 };
 
 export function ProductLanding(props: ProductLandingProps) {
@@ -92,7 +92,7 @@ export function ProductLanding(props: ProductLandingProps) {
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-7xl gap-12 px-5 md:px-8 lg:grid-cols-2 lg:items-start">
             <motion.div {...reveal}><p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">A good fit if</p><h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em]">You want a clear path forward.</h2></motion.div>
-            <ul className="divide-y divide-border/70 border-y border-border/70">{props.audience.map((item) => <li key={item} className="flex gap-4 py-5 leading-7"><span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/12"><Check className="h-3 w-3 text-primary" /></span>{item}</li>)}</ul>
+            <motion.ul {...reveal} className="divide-y divide-border/70 border-y border-border/70">{props.audience.map((item) => <li key={item} className="flex gap-4 py-5 leading-7"><span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/12"><Check className="h-3 w-3 text-primary" /></span>{item}</li>)}</motion.ul>
           </div>
         </section>
 
