@@ -34,6 +34,7 @@ export default function DashboardGroupLayout({
       const isDark =
         localStorage.getItem("theme") === "dark" ||
         !localStorage.getItem("theme");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
       setDarkMode(isDark);
     }
   }, [user, loading, router]);
@@ -138,4 +139,3 @@ export default function DashboardGroupLayout({
     </div>
   );
 }
-

@@ -170,9 +170,9 @@ export async function GET(request: NextRequest) {
       count: signups.length,
       emailId: emailData?.id
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

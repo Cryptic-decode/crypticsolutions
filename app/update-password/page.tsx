@@ -97,7 +97,7 @@ export default function UpdatePasswordPage() {
 
       // End the recovery session to avoid keeping old auth state around
       await signOut();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, "password");
     } finally {
       setFormLoading(false);
@@ -245,5 +245,4 @@ export default function UpdatePasswordPage() {
     </div>
   );
 }
-
 

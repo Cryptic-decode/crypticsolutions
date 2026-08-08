@@ -41,6 +41,7 @@ export function ProductNav({ ctaLabel, onCtaClick, darkMode: externalDarkMode, o
       const isDark =
         localStorage.getItem("theme") === "dark" ||
         !localStorage.getItem("theme");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
       setInternalDarkMode(isDark);
     }
   }, []);

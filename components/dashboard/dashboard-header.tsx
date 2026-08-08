@@ -33,6 +33,7 @@ export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- prevent server/client theme mismatch
     setMounted(true);
   }, []);
 

@@ -28,7 +28,7 @@ export default function ResetPasswordPage() {
       await resetPassword(email.trim());
       setSubmitted(true);
       showSuccess("Check your email for a password reset link.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, "auth");
     } finally {
       setLoading(false);
@@ -128,5 +128,4 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
-
 

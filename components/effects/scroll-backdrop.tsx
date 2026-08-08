@@ -21,6 +21,7 @@ export function ScrollBackdrop({ className = "", intensity = 1 }: ScrollBackdrop
 
   // Ensure component only renders on client after hydration
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- animation requires client-only viewport state
     setIsMounted(true);
   }, []);
 

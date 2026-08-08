@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
 import { toLocalDateStr } from "@/lib/utils";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import { Worker } from "@react-pdf-viewer/core";
+import { Worker, type PageChangeEvent, type RenderPageProps } from "@react-pdf-viewer/core";
 
 // Import PDF viewer styles
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -303,7 +303,7 @@ export function PDFViewer({
     textAlign: "right", lineHeight: "1.4",
   });
 
-  const renderPage = (props: any) => (
+  const renderPage = (props: RenderPageProps) => (
     <>
       {props.canvasLayer.children}
       <div style={watermarkContainerStyle}>
@@ -346,7 +346,7 @@ export function PDFViewer({
                 setError(null);
                 setViewerReady(true);
               }}
-              onPageChange={(event: any) => {
+              onPageChange={(event: PageChangeEvent) => {
                 const nextPage = typeof event.currentPage === "number" && event.currentPage >= 0
                   ? event.currentPage : 0;
                 currentPageRef.current = nextPage;

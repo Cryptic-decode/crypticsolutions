@@ -87,7 +87,7 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
 
       // Close modal immediately
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, 'password');
     } finally {
       setLoading(false);
@@ -237,4 +237,3 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
     </Modal>
   );
 }
-

@@ -36,7 +36,7 @@ function SignInForm() {
       
       showSuccess("Signed in successfully!");
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, 'auth');
     } finally {
       setLoading(false);
