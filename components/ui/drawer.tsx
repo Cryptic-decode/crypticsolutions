@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 interface DrawerProps {
   isOpen: boolean;
@@ -19,6 +19,20 @@ export function Drawer({
   position = "right",
   showCloseButton = true,
 }: DrawerProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -43,6 +57,9 @@ export function Drawer({
             className={`fixed top-0 ${position}-0 h-screen w-full md:w-[400px]
                      bg-background md:border-${position === "right" ? "l" : "r"} 
                      shadow-2xl z-[60] overflow-y-auto`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
           >
             {showCloseButton && (
               <button

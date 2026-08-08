@@ -23,9 +23,13 @@ import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
 import { ProductVisual } from "@/components/marketing/product-visual";
+import { BrandHeroVisual } from "@/components/marketing/brand-hero-visual";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { useAuth } from "@/lib/auth";
 import { SUPPORT_EMAIL } from "@/lib/contact";
+import { useActiveSection } from "@/lib/hooks/use-active-section";
+
+const homeSections = ["products", "about", "contact"] as const;
 
 const reveal = {
   initial: { opacity: 0, y: 24 },
@@ -66,6 +70,7 @@ export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const activeSection = useActiveSection(homeSections);
 
   useEffect(() => {
     if (window.location.hash.includes("type=recovery")) {
@@ -88,6 +93,13 @@ export default function Home() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const sectionLinkClass = (section: string) =>
+    `relative py-2 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
+      activeSection === section
+        ? "text-foreground after:scale-x-100"
+        : "text-muted-foreground after:scale-x-0 hover:text-foreground"
+    }`;
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/92 backdrop-blur-xl">
@@ -98,9 +110,9 @@ export default function Home() {
           </button>
 
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#products" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Products</a>
-            <a href="#about" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">What we build</a>
-            <a href="#contact" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Contact</a>
+            <a href="#products" aria-current={activeSection === "products" ? "location" : undefined} className={sectionLinkClass("products")}>Products</a>
+            <a href="#about" aria-current={activeSection === "about" ? "location" : undefined} className={sectionLinkClass("about")}>What we build</a>
+            <a href="#contact" aria-current={activeSection === "contact" ? "location" : undefined} className={sectionLinkClass("contact")}>Contact</a>
             {!authLoading && <Link href={user ? "/dashboard" : "/signin"} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{user ? "Dashboard" : "Sign in"}</Link>}
             <button onClick={toggleDarkMode} className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="Toggle theme">
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -126,6 +138,7 @@ export default function Home() {
             ...(!authLoading ? [{ href: user ? "/dashboard" : "/signin", label: user ? "Dashboard" : "Sign in" }] : []),
           ]}
           ctaButton={{ label: "Browse products", onClick: () => scrollTo("products") }}
+          activeHref={activeSection ? `#${activeSection}` : undefined}
         />
       </Drawer>
 
@@ -133,9 +146,8 @@ export default function Home() {
         <section className="relative border-b border-border/60">
           <div className="mx-auto grid min-h-[calc(100dvh-4.5rem)] max-w-7xl items-center gap-14 px-5 py-16 md:px-8 lg:grid-cols-[1.02fr_.98fr] lg:py-20">
             <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <p className="mb-6 font-mono text-xs uppercase tracking-[0.22em] text-primary">Learning tools · practical ebooks · useful software</p>
-              <h1 className="max-w-2xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-[4rem]">
-                Practical digital products for learning and work.
+              <h1 className="max-w-2xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-[3.7rem]">
+                Practical digital products for learning and work<span className="text-primary">.</span>
               </h1>
               <p className="mt-7 max-w-xl text-pretty text-lg leading-8 text-muted-foreground">
                 Cryptic Solutions turns complex topics into focused products that are clear, useful, and ready when you need them.
@@ -151,11 +163,8 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div className="relative mx-auto w-full max-w-xl" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }}>
-              <div className="relative grid grid-cols-2 items-center gap-3 rounded-[2rem] border border-border/70 bg-muted/35 p-4 shadow-[0_28px_80px_rgba(22,25,18,.12)] dark:bg-[#0d0f0c] dark:shadow-[0_30px_100px_rgba(0,0,0,.35)] sm:p-6">
-                <ProductVisual kind="ielts" priority className="min-h-80 rounded-2xl bg-transparent p-4 dark:bg-transparent" />
-                <ProductVisual kind="prompts" priority className="min-h-80 translate-y-6 rounded-2xl bg-transparent p-4 dark:bg-transparent" />
-              </div>
+            <motion.div className="relative mx-auto hidden w-full max-w-xl lg:block" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }}>
+              <BrandHeroVisual />
             </motion.div>
           </div>
         </section>

@@ -30,7 +30,7 @@ export const PRODUCTS: Record<string, ProductDefinition> = {
     name: "IELTS Preparation Manual",
     description: "Complete study guide for IELTS exam",
     type: "course",
-    totalPages: 100,
+    totalPages: 64,
   },
   "talk-to-ai-like-a-pro": {
     id: "talk-to-ai-like-a-pro",

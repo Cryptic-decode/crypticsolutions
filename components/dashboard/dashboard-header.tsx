@@ -2,77 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, User } from "lucide-react";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 
 interface DashboardHeaderProps {
+  pageTitle: string;
   userName?: string;
   userEmail?: string;
+  darkMode: boolean;
+  onToggleTheme: () => void;
 }
 
-const pageTitles: Record<string, string> = {
-  "/dashboard": "My Library",
-  "/progress": "Study Progress",
-  "/settings": "Settings",
-  "/dashboard/support": "Support",
-  "/dashboard/updates": "Updates",
-};
-
-export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = {}) {
-  const pathname = usePathname();
-  
-  // Handle dynamic course pages
-  let pageTitle = pageTitles[pathname] || "Dashboard";
-  if (pathname?.startsWith("/course/")) {
-    const productId = pathname.split("/course/")[1];
-    const productNames: Record<string, string> = {
-      'ielts-manual': 'IELTS Manual',
-    };
-    pageTitle = productNames[productId] || "Course";
-  }
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- prevent server/client theme mismatch
-    setMounted(true);
-  }, []);
-
-  const toggleTheme = () => {
-    const currentTheme = document.documentElement.classList.contains("dark")
-      ? "dark"
-      : "light";
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
-
-  if (!mounted) {
-    return (
-      <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6">
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-2xl font-semibold">{pageTitle}</h1>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" disabled>
-              <Sun className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-    );
-  }
-
-  const isDark = document.documentElement.classList.contains("dark");
-
+export function DashboardHeader({ pageTitle, userName, userEmail, darkMode, onToggleTheme }: DashboardHeaderProps) {
   return (
-    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6">
+    <div className="flex h-full items-center px-6">
       <div className="flex items-center justify-between w-full">
-        <h1 className="text-2xl font-semibold">{pageTitle}</h1>
+        <p className="text-lg font-semibold tracking-tight">{pageTitle}</p>
         <div className="flex items-center space-x-4">
           {/* User Info */}
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/20">
@@ -95,10 +38,11 @@ export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = 
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleTheme}
+            onClick={onToggleTheme}
             className="hover:bg-muted"
+            aria-label={darkMode ? "Use light theme" : "Use dark theme"}
           >
-            {isDark ? (
+            {darkMode ? (
               <Sun className="h-5 w-5" />
             ) : (
               <Moon className="h-5 w-5" />
@@ -106,6 +50,6 @@ export function DashboardHeader({ userName, userEmail }: DashboardHeaderProps = 
           </Button>
         </div>
       </div>
-    </header>
+    </div>
   );
 }

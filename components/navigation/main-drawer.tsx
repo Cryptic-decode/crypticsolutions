@@ -18,6 +18,7 @@ interface MainDrawerProps {
     label: string;
     onClick?: (e?: React.MouseEvent<HTMLAnchorElement>) => void;
   };
+  activeHref?: string;
 }
 
 export function MainDrawer({
@@ -25,7 +26,8 @@ export function MainDrawer({
   toggleDarkMode,
   onClose,
   links,
-  ctaButton
+  ctaButton,
+  activeHref,
 }: MainDrawerProps) {
   return (
     <div className="flex flex-col min-h-screen">
@@ -58,8 +60,12 @@ export function MainDrawer({
               <a 
                 key={link.href}
                 href={link.href}
-                className="flex items-center text-lg md:text-base font-semibold text-[#1B2242] dark:text-white 
-                         hover:text-primary hover:bg-secondary/50 rounded-lg p-4 md:p-3 transition-all cursor-pointer"
+                aria-current={activeHref === link.href ? "location" : undefined}
+                className={`flex items-center rounded-lg p-4 text-lg font-semibold transition-all md:p-3 md:text-base ${
+                  activeHref === link.href
+                    ? "bg-primary/10 text-foreground"
+                    : "text-foreground hover:bg-secondary/50 hover:text-primary"
+                }`}
                 onClick={(e) => {
                   if (isExternalLink) {
                     // For external links, just close drawer and let browser navigate
