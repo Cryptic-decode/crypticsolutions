@@ -8,7 +8,6 @@ import { DashboardDrawer } from "@/components/navigation/dashboard-drawer";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SignOutModal } from "@/components/dashboard/sign-out-modal";
 import { Menu, Loader2 } from "lucide-react";
-import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function DashboardLayout({
@@ -69,10 +68,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 relative">
-      <ScrollBackdrop intensity={0.8} />
+    <div className="min-h-screen bg-background relative">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex fixed top-0 left-0 h-full w-80 border-r bg-background">
+      <div className="hidden lg:flex fixed top-0 left-0 h-full w-72 border-r border-border/70 bg-background">
         <DashboardDrawer
           darkMode={darkMode}
           toggleDarkMode={toggleDarkMode}
@@ -110,9 +108,9 @@ export default function DashboardLayout({
       />
 
       {/* Main Content */}
-      <main className="lg:pl-80 pt-16 lg:pt-16">
-        {/* Desktop Header — fixed so it stays visible on scroll */}
-        <div className="hidden lg:block fixed top-0 left-80 right-0 z-40">
+      <main className="lg:pl-72 pt-16 lg:pt-16">
+        {/* Desktop Header: fixed so it stays visible on scroll */}
+        <div className="hidden lg:block fixed top-0 left-72 right-0 z-40">
           <DashboardHeader 
             userName={user.user_metadata?.full_name}
             userEmail={user.email}

@@ -25,7 +25,7 @@ export function Skeleton({
 }
 
 /**
- * A card-shaped skeleton — same dimensions as a standard Card+p-6.
+ * A card-shaped skeleton with the same dimensions as a standard Card+p-6.
  */
 export function SkeletonCard({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (

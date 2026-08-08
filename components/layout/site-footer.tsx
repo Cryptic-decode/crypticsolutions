@@ -13,16 +13,16 @@ interface FooterLink {
 }
 
 interface FooterProps {
-  /** Optional override for quick links — uses smooth-scroll anchors when provided, Link to "/" otherwise */
+  /** Optional override for quick links. Uses smooth-scroll anchors when provided, Link to "/" otherwise. */
   quickLinks?: FooterLink[];
 }
 
 export function SiteFooter({ quickLinks }: FooterProps) {
   const defaultQuickLinks: FooterLink[] = [
     { href: "/", label: "Home" },
-    { href: "/#services", label: "Our Services" },
-    { href: "/#products", label: "Our Products" },
-    { href: "/#contact", label: "Contact Us" },
+    { href: "/#products", label: "Products" },
+    { href: "/#about", label: "What we build" },
+    { href: "/#contact", label: "Contact" },
   ];
 
   const links = quickLinks ?? defaultQuickLinks;

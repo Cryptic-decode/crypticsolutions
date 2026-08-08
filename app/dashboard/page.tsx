@@ -159,7 +159,7 @@ export default function DashboardPage() {
           </p> */}
         </div>
 
-        {/* Study Streak — subtle stat line */}
+        {/* Study Streak: subtle stat line */}
         {!streakLoading && currentStreak > 0 && (
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -172,7 +172,7 @@ export default function DashboardPage() {
               <strong className="text-foreground">{currentStreak}</strong> day streak
               {!todayStudied && (
                 <span className="text-muted-foreground ml-1">
-                  — study today to keep it going
+                  . Study today to keep it going.
                 </span>
               )}
             </span>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* Empty State — no course purchases found */}
+          {/* Empty State: no course purchases found */}
           {!purchasesLoading && !purchasesError && coursePurchases.length === 0 && (
             <Card className="p-6 border-gray-200 dark:border-gray-700">
               <div className="text-center py-8">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {/* Purchases List — Only course products */}
+          {/* Purchases List: Only course products */}
           {!purchasesLoading && !purchasesError && coursePurchases.length > 0 && (
             <motion.div
               variants={containerVariants}

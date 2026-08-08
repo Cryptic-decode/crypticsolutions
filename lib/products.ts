@@ -16,7 +16,7 @@ export interface ProductDefinition {
   name: string;
   description: string;
   type: ProductType;
-  /** Total pages — only meaningful for course products. */
+  /** Total pages, only meaningful for course products. */
   totalPages?: number;
 }
 
@@ -35,7 +35,7 @@ export const PRODUCTS: Record<string, ProductDefinition> = {
   "talk-to-ai-like-a-pro": {
     id: "talk-to-ai-like-a-pro",
     name: "Prompt Engineering Ebook",
-    description: "Instant download ebook — learn to talk to AI like a pro",
+    description: "Instant download ebook for learning to talk to AI like a pro",
     type: "download",
   },
 };

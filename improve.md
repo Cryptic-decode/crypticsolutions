@@ -1,16 +1,16 @@
 
 Improvement Plan
-Phase 1 — Cleanup (no behavioral change)
+Phase 1: Cleanup (no behavioral change)
 ┌─────┬─────────────────────────────────────────────────────────────────────┬────────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────┐
 │ #   │ Task                                                                │ Files                  │ Why                                                                                         │
 ├─────┼─────────────────────────────────────────────────────────────────────┼────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 1   │ Remove unused imports (ChevronDown, Send, FileCode)                 │ app/page.tsx           │ Dead code, no impact                                                                        │
 │ 2   │ Delete stale SQL file (lydei-schema.sql)                            │ supabase/lydei-schema. │ Leftover from removed Lydei product                                                         │
 │     │                                                                     │ sql                    │                                                                                             │
-│ 3   │ Fix IELTS footer Products column — missing Prompt Engineering Ebook │ app/ielts-manual/page. │ Inconsistency — homepage and prompt-eng footers both list all 3 products; IELTS footer only │
+│ 3   │ Fix IELTS footer Products column: missing Prompt Engineering Ebook │ app/ielts-manual/page. │ Inconsistency: homepage and prompt-eng footers both list all 3 products; IELTS footer only │
 │     │ link                                                                │ tsx                    │ lists 2                                                                                     │
 └─────┴─────────────────────────────────────────────────────────────────────┴────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────┘
-Phase 2 — UX improvements
+Phase 2: UX improvements
 ┌─────┬───────────────────────────────────────────┬─────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ #   │ Task                                      │ Files                           │ Why                                                                                                           │
 ├─────┼───────────────────────────────────────────┼─────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -19,10 +19,10 @@ Phase 2 — UX improvements
 │     │ pages                                     │ sx                              │ access.                                                                                                       │
 │ 5   │ Dashboard "Browse Products" should also   │ app/dashboard/page.tsx          │ Currently only links to /ielts-manual                                                                         │
 │     │ link to Prompt Engineering ebook          │                                 │                                                                                                               │
-│ 6   │ Consolidate TikTok Pixel scripts from 4   │ app/layout.tsx                  │ 4 pixel scripts is likely redundant — confirm which are actually needed and keep only those                   │
+│ 6   │ Consolidate TikTok Pixel scripts from 4   │ app/layout.tsx                  │ 4 pixel scripts is likely redundant; confirm which are actually needed and keep only those                   │
 │     │ down to verified count                    │                                 │                                                                                                               │
 └─────┴───────────────────────────────────────────┴─────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-Phase 3 — DRY refactor (biggest impact)
+Phase 3: DRY refactor (biggest impact)
 ┌─────┬─────────────────────────────────────┬─────────────────────────────────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────┐
 │ #   │ Task                                │ Files                                                           │ Why                                                                                │
 ├─────┼─────────────────────────────────────┼─────────────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────┤

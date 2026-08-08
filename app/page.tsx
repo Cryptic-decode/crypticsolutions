@@ -1,861 +1,235 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
-  BookOpen,
-  CheckCircle2,
-  FileText,
-  Code,
-  Lightbulb,
-  TrendingUp,
-  Menu,
-  X,
+  ArrowUpRight,
+  Check,
+  CreditCard,
+  Download,
   Mail,
-  Zap,
-  Award,
+  Menu,
   Moon,
+  ShieldCheck,
   Sun,
-  ArrowUp,
-  Linkedin,
-  Instagram
+  X,
 } from "lucide-react";
-import { TikTokIcon } from "@/components/ui/tiktok-icon";
-import Image from "next/image";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+
+import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/drawer";
 import { MainDrawer } from "@/components/navigation/main-drawer";
-import { ScrollBackdrop } from "@/components/effects/scroll-backdrop";
-import { useRouter } from "next/navigation";
+import { ProductVisual } from "@/components/marketing/product-visual";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { useAuth } from "@/lib/auth";
 import { SUPPORT_EMAIL } from "@/lib/contact";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { fadeInUp, staggerContainer, buttonTap } from "@/lib/animations";
+
+const reveal = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.18 },
+  transition: { duration: 0.55, ease: "easeOut" as const },
+};
+
+const products = [
+  {
+    id: "ielts-manual",
+    eyebrow: "Guided learning",
+    title: "Prepare for IELTS with a plan you can actually follow.",
+    description: "A structured manual covering Listening, Reading, Writing, and Speaking. It is built for focused study, not information overload.",
+    price: "₦5,000",
+    detail: "Protected online library",
+    href: "/ielts-manual",
+    cta: "View IELTS manual",
+    visual: "ielts" as const,
+    features: ["All four IELTS sections", "Practical strategies and examples", "Reading progress saved automatically"],
+  },
+  {
+    id: "prompt-engineering-ebook",
+    eyebrow: "Instant download",
+    title: "Get more useful answers from the AI tools you already use.",
+    description: "A concise ebook with prompt structures, reusable templates, and clear examples for better everyday AI work.",
+    price: "₦2,000",
+    detail: "PDF download after payment",
+    href: "/prompt-engineering-ebook",
+    cta: "View prompt ebook",
+    visual: "prompts" as const,
+    features: ["Four focused chapters", "Reusable prompt templates", "Short, practical format"],
+  },
+];
 
 export default function Home() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("");
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    // Check if user landed here from a password reset link
-    // Supabase adds hash fragments like #access_token=...&type=recovery
-    const hash = window.location.hash;
-    if (hash && hash.includes('type=recovery')) {
-      // Redirect to update-password page to handle the recovery session
-      router.replace('/update-password');
+    if (window.location.hash.includes("type=recovery")) {
+      router.replace("/update-password");
       return;
     }
-
-    // Also check if user has a session but is on homepage - might be recovery session
-    // Wait for auth to load before checking
-    if (!authLoading && user) {
-      // Check if this is a recovery session by looking at URL params or hash
-      const urlParams = new URLSearchParams(window.location.search);
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      if (urlParams.get('type') === 'recovery' || hashParams.get('type') === 'recovery') {
-        router.replace('/update-password');
-        return;
-      }
-    }
-
-    // Scroll to top on mount
-    window.scrollTo(0, 0);
-
-    // Check local storage (client-side only)
-    if (typeof window !== 'undefined') {
-      const isDark = localStorage.getItem('theme') === 'dark' ||
-        (!localStorage.getItem('theme'));
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
-      setDarkMode(isDark);
-
-      // Handle scroll for Back to Top button
-      const handleScroll = () => {
-        setShowBackToTop(window.scrollY > 300);
-      };
-
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }
-  }, []);
-
-  // Track active section using Intersection Observer
-  useEffect(() => {
-    const sections = ['about', 'services', 'products', 'contact'];
-    const observers: IntersectionObserver[] = [];
-
-    // Clear active section when at top (Hero section)
-    const handleScroll = () => {
-      if (window.scrollY < 100) {
-        setActiveSection("");
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-
-    sections.forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (!element) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setActiveSection(sectionId);
-            }
-          });
-        },
-        {
-          rootMargin: '-20% 0px -60% 0px', // Trigger when section is in upper portion of viewport
-          threshold: 0.1,
-        }
-      );
-
-      observer.observe(element);
-      observers.push(observer);
-    });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      observers.forEach((observer) => observer.disconnect());
-    };
-  }, []);
+    const storedTheme = localStorage.getItem("theme");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
+    setDarkMode(storedTheme !== "light");
+  }, [router]);
 
   const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
+    const next = !darkMode;
+    setDarkMode(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("theme", next ? "dark" : "light");
   };
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault();
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
-
-  // Animation variants now imported from @/lib/animations
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
-      <ScrollBackdrop />
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <Image
-                src="/cryptic-assets/fullLogo.png"
-                alt="Cryptic Solutions"
-                width={180}
-                height={45}
-                className="h-[45px] w-auto dark:hidden"
-                priority
-              />
-              <Image
-                src="/cryptic-assets/fullLogo2.png"
-                alt="Cryptic Solutions"
-                width={180}
-                height={45}
-                className="h-[45px] w-auto hidden dark:block"
-                priority
-              />
-            </div>
-            <div className="hidden md:flex items-center gap-6">
-              <a
-                href="#about"
-                className={`text-sm font-bold transition-colors ${activeSection === "about"
-                  ? "text-primary"
-                  : "text-[#1B2242] dark:text-white hover:text-primary"
-                  }`}
-                onClick={(e) => handleNavClick(e, "about")}
-              >
-                About
-              </a>
-              <a
-                href="#services"
-                className={`text-sm font-bold transition-colors ${activeSection === "services"
-                  ? "text-primary"
-                  : "text-[#1B2242] dark:text-white hover:text-primary"
-                  }`}
-                onClick={(e) => handleNavClick(e, "services")}
-              >
-                Services
-              </a>
-              <a
-                href="#products"
-                className={`text-sm font-bold transition-colors ${activeSection === "products"
-                  ? "text-primary"
-                  : "text-[#1B2242] dark:text-white hover:text-primary"
-                  }`}
-                onClick={(e) => handleNavClick(e, "products")}
-              >
-                Products
-              </a>
-              <a
-                href="#contact"
-                className={`text-sm font-bold transition-colors ${activeSection === "contact"
-                  ? "text-primary"
-                  : "text-[#1B2242] dark:text-white hover:text-primary"
-                  }`}
-                onClick={(e) => handleNavClick(e, "contact")}
-              >
-                Contact
-              </a>
-              {!authLoading && !user && (
-                <Link
-                  href="/signin"
-                  className="text-sm font-bold text-[#1B2242] dark:text-white hover:text-primary transition-colors"
-                >
-                  Sign In
-                </Link>
-              )}
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-lg hover:bg-secondary/50 transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
-              <motion.div whileTap={buttonTap}>
-                {user ? (
-                  <Button asChild size="sm">
-                    <Link href="/dashboard">Dashboard</Link>
-                  </Button>
-                ) : (
-                  <Button asChild size="sm">
-                    <a href="#products" onClick={(e) => handleNavClick(e, "products")}>Get Started</a>
-                  </Button>
-                )}
-              </motion.div>
-            </div>
-            <button
-              className="md:hidden p-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/92 backdrop-blur-xl">
+        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 md:px-8">
+          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top">
+            <Image src="/cryptic-assets/fullLogo.png" alt="Cryptic Solutions" width={150} height={38} className="h-9 w-auto dark:hidden" priority />
+            <Image src="/cryptic-assets/fullLogo2.png" alt="Cryptic Solutions" width={150} height={38} className="hidden h-9 w-auto dark:block" priority />
+          </button>
+
+          <div className="hidden items-center gap-8 md:flex">
+            <a href="#products" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Products</a>
+            <a href="#about" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">What we build</a>
+            <a href="#contact" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">Contact</a>
+            {!authLoading && <Link href={user ? "/dashboard" : "/signin"} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{user ? "Dashboard" : "Sign in"}</Link>}
+            <button onClick={toggleDarkMode} className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="Toggle theme">
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
+            <Button asChild className="h-10 px-5"><a href="#products">Browse products</a></Button>
           </div>
 
-          {/* Mobile Menu */}
-          <Drawer
-            isOpen={mobileMenuOpen}
-            onClose={() => setMobileMenuOpen(false)}
-          >
-            <MainDrawer
-              darkMode={darkMode}
-              toggleDarkMode={toggleDarkMode}
-              onClose={() => setMobileMenuOpen(false)}
-              links={[
-                {
-                  href: "#about",
-                  label: "About",
-                  onClick: (e) => handleNavClick(e, "about")
-                },
-                {
-                  href: "#services",
-                  label: "Services",
-                  onClick: (e) => handleNavClick(e, "services")
-                },
-                {
-                  href: "#products",
-                  label: "Products",
-                  onClick: (e) => handleNavClick(e, "products")
-                },
-                {
-                  href: "#contact",
-                  label: "Contact",
-                  onClick: (e) => handleNavClick(e, "contact")
-                },
-                ...(!authLoading && !user ? [{
-                  href: "/signin",
-                  label: "Sign In",
-                  onClick: undefined
-                }] : [])
-              ]}
-              ctaButton={{
-                label: user ? "Dashboard" : "Get Started",
-                onClick: () => {
-                  if (user) {
-                    router.push("/dashboard");
-                  } else {
-                    // Scroll to products section
-                    const el = document.getElementById("products");
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }
-                },
-              }}
-            />
-          </Drawer>
+          <button className="rounded-md p-2 md:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Open navigation">
+            {mobileMenuOpen ? <X /> : <Menu />}
+          </button>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative container mx-auto px-4 md:px-6 lg:px-8 pt-20 md:pt-28 pb-20 md:pb-32">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <motion.div
-            className="relative z-10 text-center lg:text-left"
-            initial="initial"
-            animate="animate"
-            variants={fadeInUp}
-          >
-            <motion.div
-              className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-8 backdrop-blur-sm shadow-sm dark:shadow-primary/5"
-              variants={fadeInUp}
-            >
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <span className="text-primary font-medium">Building Digital Excellence</span>
-            </motion.div>
-
-            <motion.h1
-              className="text-4xl md:text-6xl lg:text-6xl font-bold tracking-tight mb-6"
-              variants={fadeInUp}
-            >
-              <span className="text-[#1B2242] dark:text-white">Digital Products That</span>
-              <span className="block mt-2 text-primary">Connect Brands to Customers</span>
-            </motion.h1>
-
-            <motion.p
-              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl lg:max-w-none"
-              variants={fadeInUp}
-            >
-              We create innovative digital products and solutions that empower businesses and individuals
-              to achieve their goals. From educational tools to web platforms, we're building the future of digital excellence.
-            </motion.p>
-
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center lg:items-start"
-              variants={fadeInUp}
-            >
-              <motion.div
-                whileTap={buttonTap}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button asChild size="lg" className="w-full sm:w-auto shadow-lg hover:shadow-primary/20 transition-shadow">
-                  <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
-                    Explore Products
-                  </a>
-                </Button>
-              </motion.div>
-              <motion.div
-                whileTap={buttonTap}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button asChild variant="outline" size="lg" className="w-full sm:w-auto hover:bg-primary/5 hover:border-primary/30 transition-colors">
-                  <a href="#services" onClick={(e) => handleNavClick(e, "services")}>Learn More</a>
-                </Button>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="relative hidden lg:flex justify-end"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <Image
-              src="/undraw-assets/undraw_designing-components_kb05.svg"
-              alt="Illustration of designing components"
-              width={720}
-              height={520}
-              priority
-              className="w-full max-w-md h-auto"
-            />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-        {/* Subtle right accent */}
-        <motion.div
-          className="absolute top-8 right-6 w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/15 hidden md:block pointer-events-none"
-          style={{
-            boxShadow:
-              "0 0 30px rgba(147, 224, 48, 0.12), 0 0 60px rgba(147, 224, 48, 0.08)",
-          }}
-          aria-hidden="true"
-          animate={{
-            y: [0, 10, 0],
-            opacity: [0.35, 0.5, 0.35],
-            scale: [1, 1.08, 1],
-          }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      <Drawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+        <MainDrawer
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          onClose={() => setMobileMenuOpen(false)}
+          links={[
+            { href: "#products", label: "Products", onClick: () => scrollTo("products") },
+            { href: "#about", label: "What we build", onClick: () => scrollTo("about") },
+            { href: "#contact", label: "Contact", onClick: () => scrollTo("contact") },
+            ...(!authLoading ? [{ href: user ? "/dashboard" : "/signin", label: user ? "Dashboard" : "Sign in" }] : []),
+          ]}
+          ctaButton={{ label: "Browse products", onClick: () => scrollTo("products") }}
         />
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-            <span className="text-[#1B2242] dark:text-white">About</span> <span className="text-primary">Cryptic Solutions</span>
-          </h2>
-          <p className="text-lg text-muted-foreground mb-6">
-            We build innovative digital products and human‑centered solutions that simplify complex workflows,
-            improve productivity, and drive measurable growth. Our approach blends product thinking, clean
-            engineering, and practical UX to deliver secure, scalable, easy‑to‑use software.
-          </p>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-3">
-              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">What we do</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
-                  <span>Educational tools that make learning accessible and effective</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
-                  <span>Custom digital products tailored to business workflows</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
-                  <span>Web platforms and applications for interaction and automation</span>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-base md:text-lg font-semibold text-[#1B2242] dark:text-white">Why choose us</h3>
-              <p className="text-muted-foreground">
-                We don’t just build features — we connect the right pieces. By focusing on outcomes and user
-                experience, we translate complex challenges into elegant, practical solutions that save time,
-                reduce cost, and unlock new value.
+      </Drawer>
+
+      <main className="pt-[4.5rem]">
+        <section className="relative border-b border-border/60">
+          <div className="mx-auto grid min-h-[calc(100dvh-4.5rem)] max-w-7xl items-center gap-14 px-5 py-16 md:px-8 lg:grid-cols-[1.02fr_.98fr] lg:py-20">
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <p className="mb-6 font-mono text-xs uppercase tracking-[0.22em] text-primary">Learning tools · practical ebooks · useful software</p>
+              <h1 className="max-w-2xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-[4rem]">
+                Practical digital products for learning and work.
+              </h1>
+              <p className="mt-7 max-w-xl text-pretty text-lg leading-8 text-muted-foreground">
+                Cryptic Solutions turns complex topics into focused products that are clear, useful, and ready when you need them.
               </p>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* What We Do */}
-      <section id="services" className="container mx-auto px-4 md:px-6 lg:px-8 py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-[#1B2242] dark:text-white">What</span> <span className="text-primary">We Do</span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Innovative solutions that transform ideas into impactful digital products
-            </p>
-          </div>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-6"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Educational Tools</h3>
-                <p className="text-muted-foreground">
-                  Comprehensive digital learning solutions that make education more accessible and effective.
-                </p>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
-                  <Lightbulb className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Digital Products</h3>
-                <p className="text-muted-foreground">
-                  Innovative solutions that solve real-world problems and create value for users.
-                </p>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              variants={fadeInUp}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="p-6 hover:shadow-lg transition-all border hover:border-primary/20">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-4">
-                  <Code className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-[#1B2242] dark:text-white">Web Platforms</h3>
-                <p className="text-muted-foreground">
-                  Scalable web solutions that help businesses and individuals achieve their digital goals.
-                </p>
-              </Card>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Products Section */}
-      <section id="products" className="bg-secondary/50 py-20">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                <span className="text-[#1B2242] dark:text-white">Our</span> <span className="text-primary">Products</span>
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Innovative solutions designed to help you succeed
-              </p>
-            </div>
-
-            {/* Available Products - Horizontal Layout */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* IELTS Manual */}
-              <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm mb-4">
-                    <Award className="h-4 w-4" />
-                    <span>Ready Now</span>
-                  </div>
-
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                    <span className="text-[#1B2242] dark:text-white">IELTS Preparation</span> <span className="text-primary">Manual</span>
-                  </h3>
-
-                  <p className="text-muted-foreground mb-6">
-                    Comprehensive preparation guide designed to help you achieve your IELTS goals.
-                    Master all four sections with proven strategies and practice materials.
-                  </p>
-
-                  <div className="space-y-3 mb-8">
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Complete coverage of all IELTS sections</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Proven test-taking strategies</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Practice questions and examples</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Expert tips and insights</span>
-                    </motion.div>
-                  </div>
-
-                  <motion.div whileTap={buttonTap} className="w-full">
-                    <Button asChild size="lg" className="w-full">
-                      <a href="/ielts-manual">
-                        Start Learning Now
-                      </a>
-                    </Button>
-                  </motion.div>
-                </div>
-              </Card>
-
-              {/* Prompt Engineering Ebook */}
-              <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-sm mb-4">
-                    <BookOpen className="h-4 w-4" />
-                    <span>Ready Now</span>
-                  </div>
-
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                    <span className="text-[#1B2242] dark:text-white">Talk to AI</span> <span className="text-primary">like a Pro</span>
-                  </h3>
-
-                  <p className="text-muted-foreground mb-6">
-                    Master the art of writing effective AI prompts. Learn proven structures, ready-to-use templates, and strategies that transform your AI interactions.
-                  </p>
-
-                  <div className="space-y-3 mb-8">
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">4 comprehensive chapters</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Plug-and-play prompt templates</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Quick read format</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Avoid common prompting pitfalls</span>
-                    </motion.div>
-                  </div>
-
-                  <motion.div whileTap={buttonTap} className="w-full">
-                    <Button asChild size="lg" variant="outline" className="w-full hover:bg-primary/5 hover:border-primary/30">
-                      <a href="/prompt-engineering-ebook">
-                        Get Instant Access
-                      </a>
-                    </Button>
-                  </motion.div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Quickland - Coming Soon */}
-            <Card className="p-8 md:p-12 mt-6 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border bg-primary/10 border-primary/20 px-4 py-1.5 text-sm mb-4">
-                    <Lightbulb className="h-4 w-4 text-primary" />
-                    <span className="text-primary font-medium">Coming Soon</span>
-                  </div>
-
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                    <span className="text-[#1B2242] dark:text-white">Quickland</span>
-                  </h3>
-
-                  <p className="text-muted-foreground mb-6">
-                    A revolutionary user input website creator that empowers you to build
-                    stunning websites without writing a single line of code. Simply provide
-                    your content and watch it come to life.
-                  </p>
-
-                  <div className="space-y-3 mb-8">
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">No coding required</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">AI-powered design suggestions</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Responsive and modern layouts</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-3"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 }}
-                      viewport={{ once: true }}
-                    >
-                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
-                      <span className="text-sm">Fast deployment</span>
-                    </motion.div>
-                  </div>
-
-                  <Button variant="outline" size="lg" disabled className="w-full sm:w-auto">
-                    Coming Soon
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-center">
-                  <motion.div
-                    className="relative w-full max-w-md"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <motion.div
-                      className="bg-gradient-to-br from-primary/20 to-primary/40 rounded-2xl flex items-center justify-center p-8"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Image
-                        src="/undraw-assets/undraw_building-blocks_h5jb.svg"
-                        alt="Quickland Website Builder"
-                        width={260}
-                        height={180}
-                        className="w-full h-auto"
-                      />
-                    </motion.div>
-                  </motion.div>
-                </div>
+              <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <Button asChild size="lg" className="h-12 px-6"><a href="#products">Explore the products <ArrowRight /></a></Button>
+                <a href="#about" className="group inline-flex items-center gap-2 px-2 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">How we work <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></a>
               </div>
-            </Card>
+              <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-border/70 pt-6 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-2"><CreditCard className="h-4 w-4 text-primary" /> Secure Paystack checkout</span>
+                <span className="inline-flex items-center gap-2"><Download className="h-4 w-4 text-primary" /> Immediate product access</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" /> Protected customer library</span>
+              </div>
+            </motion.div>
+
+            <motion.div className="relative mx-auto w-full max-w-xl" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.1 }}>
+              <div className="relative grid grid-cols-2 items-center gap-3 rounded-[2rem] border border-border/70 bg-muted/35 p-4 shadow-[0_28px_80px_rgba(22,25,18,.12)] dark:bg-[#0d0f0c] dark:shadow-[0_30px_100px_rgba(0,0,0,.35)] sm:p-6">
+                <ProductVisual kind="ielts" priority className="min-h-80 rounded-2xl bg-transparent p-4 dark:bg-transparent" />
+                <ProductVisual kind="prompts" priority className="min-h-80 translate-y-6 rounded-2xl bg-transparent p-4 dark:bg-transparent" />
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 md:px-6 lg:px-8 py-20">
-        <div className="mx-auto max-w-4xl">
-          <Card className="p-12 text-center bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-[#1B2242] dark:text-white">Ready to</span> <span className="text-primary">Get Started?</span>
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Explore our digital products and take the next step in your journey. Or reach out to discuss how we can help with your digital product needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div whileTap={buttonTap}>
-                <Button asChild size="lg">
-                  <a href="/ielts-manual">
-                    Get IELTS Manual
-                  </a>
-                </Button>
-              </motion.div>
-              <motion.div whileTap={buttonTap}>
-                <Button asChild size="lg" variant="outline">
-                  <a href="/prompt-engineering-ebook">
-                    Get Prompt Engineering Ebook
-                  </a>
-                </Button>
-              </motion.div>
-              <motion.div whileTap={buttonTap}>
-                <Button variant="outline" size="lg" asChild>
-                  <a href="#contact">Contact Us</a>
-                </Button>
-              </motion.div>
-            </div>
-          </Card>
-        </div>
-      </section>
+        <section id="products" className="scroll-mt-28 py-24 md:py-32">
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+            <motion.div {...reveal} className="mb-16 max-w-2xl">
+              <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-primary">Available now</p>
+              <h2 className="text-balance text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Start with something useful today.</h2>
+            </motion.div>
 
-      {/* Contact Section */}
-      <section id="contact" className="bg-secondary/50 py-20">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-[#1B2242] dark:text-white">Get in</span> <span className="text-primary">Touch</span>
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Have questions about our products or need custom digital solutions?
-              We'd love to hear from you.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div whileTap={buttonTap}>
-                <Button asChild variant="outline" size="lg">
-                  <a href={`mailto:${SUPPORT_EMAIL}`}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Email Us
-                  </a>
-                </Button>
-              </motion.div>
-              <motion.div whileTap={buttonTap}>
-                <Button asChild variant="outline" size="lg">
-                  <a href="#products" onClick={(e) => handleNavClick(e, "products")}>
-                    Explore Products
-                  </a>
-                </Button>
-              </motion.div>
+            <div className="space-y-8">
+              {products.map((product, index) => (
+                <motion.article key={product.id} {...reveal} className="grid overflow-hidden rounded-[1.75rem] border border-border/70 bg-card lg:grid-cols-2">
+                  <ProductVisual kind={product.visual} className={index % 2 ? "lg:order-2 bg-muted/40 dark:bg-[#0d0f0c]" : "bg-muted/40 dark:bg-[#0d0f0c]"} />
+                  <div className="flex flex-col p-8 sm:p-10 lg:p-14">
+                    <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">{product.eyebrow}</p>
+                    <h3 className="mt-5 max-w-xl text-balance text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{product.title}</h3>
+                    <p className="mt-5 max-w-xl leading-7 text-muted-foreground">{product.description}</p>
+                    <ul className="mt-8 space-y-3">
+                      {product.features.map((feature) => <li key={feature} className="flex items-center gap-3 text-sm"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/12"><Check className="h-3 w-3 text-primary" /></span>{feature}</li>)}
+                    </ul>
+                    <div className="mt-10 flex flex-col gap-5 border-t border-border/70 pt-7 sm:flex-row sm:items-end sm:justify-between">
+                      <div><p className="text-2xl font-semibold tabular-nums">{product.price}</p><p className="mt-1 text-xs text-muted-foreground">{product.detail}</p></div>
+                      <Button asChild size="lg"><Link href={product.href}>{product.cta} <ArrowUpRight /></Link></Button>
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Back to Top Button */}
-      <motion.button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-8 right-8 z-40 p-4 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-colors ${showBackToTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        initial={{ scale: 0 }}
-        animate={{ scale: showBackToTop ? 1 : 0 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        transition={{ duration: 0.2 }}
-        aria-label="Back to top"
-      >
-        <ArrowUp className="h-6 w-6" />
-      </motion.button>
+        <section id="about" className="scroll-mt-28 border-y border-border/60 bg-muted/30 py-24 md:py-32">
+          <div className="mx-auto grid max-w-7xl gap-16 px-5 md:px-8 lg:grid-cols-[.8fr_1.2fr]">
+            <motion.div {...reveal}>
+              <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-primary">What we build</p>
+              <h2 className="text-balance text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Less noise. More useful outcomes.</h2>
+            </motion.div>
+            <div className="divide-y divide-border/70 border-y border-border/70">
+              {[
+                ["01", "Learning products", "Structured resources that make difficult subjects easier to study and revisit."],
+                ["02", "Practical ebooks", "Focused guides with examples, templates, and next steps, without padded theory."],
+                ["03", "Web products", "Clear, dependable tools designed around the work people actually need to do."],
+              ].map(([number, title, copy]) => (
+                <motion.div key={number} {...reveal} className="grid gap-4 py-8 sm:grid-cols-[4rem_12rem_1fr] sm:items-start">
+                  <span className="font-mono text-xs text-primary">{number}</span>
+                  <h3 className="font-semibold">{title}</h3>
+                  <p className="max-w-lg leading-7 text-muted-foreground">{copy}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <SiteFooter
-        quickLinks={[
-          { href: "#services", label: "Our Services", onClick: (e) => handleNavClick(e, "services") },
-          { href: "#products", label: "Our Products", onClick: (e) => handleNavClick(e, "products") },
-          { href: "#contact", label: "Contact Us", onClick: (e) => handleNavClick(e, "contact") },
-        ]}
-      />
+        <section className="py-20 md:py-24">
+          <motion.div {...reveal} className="mx-auto flex max-w-7xl flex-col gap-8 px-5 md:px-8 lg:flex-row lg:items-center lg:justify-between">
+            <div><p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">In development</p><h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em]">Quickland is taking shape.</h2><p className="mt-3 max-w-2xl text-muted-foreground">A straightforward way to turn structured business information into a polished web presence.</p></div>
+            <span className="w-fit border-l-2 border-primary pl-4 text-sm text-muted-foreground">Product updates coming soon</span>
+          </motion.div>
+        </section>
+
+        <section id="contact" className="scroll-mt-28 bg-[#0d0f0c] py-24 text-white md:py-32">
+          <motion.div {...reveal} className="mx-auto max-w-7xl px-5 md:px-8">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">Have a question?</p>
+            <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+              <h2 className="max-w-4xl text-balance text-4xl font-semibold tracking-[-0.045em] sm:text-6xl">Let’s find the most useful next step.</h2>
+              <Button asChild size="lg" className="h-12"><a href={`mailto:${SUPPORT_EMAIL}`}><Mail /> Email Cryptic Solutions</a></Button>
+            </div>
+          </motion.div>
+        </section>
+      </main>
+
+      <SiteFooter quickLinks={[{ href: "#products", label: "Products" }, { href: "#about", label: "What we build" }, { href: "#contact", label: "Contact" }]} />
     </div>
   );
 }
