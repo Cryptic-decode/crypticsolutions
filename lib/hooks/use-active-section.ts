@@ -18,7 +18,22 @@ export function useActiveSection(sectionIds: readonly string[]) {
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-        if (!visibleSection) return;
+        if (!visibleSection) {
+          const firstSectionTop = sections[0].getBoundingClientRect().top;
+          const activeZoneBottom = window.innerHeight * 0.4;
+
+          if (firstSectionTop > activeZoneBottom) {
+            setActiveSection("");
+            window.history.replaceState(
+              null,
+              "",
+              `${window.location.pathname}${window.location.search}`
+            );
+          }
+
+          return;
+        }
+
         const nextSection = visibleSection.target.id;
         setActiveSection(nextSection);
         window.history.replaceState(null, "", `#${nextSection}`);

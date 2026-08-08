@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Linkedin, Instagram } from "lucide-react";
+import { Mail, Linkedin, Instagram, Youtube } from "lucide-react";
 import { TikTokIcon } from "@/components/ui/tiktok-icon";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,6 +16,13 @@ interface FooterProps {
   /** Optional override for quick links. Uses smooth-scroll anchors when provided, Link to "/" otherwise. */
   quickLinks?: FooterLink[];
 }
+
+const socialLinks = [
+  { href: "https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV", label: "TikTok", icon: TikTokIcon },
+  { href: "https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4", label: "Instagram", icon: Instagram },
+  { href: "https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app", label: "LinkedIn", icon: Linkedin },
+  { href: "https://www.youtube.com/@crypticsolutionsltd", label: "YouTube", icon: Youtube },
+] as const;
 
 export function SiteFooter({ quickLinks }: FooterProps) {
   const defaultQuickLinks: FooterLink[] = [
@@ -127,33 +134,18 @@ export function SiteFooter({ quickLinks }: FooterProps) {
                 </li>
               </ul>
               <div className="flex items-center gap-3 mt-4">
-                <a
-                  href="https://www.tiktok.com/@cryptic.solutions?_r=1&_t=ZS-93LUV85mxZV"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                  aria-label="TikTok"
-                >
-                  <TikTokIcon className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://www.instagram.com/cryptic.solutions?igsh=dTR2dW5oaWc4amg4"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                  aria-label="Instagram"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/cryptic-solutions-5ba56b397?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
+                {socialLinks.map(({ href, label, icon: Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+                    aria-label={label}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                ))}
               </div>
             </div>
           </div>
