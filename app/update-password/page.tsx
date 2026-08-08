@@ -97,7 +97,7 @@ export default function UpdatePasswordPage() {
 
       // End the recovery session to avoid keeping old auth state around
       await signOut();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, "password");
     } finally {
       setFormLoading(false);
@@ -105,7 +105,7 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -245,5 +245,3 @@ export default function UpdatePasswordPage() {
     </div>
   );
 }
-
-

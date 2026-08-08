@@ -1,444 +1,276 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AlertCircle, ArrowRight, BookOpen, Check, Clock, Flame, LockKeyhole, RefreshCw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
+import { DashboardPageFrame, DashboardPageHeader, DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
 import { useStudyStreak } from "@/lib/hooks/use-study-streak";
+import { formatReadingTime, getCourseProductIds, getProductInfo } from "@/lib/products";
+import { supabase } from "@/lib/supabase";
 import { showSuccess } from "@/lib/utils";
-import {
-  getCourseProductIds,
-  getProductInfo,
-  formatReadingTime,
-} from "@/lib/products";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef, useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import { BookOpen, AlertCircle, CheckCircle2, ArrowRight, Settings, HelpCircle, Bell, BarChart3, Clock, Flame } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
-import { Button } from "@/components/ui/button";
-import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
 
-// Animation variants following design guide
-const containerVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-};
-
-const cardVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  hover: { scale: 1.02, y: -2 },
-};
-
-// Only show course-type purchases on the dashboard (instant-download products
-// like ebooks don't need progress tracking or a course card).
 const courseProductIds = getCourseProductIds();
+
+function LibrarySkeleton() {
+  return (
+    <DashboardPageFrame aria-busy="true" aria-label="Loading your library">
+      <div className="space-y-3 border-b border-border/70 pb-8">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-10 w-72 max-w-full" />
+        <Skeleton className="h-5 w-[32rem] max-w-full" />
+      </div>
+      <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-3">
+        {[0, 1, 2].map((item) => <Skeleton key={item} className="h-24 rounded-none bg-card" />)}
+      </div>
+      <div className="mt-12 space-y-5">
+        <Skeleton className="h-8 w-36" />
+        <Skeleton className="h-80 w-full rounded-2xl" />
+      </div>
+    </DashboardPageFrame>
+  );
+}
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const { purchases, loading: purchasesLoading, error: purchasesError, refetch } = usePurchases();
   const { getProgressForProduct } = useReadingProgress();
-  const { currentStreak, longestStreak, todayStudied, loading: streakLoading } = useStudyStreak();
+  const { currentStreak, todayStudied, loading: streakLoading } = useStudyStreak();
   const router = useRouter();
   const [linkingPurchases, setLinkingPurchases] = useState(false);
+  const [linkingError, setLinkingError] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const hasLinkedPurchases = useRef(false);
 
-  // Filter purchases to only course products
   const coursePurchases = useMemo(
-    () => purchases.filter((p) => courseProductIds.has(p.product_id)),
+    () => purchases.filter((purchase) => courseProductIds.has(purchase.product_id)),
     [purchases]
   );
 
+  const totalReadingSeconds = coursePurchases.reduce(
+    (total, purchase) => total + (getProgressForProduct(purchase.product_id)?.total_read_seconds ?? 0),
+    0
+  );
+
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/signin");
-    }
+    if (!authLoading && !user) router.replace("/signin");
   }, [user, authLoading, router]);
 
-  // Link purchases when user first accesses dashboard after email confirmation
   useEffect(() => {
     const linkPurchases = async () => {
-      if (!user || hasLinkedPurchases.current || linkingPurchases) return;
-      
-      // Only link if email is confirmed
-      if (!user.email_confirmed_at) return;
+      if (!user?.email_confirmed_at || hasLinkedPurchases.current) return;
 
+      setLinkingPurchases(true);
+      setLinkingError("");
       try {
-        setLinkingPurchases(true);
-        const response = await fetch('/api/purchases/link', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            email: user.email,
-          }),
-        });
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
 
+        const response = await fetch("/api/purchases/link", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
         const data = await response.json();
-        
-        if (data.success && data.linked_count > 0) {
-          // Refetch purchases after linking
+        if (!response.ok) throw new Error(data.error || "We could not sync your purchases.");
+
+        if (data.linked_count > 0) {
           await refetch();
-          showSuccess(`Successfully linked ${data.linked_count} purchase${data.linked_count > 1 ? 's' : ''}!`);
+          showSuccess(`${data.linked_count} purchase${data.linked_count > 1 ? "s" : ""} added to your library.`);
         }
-        
         hasLinkedPurchases.current = true;
       } catch (error) {
-        // Handle purchase linking errors silently - user can still use dashboard
+        setLinkingError(error instanceof Error ? error.message : "We could not sync your purchases.");
       } finally {
         setLinkingPurchases(false);
       }
     };
 
-    if (user && user.email_confirmed_at) {
-      linkPurchases();
-    }
-  }, [user, refetch, linkingPurchases]);
+    linkPurchases();
+  }, [user, refetch]);
 
-  if (authLoading || purchasesLoading) {
-    return (
-      <div className="p-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Title skeleton */}
-          <Skeleton className="h-10 w-48 mb-8" />
+  if (authLoading || purchasesLoading) return <LibrarySkeleton />;
+  if (!user) return null;
 
-          {/* Streak widget skeleton */}
-          <Skeleton className="h-24 w-full rounded-xl p-5">
-            <div className="flex items-center gap-5">
-              <Skeleton className="h-14 w-14 rounded-full" />
-              <div className="flex-1 space-y-2">
-                <Skeleton className="h-6 w-3/5" />
-                <Skeleton className="h-4 w-2/5" />
-              </div>
-            </div>
-          </Skeleton>
-
-          {/* Library heading */}
-          <Skeleton className="h-8 w-32" />
-
-          {/* Course cards */}
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null; // Will redirect
-  }
+  const displayName = user.user_metadata?.full_name?.trim() || user.email?.split("@")[0] || "there";
+  const firstName = displayName.split(" ")[0];
 
   return (
-    <div className="p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl"
-      >
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
-          {/* <p className="text-muted-foreground">
-            {user.user_metadata?.full_name || user.email}
-          </p> */}
-        </div>
+    <DashboardPageFrame>
+      <DashboardPageHeader
+        eyebrow="Your learning space"
+        title={`Welcome back, ${firstName}`}
+        description="Continue reading, review your progress, or manage your account from one focused workspace."
+        action={coursePurchases[0] && (
+          <Button asChild size="lg">
+            <Link href={`/course/${coursePurchases[0].product_id}`}>Continue reading <ArrowRight /></Link>
+          </Button>
+        )}
+      />
 
-        {/* Study Streak — subtle stat line */}
-        {!streakLoading && currentStreak > 0 && (
-          <motion.p
+      <section aria-label="Learning overview" className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-3">
+        <div className="bg-card px-5 py-5 sm:px-6">
+          <p className="text-xs font-medium text-muted-foreground">Course library</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">{coursePurchases.length}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{coursePurchases.length === 1 ? "course ready" : "courses ready"}</p>
+        </div>
+        <div className="bg-card px-5 py-5 sm:px-6">
+          <p className="text-xs font-medium text-muted-foreground">Reading time</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">{totalReadingSeconds ? formatReadingTime(totalReadingSeconds) : "0 min"}</p>
+          <p className="mt-1 text-xs text-muted-foreground">across your library</p>
+        </div>
+        <div className="bg-card px-5 py-5 sm:px-6">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><Flame className="h-3.5 w-3.5 text-primary" /> Study streak</p>
+          <p className="mt-2 text-2xl font-semibold tabular-nums">{streakLoading ? "..." : `${currentStreak} ${currentStreak === 1 ? "day" : "days"}`}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{todayStudied ? "Studied today" : "Open a course to keep learning"}</p>
+        </div>
+      </section>
+
+      <div aria-live="polite" className="mt-6 space-y-3">
+        {linkingPurchases && (
+          <div className="flex items-center gap-3 rounded-lg border border-border/70 bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary" /> Checking for recent purchases
+          </div>
+        )}
+        {linkingError && (
+          <div className="flex flex-col gap-3 rounded-lg border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+            <span className="flex items-center gap-2 text-destructive"><AlertCircle className="h-4 w-4" />{linkingError}</span>
+            <Button type="button" variant="outline" size="sm" onClick={() => { hasLinkedPurchases.current = false; setLinkingError(""); window.location.reload(); }}>Try again</Button>
+          </div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {!user.user_metadata?.password_changed && (
+          <motion.section
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-sm text-muted-foreground mb-6 flex items-center gap-1.5"
+            exit={{ opacity: 0, y: -8 }}
+            className="mt-8 grid gap-4 rounded-xl border border-primary/25 bg-primary/[0.06] p-5 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-6"
+            aria-labelledby="security-task-title"
           >
-            <Flame className="h-3.5 w-3.5 text-orange-500" />
-            <span>
-              <strong className="text-foreground">{currentStreak}</strong> day streak
-              {!todayStudied && (
-                <span className="text-muted-foreground ml-1">
-                  — study today to keep it going
-                </span>
-              )}
-            </span>
-          </motion.p>
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15"><LockKeyhole className="h-5 w-5 text-primary" /></div>
+            <div>
+              <h2 id="security-task-title" className="font-semibold">Secure your account</h2>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">Replace your temporary password before your next study session.</p>
+            </div>
+            <Button variant="outline" onClick={() => setShowPasswordModal(true)}>Change password</Button>
+          </motion.section>
+        )}
+      </AnimatePresence>
+
+      <section className="mt-12" aria-labelledby="library-title">
+        <DashboardSectionHeader
+          title="My library"
+          description="Your protected courses and saved reading progress."
+          action={<Button asChild variant="ghost" size="sm"><Link href="/progress">View progress <ArrowRight /></Link></Button>}
+        />
+
+        {purchasesError && (
+          <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-6">
+            <AlertCircle className="h-5 w-5 text-destructive" />
+            <h3 className="mt-4 font-semibold">We could not load your library</h3>
+            <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">{purchasesError}</p>
+            <Button className="mt-5" variant="outline" onClick={() => refetch()}><RefreshCw /> Try again</Button>
+          </div>
         )}
 
-        {/* Security Alert - Password Change */}
-        <AnimatePresence>
-          {!user.user_metadata?.password_changed && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="mb-8"
-            >
-              <Card className="p-4 border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/20">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-yellow-800 dark:text-yellow-200">Security Recommendation</h3>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                      Please change your temporary password to ensure account security.
-                    </p>
+        {!purchasesError && coursePurchases.length === 0 && (
+          <div className="grid overflow-hidden rounded-2xl border border-border/70 bg-card md:grid-cols-[1fr_16rem]">
+            <div className="p-7 sm:p-10">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Start your library</p>
+              <h3 className="mt-4 text-2xl font-semibold tracking-[-0.025em]">Choose a practical learning product.</h3>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-muted-foreground">The IELTS manual includes protected online reading and progress tracking. Download products remain available through their purchase links.</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button asChild><Link href="/ielts-manual">Explore IELTS manual <ArrowRight /></Link></Button>
+                <Button asChild variant="outline"><Link href="/prompt-engineering-ebook">View prompt ebook</Link></Button>
+              </div>
+            </div>
+            <div className="grid place-items-center bg-muted/45 p-8 dark:bg-[#10120f]">
+              <Image src="/product-assets/ielts-manual-cover.png" alt="IELTS Preparation Manual cover" width={180} height={256} className="h-52 w-auto rounded-md shadow-[0_18px_40px_rgba(20,25,16,.18)]" />
+            </div>
+          </div>
+        )}
+
+        {!purchasesError && coursePurchases.length > 0 && (
+          <div className="space-y-5">
+            {coursePurchases.map((purchase) => {
+              const product = getProductInfo(purchase.product_id);
+              if (!product?.totalPages) return null;
+
+              const totalPages = product.totalPages;
+              const readingProgress = getProgressForProduct(purchase.product_id);
+              const currentPage = readingProgress ? readingProgress.last_page + 1 : 0;
+              const progressPercent = readingProgress ? Math.min(100, Math.round((currentPage / totalPages) * 100)) : 0;
+
+              return (
+                <article key={purchase.id} className="grid overflow-hidden rounded-2xl border border-border/70 bg-card transition-colors hover:border-primary/35 lg:grid-cols-[13rem_1fr]">
+                  <div className="grid min-h-64 place-items-center bg-muted/45 p-7 dark:bg-[#10120f]">
+                    <Image src="/product-assets/ielts-manual-cover.png" alt={`${product.name} cover`} width={180} height={256} className="h-52 w-auto rounded-md shadow-[0_18px_45px_rgba(20,25,16,.2)]" />
                   </div>
-                  <Button
-                    onClick={() => setShowPasswordModal(true)}
-                    size="sm"
-                    className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800"
-                  >
-                    Change Password
-                  </Button>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* My Library Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">My Library</h2>
-          
-          {/* Error State */}
-          {purchasesError && (
-            <Card className="p-6 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
-                <div>
-                  <h3 className="font-medium text-red-800 dark:text-red-200">Error Loading Purchases</h3>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                    {purchasesError}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* Empty State — no course purchases found */}
-          {!purchasesLoading && !purchasesError && coursePurchases.length === 0 && (
-            <Card className="p-6 border-gray-200 dark:border-gray-700">
-              <div className="text-center py-8">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">No Courses Yet</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {purchases.length > 0
-                    ? "You have purchases but no course products. Only courses with progress tracking appear here."
-                    : "You haven't purchased any products yet. Explore our products to get started."}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button asChild size="lg">
-                    <Link href="/ielts-manual" className="inline-flex items-center gap-2">
-                      IELTS Manual
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/prompt-engineering-ebook" className="inline-flex items-center gap-2">
-                      Prompt Engineering Ebook
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* Purchases List — Only course products */}
-          {!purchasesLoading && !purchasesError && coursePurchases.length > 0 && (
-            <motion.div
-              variants={containerVariants}
-              initial="initial"
-              animate="animate"
-              className="space-y-4"
-            >
-              {coursePurchases.map((purchase) => {
-                const product = getProductInfo(purchase.product_id) ?? {
-                  id: purchase.product_id,
-                  name: purchase.product_id,
-                  description: 'Product',
-                  type: 'course' as const,
-                  totalPages: 100,
-                };
-                const totalPages = product.totalPages ?? 100;
-                const readingProgress = getProgressForProduct(purchase.product_id);
-                const progressPercent = readingProgress
-                  ? Math.min(100, Math.round(((readingProgress.last_page + 1) / totalPages) * 100))
-                  : 0;
-
-                return (
-                  <motion.div key={purchase.id} variants={itemVariants}>
-                    <Card className="p-6 border-gray-200 dark:border-gray-700 hover:border-primary/50 transition-colors">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-semibold text-[#1B2242] dark:text-white">
-                              {product.name}
-                            </h3>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Active
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {product.description}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Purchased on {new Date(purchase.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
-                          </p>
-                        </div>
+                  <div className="flex flex-col p-6 sm:p-8">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary"><Check className="h-3.5 w-3.5" /> Ready to read</span>
+                        <h3 className="mt-2 text-2xl font-semibold tracking-[-0.025em]">{product.name}</h3>
+                        <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">{product.description}</p>
                       </div>
+                      <p className="shrink-0 text-xs text-muted-foreground">Added {new Date(purchase.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+                    </div>
 
-                      {/* Reading Progress Indicator */}
-                      {readingProgress && (
-                        <div className="mb-4 p-3 rounded-lg bg-secondary/20 border border-secondary/40">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-[#1B2242] dark:text-white">
-                              Reading Progress
-                            </span>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <BookOpen className="h-3 w-3" />
-                                Page {readingProgress.last_page + 1}
-                              </span>
-                              {readingProgress.total_read_seconds > 0 && (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {formatReadingTime(readingProgress.total_read_seconds)}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary transition-all duration-300"
-                              style={{ width: `${progressPercent}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1 text-right">
-                            {progressPercent}% complete
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="grid gap-4 md:grid-cols-2 mt-6">
-                        <motion.div variants={itemVariants}>
-                          <Button
-                            asChild
-                            size="lg"
-                            className="w-full h-auto py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                          >
-                            <Link href={`/course/${purchase.product_id}`} className="flex items-center justify-center gap-2">
-                              <BookOpen className="h-5 w-5" />
-                              <div className="text-left">
-                                <div className="font-semibold">Continue Reading</div>
-                                <div className="text-xs opacity-90">Pick up where you left off</div>
-                              </div>
-                              <ArrowRight className="h-4 w-4 ml-auto" />
-                            </Link>
-                          </Button>
-                        </motion.div>
-
-                        <motion.div variants={itemVariants}>
-                          <Button
-                            asChild
-                            variant="outline"
-                            size="lg"
-                            className="w-full h-auto py-4 border-2 hover:border-primary/50 hover:bg-primary/5 transition-colors"
-                          >
-                            <Link href="/progress" className="flex items-center justify-center gap-2">
-                              <BarChart3 className="h-5 w-5" />
-                              <div className="text-left">
-                                <div className="font-semibold">Study Progress</div>
-                                <div className="text-xs text-muted-foreground">Track your learning journey</div>
-                              </div>
-                              <ArrowRight className="h-4 w-4 ml-auto" />
-                            </Link>
-                          </Button>
-                        </motion.div>
+                    <div className="mt-7 rounded-lg bg-muted/45 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                        <span className="font-medium">{progressPercent ? `${progressPercent}% complete` : "Ready to begin"}</span>
+                        <span className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5"><BookOpen className="h-3.5 w-3.5" />{currentPage ? `Page ${currentPage} of ${totalPages}` : `${totalPages} pages`}</span>
+                          {Boolean(readingProgress?.total_read_seconds) && <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" />{formatReadingTime(readingProgress!.total_read_seconds)}</span>}
+                        </span>
                       </div>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          )}
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-background" role="progressbar" aria-label={`${product.name} reading progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progressPercent}>
+                        <div className="h-full rounded-full bg-primary transition-[width] duration-500" style={{ width: `${progressPercent}%` }} />
+                      </div>
+                    </div>
 
+                    <div className="mt-auto flex flex-wrap items-center gap-3 pt-7">
+                      <Button asChild size="lg"><Link href={`/course/${purchase.product_id}`}>{progressPercent ? "Continue reading" : "Start reading"} <ArrowRight /></Link></Button>
+                      <Button asChild variant="ghost"><Link href="/progress">Detailed progress</Link></Button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-12 border-t border-border/70 pt-8" aria-labelledby="account-shortcuts-title">
+        <DashboardSectionHeader title="Account shortcuts" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Link href="/settings" className="group rounded-xl bg-muted/45 p-5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <p className="font-semibold">Account settings</p>
+            <p className="mt-1 text-sm text-muted-foreground">Review your profile, email, and password.</p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary">Open settings <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
+          </Link>
+          <a href="mailto:info@crypticsolutionsltd.com" className="group rounded-xl bg-muted/45 p-5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <p className="font-semibold">Customer support</p>
+            <p className="mt-1 text-sm text-muted-foreground">Get help with access, payments, or reading.</p>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary">Email support <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></span>
+          </a>
         </div>
+      </section>
 
-        {/* Quick Actions */}
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className="grid gap-4 md:grid-cols-3 mt-8"
-        >
-          <motion.div variants={itemVariants}>
-            <Link href="/settings">
-              <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <Settings className="h-5 w-5 text-primary" />
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-                <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Account Settings</h3>
-                <p className="text-sm text-muted-foreground">Update your profile and preferences</p>
-              </Card>
-            </Link>
-          </motion.div>
-          
-          <motion.div variants={itemVariants}>
-            <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <HelpCircle className="h-5 w-5 text-primary" />
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-              </div>
-              <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Support</h3>
-              <p className="text-sm text-muted-foreground">Get help with your manual</p>
-            </Card>
-          </motion.div>
-          
-          <motion.div variants={itemVariants}>
-            <Card className="p-6 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer group h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/15 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Bell className="h-5 w-5 text-primary" />
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-              </div>
-              <h3 className="font-semibold mb-1 text-[#1B2242] dark:text-white">Updates</h3>
-              <p className="text-sm text-muted-foreground">Check for new content</p>
-            </Card>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      {/* Change Password Modal */}
-      <ChangePasswordModal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-      />
-    </div>
+      <ChangePasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
+    </DashboardPageFrame>
   );
 }

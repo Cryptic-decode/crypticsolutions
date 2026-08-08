@@ -35,7 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_study_sessions_user_product
 -- 3. Enable Row Level Security
 ALTER TABLE public.study_sessions ENABLE ROW LEVEL SECURITY;
 
--- 4. RLS policy — users can only manage their own study sessions
+-- 4. RLS policy: users can only manage their own study sessions
 DROP POLICY IF EXISTS "Users manage their own study sessions" ON public.study_sessions;
 CREATE POLICY "Users manage their own study sessions"
   ON public.study_sessions

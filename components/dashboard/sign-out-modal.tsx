@@ -2,8 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { LogOut, AlertCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { LogOut } from "lucide-react";
 
 interface SignOutModalProps {
   isOpen: boolean;
@@ -18,23 +17,11 @@ export function SignOutModal({ isOpen, onClose, onConfirm }: SignOutModalProps) 
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Sign Out">
+    <Modal isOpen={isOpen} onClose={onClose} title="Sign out">
       <div className="space-y-6">
-        {/* Warning Icon and Message */}
-        <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-destructive" />
-            </div>
-          </div>
-          <div className="flex-1 pt-1">
-            <h3 className="text-lg font-semibold mb-2 text-[#1B2242] dark:text-white">
-              Are you sure you want to sign out?
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              You'll need to sign in again to access your dashboard and course materials.
-            </p>
-          </div>
+        <div>
+          <h3 className="text-lg font-semibold">Leave your learning workspace?</h3>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">You will need to sign in again to access your library and protected course materials.</p>
         </div>
 
         {/* Action Buttons */}
@@ -46,19 +33,16 @@ export function SignOutModal({ isOpen, onClose, onConfirm }: SignOutModalProps) 
           >
             Cancel
           </Button>
-          <motion.div whileTap={{ scale: 0.98 }} className="flex-1">
-            <Button
+          <Button
               variant="destructive"
               onClick={handleConfirm}
-              className="w-full"
+              className="flex-1"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              Sign out
             </Button>
-          </motion.div>
         </div>
       </div>
     </Modal>
   );
 }
-

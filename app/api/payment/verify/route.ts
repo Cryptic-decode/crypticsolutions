@@ -1,56 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
-import { getPaystackSecretKey } from '@/lib/paystack-accounts';
+import { NextRequest, NextResponse } from "next/server";
+
+import { verifyProductPayment } from "@/lib/payments";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { reference } = body;
-
-    if (!reference) {
-      return NextResponse.json(
-        { error: 'Reference is required' },
-        { status: 400 }
-      );
+    const { reference, productId } = await request.json();
+    if (typeof reference !== "string" || !reference) {
+      return NextResponse.json({ error: "Reference is required" }, { status: 400 });
     }
 
-    const secretKey = getPaystackSecretKey();
-
-    if (!secretKey) {
-      return NextResponse.json(
-        { error: 'Paystack secret key is not configured' },
-        { status: 500 }
-      );
-    }
-
-    // Verify payment with Paystack
-    const response = await axios.get(
-      `https://api.paystack.co/transaction/verify/${reference}`,
-      {
-        headers: {
-          Authorization: `Bearer ${secretKey}`,
-        },
-      }
+    const { transaction, product } = await verifyProductPayment(
+      reference,
+      typeof productId === "string" ? productId : undefined,
     );
 
-    if (response.data.status && response.data.data.status === 'success') {
-      return NextResponse.json({
-        success: true,
-        transaction: response.data.data,
-        message: 'Payment verified successfully'
-      });
-    } else {
-      return NextResponse.json(
-        { error: 'Payment verification failed' },
-        { status: 400 }
-      );
-    }
-  } catch (error: any) {
-    console.error('Verification error:', error);
-    return NextResponse.json(
-      { error: error.response?.data?.message || 'Failed to verify payment' },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: true,
+      transaction: {
+        reference: transaction.reference,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        customer: transaction.customer,
+        productId: product.id,
+      },
+      message: "Payment verified successfully",
+    });
+  } catch (error: unknown) {
+    console.error("Verification error:", error);
+    return NextResponse.json({ error: "Payment verification failed" }, { status: 400 });
   }
 }
-

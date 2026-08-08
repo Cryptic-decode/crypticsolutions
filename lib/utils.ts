@@ -23,8 +23,8 @@ export function generatePassword(length = 12) {
  * @param context - Optional context for context-specific error handling
  * @returns User-friendly error message
  */
-export function getErrorMessage(error: any, context?: 'auth' | 'pdf' | 'password' | 'payment' | 'general'): string {
-  const errorStr = String(error?.message || error?.toString() || error || '');
+export function getErrorMessage(error: unknown, context?: 'auth' | 'pdf' | 'password' | 'payment' | 'general'): string {
+  const errorStr = error instanceof Error ? error.message : String(error ?? '');
   const lowerError = errorStr.toLowerCase();
 
   // Authentication errors
@@ -109,7 +109,7 @@ export function showSuccess(message: string) {
  * @param error - Error object or string
  * @param context - Optional context for context-specific error handling
  */
-export function showError(error: any, context?: 'auth' | 'pdf' | 'password' | 'payment' | 'general') {
+export function showError(error: unknown, context?: 'auth' | 'pdf' | 'password' | 'payment' | 'general') {
   const message = getErrorMessage(error, context);
   toast.error(message);
 }

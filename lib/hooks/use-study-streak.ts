@@ -68,7 +68,7 @@ function computeStreaks(dates: Set<string>): {
   // Sort dates descending
   const sorted = [...dates].sort().reverse();
 
-  // Longest streak — walk forward through sorted ascending dates
+  // Longest streak: walk forward through sorted ascending dates
   const sortedAsc = [...sorted].reverse();
   let longestStreak = 1;
   let run = 1;
@@ -86,7 +86,7 @@ function computeStreaks(dates: Set<string>): {
     }
   }
 
-  // Current streak — count consecutive days backwards from the latest date,
+  // Current streak: count consecutive days backwards from the latest date,
   // but only if the latest date is today or yesterday.
   const latest = sorted[0];
   if (latest !== today && latest !== yesterday) {
@@ -149,8 +149,8 @@ export function useStudyStreak(): StreakData {
       }
 
       setSessions(data || []);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
       setSessions([]);
     } finally {
       setLoading(false);

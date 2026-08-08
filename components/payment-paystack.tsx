@@ -17,9 +17,9 @@ interface PaystackPaymentProps {
   productId: string;
   productName: string;
   successPath?: string; // Optional: defaults to '/payment/success' for IELTS flow
-  metadata?: Record<string, any>;
-  onSuccess?: (response: any) => void;
-  onError?: (error: any) => void;
+  metadata?: Record<string, unknown>;
+  onSuccess?: (response: unknown) => void;
+  onError?: (error: unknown) => void;
   disabled?: boolean;
   className?: string;
   buttonLabel?: string;
@@ -31,10 +31,6 @@ export function PaystackPayment({
   email, 
   amount,
   productId,
-  productName,
-  successPath = '/payment/success', // Default to IELTS flow
-  metadata, 
-  onSuccess, 
   onError,
   disabled = false,
   className,
@@ -60,16 +56,8 @@ export function PaystackPayment({
         },
         body: JSON.stringify({
           email: checkoutEmail,
-          amount,
           productId,
-          productName,
-          successPath,
           referralCode,
-          metadata: {
-            ...metadata,
-            product_id: productId,
-            product_name: productName
-          }
         }),
       });
 
@@ -89,7 +77,7 @@ export function PaystackPayment({
         throw new Error('Invalid response from payment initialization');
       }
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (onError) {
         onError(error);
       }
@@ -122,4 +110,3 @@ export function PaystackPayment({
     </Button>
   );
 }
-

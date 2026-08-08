@@ -49,8 +49,8 @@ export function usePurchases(): UsePurchasesReturn {
       }
 
       setPurchases(data || []);
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       setPurchases([]);
     } finally {
       setLoading(false);

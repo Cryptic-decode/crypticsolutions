@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in ebook download route:", error);
     return NextResponse.json(
       { error: "Internal server error" },

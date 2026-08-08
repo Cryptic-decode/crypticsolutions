@@ -52,8 +52,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   /* Cryptic Solutions Brand Colors */
-  --primary: oklch(0.85 0.175 125); /* #93E030 - Cryptic Green */
-  --primary-foreground: oklch(1 0 0); /* White text on primary */
+  --primary: oklch(0.75 0.18 125); /* Brand lime on light surfaces, paired with dark foreground */
+  --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.96 0 0); /* Light background for subtle areas */
   --secondary-foreground: oklch(0.2 0.035 255); /* #1B2242 - Cryptic Navy for text on secondary */
   --muted: oklch(0.96 0 0);
@@ -114,11 +114,29 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

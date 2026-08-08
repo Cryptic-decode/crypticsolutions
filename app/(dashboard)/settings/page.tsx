@@ -1,205 +1,87 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Loader2, User, Mail, Calendar, Shield, Key } from "lucide-react";
-import { motion } from "framer-motion";
+import { Check, KeyRound, Mail, UserRound, X } from "lucide-react";
+
 import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
+import { DashboardPageFrame, DashboardPageHeader, DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/auth";
 
-// Animation variants following design guide
-const containerVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+function SettingsSkeleton() {
+  return (
+    <DashboardPageFrame aria-busy="true" aria-label="Loading account settings">
+      <div className="space-y-3 border-b border-border/70 pb-8"><Skeleton className="h-3 w-24" /><Skeleton className="h-10 w-64" /><Skeleton className="h-5 w-96 max-w-full" /></div>
+      <div className="mt-12 space-y-8"><Skeleton className="h-44 w-full rounded-2xl" /><Skeleton className="h-36 w-full rounded-2xl" /></div>
+    </DashboardPageFrame>
+  );
+}
 
-const itemVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-};
+function formatDate(dateString?: string) {
+  if (!dateString) return "Not available";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Not available";
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
 
 export default function SettingsPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/signin");
-    }
-  }, [user, authLoading, router]);
+    if (!loading && !user) router.replace("/signin");
+  }, [user, loading, router]);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <SettingsSkeleton />;
+  if (!user) return null;
 
-  if (!user) {
-    return null; // Will redirect
-  }
-
-  // Format account creation date
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return "N/A";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return "N/A";
-    }
-  };
+  const fullName = user.user_metadata?.full_name || "Not set";
+  const passwordChanged = Boolean(user.user_metadata?.password_changed);
+  const emailVerified = Boolean(user.email_confirmed_at);
 
   return (
-    <div className="p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl"
-      >
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Account Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account information and preferences
-          </p>
+    <DashboardPageFrame>
+      <DashboardPageHeader eyebrow="Account" title="Settings" description="Review your account details and keep your sign-in information secure." />
+
+      <section className="mt-12" aria-labelledby="profile-settings-title">
+        <DashboardSectionHeader title="Profile information" description="These details identify your Cryptic Solutions account." />
+        <div className="overflow-hidden rounded-xl border border-border/70 bg-card">
+          <div className="grid gap-3 border-b border-border/70 px-5 py-5 sm:grid-cols-[12rem_1fr] sm:px-6">
+            <p className="flex items-center gap-2 text-sm text-muted-foreground"><UserRound className="h-4 w-4 text-primary" /> Full name</p>
+            <p className="break-words text-sm font-medium sm:text-right">{fullName}</p>
+          </div>
+          <div className="grid gap-3 border-b border-border/70 px-5 py-5 sm:grid-cols-[12rem_1fr] sm:px-6">
+            <p className="flex items-center gap-2 text-sm text-muted-foreground"><Mail className="h-4 w-4 text-primary" /> Email address</p>
+            <div className="sm:text-right">
+              <p className="break-all text-sm font-medium">{user.email}</p>
+              <p className={`mt-1 inline-flex items-center gap-1.5 text-xs ${emailVerified ? "text-primary" : "text-destructive"}`}>{emailVerified ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}{emailVerified ? "Verified" : "Verification required"}</p>
+            </div>
+          </div>
+          <div className="grid gap-3 px-5 py-5 sm:grid-cols-[12rem_1fr] sm:px-6">
+            <p className="text-sm text-muted-foreground">Member since</p>
+            <p className="text-sm font-medium sm:text-right">{formatDate(user.created_at)}</p>
+          </div>
         </div>
+      </section>
 
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className="space-y-6"
-        >
-          {/* Account Information */}
-          <motion.div variants={itemVariants}>
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <h2 className="text-2xl font-semibold">Account Information</h2>
-              </div>
+      <section className="mt-12" aria-labelledby="security-settings-title">
+        <DashboardSectionHeader title="Security" description="Use a password that you do not reuse on another service." />
+        <div className="flex flex-col gap-5 rounded-xl border border-border/70 bg-card p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/12"><KeyRound className="h-5 w-5 text-primary" /></div>
+            <div>
+              <h3 className="font-semibold">Password</h3>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{passwordChanged ? "Your temporary password has been replaced." : "Your account is still using its temporary password."}</p>
+            </div>
+          </div>
+          <Button onClick={() => setShowPasswordModal(true)} variant={passwordChanged ? "outline" : "default"}>Change password</Button>
+        </div>
+      </section>
 
-              <div className="space-y-4">
-                {/* Full Name */}
-                <div className="flex items-start gap-4 p-4 rounded-lg bg-secondary/20">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Full Name
-                    </p>
-                    <p className="text-base font-semibold text-[#1B2242] dark:text-white">
-                      {user.user_metadata?.full_name || "Not set"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="flex items-start gap-4 p-4 rounded-lg bg-secondary/20">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Email Address
-                    </p>
-                    <p className="text-base font-semibold text-[#1B2242] dark:text-white">
-                      {user.email}
-                    </p>
-                    {user.email_confirmed_at ? (
-                      <p className="text-xs text-primary mt-1">✓ Email verified</p>
-                    ) : (
-                      <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                        ⚠ Email not verified
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Account Created */}
-                <div className="flex items-start gap-4 p-4 rounded-lg bg-secondary/20">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                      Account Created
-                    </p>
-                    <p className="text-base font-semibold text-[#1B2242] dark:text-white">
-                      {formatDate(user.created_at)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-
-          {/* Security Settings */}
-          <motion.div variants={itemVariants}>
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-primary" />
-                </div>
-                <h2 className="text-2xl font-semibold">Security</h2>
-              </div>
-
-              <div className="space-y-4">
-                {/* Password */}
-                <div className="flex items-center justify-between p-4 rounded-lg bg-secondary/20">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Key className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-[#1B2242] dark:text-white mb-1">
-                        Password
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.user_metadata?.password_changed
-                          ? "Password has been changed"
-                          : "Change your temporary password"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowPasswordModal(true)}
-                    className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Change Password
-                  </button>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      {/* Change Password Modal */}
-      <ChangePasswordModal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-      />
-    </div>
+      <ChangePasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
+    </DashboardPageFrame>
   );
 }
-

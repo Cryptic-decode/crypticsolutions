@@ -164,7 +164,7 @@ export async function GET(
         { status: 404 }
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in PDF route:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -172,4 +172,3 @@ export async function GET(
     );
   }
 }
-

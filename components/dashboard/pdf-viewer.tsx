@@ -2,13 +2,14 @@
 
 import type React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { AlertCircle, Check, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
 import { toLocalDateStr } from "@/lib/utils";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import { Worker } from "@react-pdf-viewer/core";
+import { Worker, type PageChangeEvent, type RenderPageProps } from "@react-pdf-viewer/core";
 
 // Import PDF viewer styles
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -42,6 +43,8 @@ export function PDFViewer({
   const [isDark, setIsDark] = useState(false);
   const [initialPage, setInitialPage] = useState<number | null>(null);
   const [viewerReady, setViewerReady] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const userIdRef = useRef<string | null>(null);
   const readingStartTimeRef = useRef<number>(Date.now());
@@ -79,6 +82,7 @@ export function PDFViewer({
       const userId = userIdRef.current;
       if (!userId) return;
       try {
+        setSaveStatus("saving");
         const now = Date.now();
         const elapsedSeconds = Math.max(0, Math.floor((now - readingStartTimeRef.current) / 1000));
         const totalSeconds = initialReadSecondsRef.current + elapsedSeconds;
@@ -91,7 +95,10 @@ export function PDFViewer({
           );
 
         await upsertStudySession(elapsedSeconds);
-      } catch { /* silent */ }
+        setSaveStatus("saved");
+      } catch {
+        setSaveStatus("error");
+      }
     },
     [productId, upsertStudySession],
   );
@@ -185,6 +192,7 @@ export function PDFViewer({
           if (typeof p.last_page === "number" && p.last_page >= 0) {
             setInitialPage(p.last_page);
             currentPageRef.current = p.last_page;
+            setCurrentPage(p.last_page + 1);
           }
           if (typeof p.total_read_seconds === "number" && p.total_read_seconds >= 0) {
             initialReadSecondsRef.current = p.total_read_seconds;
@@ -249,14 +257,12 @@ export function PDFViewer({
 
   if (!mounted || loading) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-            <p className="text-muted-foreground">Loading PDF viewer...</p>
-          </div>
+      <div className="overflow-hidden rounded-xl border border-border/70" aria-busy="true" aria-label="Preparing protected reader">
+        <div className="flex h-14 items-center gap-3 border-b border-border/70 px-4"><Skeleton className="h-8 w-24" /><Skeleton className="h-8 w-20" /><Skeleton className="ml-auto h-5 w-32" /></div>
+        <div className="grid min-h-[32rem] place-items-center bg-muted/25 p-8">
+          <Skeleton className="h-[28rem] w-full max-w-sm rounded-md" />
         </div>
-      </Card>
+      </div>
     );
   }
 
@@ -264,21 +270,20 @@ export function PDFViewer({
 
   if (error) {
     return (
-      <Card className="p-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <p className="text-destructive font-medium mb-2">{error}</p>
-          <p className="text-sm text-muted-foreground mb-4 text-center">
-            If the problem persists, please contact support.
-          </p>
-          <button
+      <section className="grid min-h-[28rem] place-items-center rounded-xl border border-destructive/25 bg-destructive/5 p-7" aria-labelledby="reader-error-title">
+        <div className="max-w-md text-center">
+          <AlertCircle className="mx-auto h-7 w-7 text-destructive" />
+          <h2 id="reader-error-title" className="mt-4 text-xl font-semibold">The reader could not open</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{error}</p>
+          <Button
+            variant="outline"
+            className="mt-6"
             onClick={() => { setError(null); setLoading(true); initializeViewer(); }}
-            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
-            Retry
-          </button>
+            <RefreshCw /> Try again
+          </Button>
         </div>
-      </Card>
+      </section>
     );
   }
 
@@ -303,7 +308,7 @@ export function PDFViewer({
     textAlign: "right", lineHeight: "1.4",
   });
 
-  const renderPage = (props: any) => (
+  const renderPage = (props: RenderPageProps) => (
     <>
       {props.canvasLayer.children}
       <div style={watermarkContainerStyle}>
@@ -318,17 +323,21 @@ export function PDFViewer({
   );
 
   return (
-    <div className={`w-full ${isDark ? "dark" : ""}`}>
-      <Card className="p-0 ring-1 ring-border/60 dark:ring-border/40 rounded-lg">
-        <div className="relative h-[calc(100dvh-16rem)] min-h-[500px] no-select bg-secondary/10 dark:bg-secondary/20">
+    <div className={`w-full overflow-hidden rounded-xl border border-border/70 bg-card ${isDark ? "dark" : ""}`}>
+      <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 border-b border-border/70 px-4 py-2 text-xs text-muted-foreground" aria-live="polite">
+        <span className="tabular-nums">Page {currentPage}</span>
+        <span className={`inline-flex items-center gap-1.5 ${saveStatus === "error" ? "text-destructive" : ""}`}>
+          {saveStatus === "saved" && <Check className="h-3.5 w-3.5 text-primary" />}
+          {saveStatus === "saving" ? "Saving progress" : saveStatus === "error" ? "Progress will retry while you read" : saveStatus === "saved" ? "Progress saved" : "Progress saves automatically"}
+        </span>
+      </div>
+        <div className="relative h-[calc(100dvh-16rem)] min-h-[32rem] no-select bg-muted/25 dark:bg-muted/15">
           {/* Overlay while viewer is preparing */}
           {!viewerReady && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-secondary/10 dark:bg-secondary/20">
-              <div className="text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
-                <p className="text-sm text-muted-foreground">
-                  Preparing your last reading position...
-                </p>
+            <div className="absolute inset-0 z-20 grid place-items-center bg-background/85 p-8 backdrop-blur-sm">
+              <div className="w-full max-w-sm space-y-4 text-center">
+                <Skeleton className="mx-auto h-[24rem] w-full rounded-md" />
+                <p className="text-sm text-muted-foreground">Restoring your last reading position</p>
               </div>
             </div>
           )}
@@ -346,16 +355,16 @@ export function PDFViewer({
                 setError(null);
                 setViewerReady(true);
               }}
-              onPageChange={(event: any) => {
+              onPageChange={(event: PageChangeEvent) => {
                 const nextPage = typeof event.currentPage === "number" && event.currentPage >= 0
                   ? event.currentPage : 0;
                 currentPageRef.current = nextPage;
+                setCurrentPage(nextPage + 1);
                 debouncedSaveRef.current?.(nextPage);
               }}
             />
           </Worker>
         </div>
-      </Card>
     </div>
   );
 }

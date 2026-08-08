@@ -1,341 +1,133 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
-import { Card } from "@/components/ui/card";
-import { BookOpen, BarChart3, TrendingUp, Clock, CheckCircle2, Flame } from "lucide-react";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import { AlertCircle, ArrowRight, BookOpen, CalendarDays, Clock, Flame, RefreshCw } from "lucide-react";
+
+import { DashboardPageFrame, DashboardPageHeader, DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/auth";
 import { usePurchases } from "@/lib/hooks/use-purchases";
 import { useReadingProgress } from "@/lib/hooks/use-reading-progress";
-import {
-  getCourseProductIds,
-  getProductInfo,
-  formatReadingTime,
-} from "@/lib/products";
 import { useStudyStreak } from "@/lib/hooks/use-study-streak";
-import { Skeleton, SkeletonCard, SkeletonStatCard } from "@/components/ui/skeleton";
+import { formatReadingTime, getCourseProductIds, getProductInfo } from "@/lib/products";
 
-// Animation variants following design guide
-const containerVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-};
-
-// Only show course-type purchases on the progress page.
 const courseProductIds = getCourseProductIds();
+
+function ProgressSkeleton() {
+  return (
+    <DashboardPageFrame aria-busy="true" aria-label="Loading study progress">
+      <div className="space-y-3 border-b border-border/70 pb-8"><Skeleton className="h-3 w-24" /><Skeleton className="h-10 w-64" /><Skeleton className="h-5 w-96 max-w-full" /></div>
+      <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-2 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-28 rounded-none bg-card" />)}
+      </div>
+      <Skeleton className="mt-12 h-72 w-full rounded-2xl" />
+    </DashboardPageFrame>
+  );
+}
 
 export default function ProgressPage() {
   const { user, loading: authLoading } = useAuth();
-  const { purchases, loading: purchasesLoading } = usePurchases();
-  const { progress, loading: progressLoading, getProgressForProduct } = useReadingProgress();
+  const { purchases, loading: purchasesLoading, error: purchasesError, refetch: refetchPurchases } = usePurchases();
+  const { progress, loading: progressLoading, error: progressError, refetch: refetchProgress, getProgressForProduct } = useReadingProgress();
   const { currentStreak, longestStreak, totalStudyDays, loading: streakLoading } = useStudyStreak();
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/signin");
-    }
+    if (!authLoading && !user) router.replace("/signin");
   }, [user, authLoading, router]);
 
-  // Compute derived data (placed before early returns to respect Rules of Hooks)
-  const completedPurchases = useMemo(
-    () => purchases.filter((p) => p.status === 'completed'),
+  const coursePurchases = useMemo(
+    () => purchases.filter((purchase) => courseProductIds.has(purchase.product_id)),
     [purchases]
   );
-  const coursePurchases = useMemo(
-    () => completedPurchases.filter((p) => courseProductIds.has(p.product_id)),
-    [completedPurchases]
-  );
-  // Calculate total study time across all courses
-  const totalStudySeconds = progress.reduce((sum, p) => sum + p.total_read_seconds, 0);
-  // Count courses with any progress
-  const activeCoursesCount = progress.filter((p) => p.last_page > 0 || p.total_read_seconds > 0).length;
+  const totalStudySeconds = progress.reduce((total, item) => total + item.total_read_seconds, 0);
+  const activeCourses = coursePurchases.filter((purchase) => Boolean(getProgressForProduct(purchase.product_id))).length;
+  const dataError = purchasesError || progressError;
 
-  if (authLoading || purchasesLoading || progressLoading) {
-    return (
-      <div className="p-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header skeleton */}
-          <div className="flex items-center gap-3 mb-8">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-10 w-48" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
+  if (authLoading || purchasesLoading || progressLoading) return <ProgressSkeleton />;
+  if (!user) return null;
 
-          {/* Stat grid skeleton */}
-          <div className="grid gap-4 md:grid-cols-4">
-            <SkeletonStatCard />
-            <SkeletonStatCard />
-            <SkeletonStatCard />
-            <SkeletonStatCard />
-          </div>
-
-          {/* Course cards skeleton */}
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-40" />
-            <SkeletonCard />
-            <SkeletonCard />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null; // Will redirect
-  }
+  const retry = () => Promise.all([refetchPurchases(), refetchProgress()]);
 
   return (
-    <div className="p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl"
-      >
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <BarChart3 className="h-6 w-6 text-primary" />
+    <DashboardPageFrame>
+      <DashboardPageHeader eyebrow="Learning record" title="Study progress" description="A clear view of your reading activity, course position, and study consistency." />
+
+      <section aria-label="Progress summary" className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          [BookOpen, "Courses", String(coursePurchases.length), "in your library"],
+          [Clock, "Reading time", totalStudySeconds ? formatReadingTime(totalStudySeconds) : "0 min", "across all courses"],
+          [CalendarDays, "Study days", String(totalStudyDays), "days with activity"],
+          [Flame, "Current streak", streakLoading ? "..." : `${currentStreak} ${currentStreak === 1 ? "day" : "days"}`, longestStreak ? `Best: ${longestStreak} ${longestStreak === 1 ? "day" : "days"}` : "Start with one session"],
+        ].map(([Icon, label, value, detail]) => {
+          const SummaryIcon = Icon as typeof BookOpen;
+          return (
+            <div key={String(label)} className="bg-card px-5 py-5 sm:px-6">
+              <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground"><SummaryIcon className="h-3.5 w-3.5 text-primary" />{String(label)}</p>
+              <p className="mt-2 text-2xl font-semibold tabular-nums">{String(value)}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{String(detail)}</p>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Study Progress</h1>
-              <p className="text-muted-foreground">Track your learning journey</p>
-            </div>
-          </div>
-        </div>
+          );
+        })}
+      </section>
 
-        <motion.div
-          variants={containerVariants}
-          initial="initial"
-          animate="animate"
-          className="space-y-6"
-        >
-          {/* Summary Stats */}
-          <motion.div variants={itemVariants}>
-            <div className="grid gap-4 md:grid-cols-4">
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <BookOpen className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Total Courses</p>
-                    <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
-                      {coursePurchases.length}
-                    </p>
-                  </div>
-                </div>
-              </Card>
+      {dataError && (
+        <section className="mt-8 rounded-xl border border-destructive/25 bg-destructive/5 p-6" aria-labelledby="progress-error-title">
+          <AlertCircle className="h-5 w-5 text-destructive" />
+          <h2 id="progress-error-title" className="mt-4 font-semibold">We could not load all progress data</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{dataError}</p>
+          <Button className="mt-5" variant="outline" onClick={retry}><RefreshCw /> Try again</Button>
+        </section>
+      )}
 
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <TrendingUp className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Active Learning</p>
-                    <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
-                      {activeCoursesCount}
-                    </p>
-                  </div>
-                </div>
-              </Card>
+      {!dataError && (
+        <section className="mt-12" aria-labelledby="course-progress-title">
+          <DashboardSectionHeader title="Course progress" description={`${activeCourses} of ${coursePurchases.length} courses started.`} />
 
-              <Card className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Clock className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Study Time</p>
-                    <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
-                      {totalStudySeconds > 0 ? formatReadingTime(totalStudySeconds) : "0 min"}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Streak Card */}
-              <Card className={`p-6 ${currentStreak > 0 ? 'bg-gradient-to-br from-orange-50/70 to-amber-50/30 dark:from-orange-950/20 dark:to-amber-950/10' : ''}`}>
-                <div className="flex items-center gap-4">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    currentStreak > 0
-                      ? 'bg-gradient-to-br from-orange-400 to-amber-500'
-                      : 'bg-secondary/40'
-                  }`}>
-                    <Flame className={`h-6 w-6 ${currentStreak > 0 ? 'text-white' : 'text-muted-foreground'}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {currentStreak > 0 ? 'Current Streak' : 'Streak'}
-                    </p>
-                    <p className="text-2xl font-bold text-[#1B2242] dark:text-white">
-                      {currentStreak > 0
-                        ? `${currentStreak} ${currentStreak === 1 ? 'day' : 'days'}`
-                        : totalStudyDays > 0
-                        ? `${totalStudyDays} study days`
-                        : 'Not started'}
-                    </p>
-                    {longestStreak > currentStreak && currentStreak > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Best: {longestStreak} days
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </motion.div>
-
-          {/* Streak Details (loads independently so stats aren't blocked) */}
-          {!streakLoading && currentStreak === 0 && totalStudyDays === 0 && (
-            <motion.div variants={itemVariants}>
-              <Card className="p-5 border-2 border-dashed border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-secondary/40 flex items-center justify-center flex-shrink-0">
-                    <Flame className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    No study days yet. Open your course and start reading to begin tracking your streak.
-                  </p>
-                </div>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Course Progress */}
           {coursePurchases.length === 0 ? (
-            <motion.div variants={itemVariants}>
-              <Card className="p-8 text-center">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No Progress Yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start learning by purchasing a course and begin your journey.
-                </p>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  Browse Courses
-                </Link>
-              </Card>
-            </motion.div>
+            <div className="rounded-2xl border border-border/70 bg-card p-8 sm:p-10">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Nothing to track yet</p>
+              <h2 className="mt-4 text-2xl font-semibold tracking-[-0.025em]">Add a course to begin your learning record.</h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Once you start reading, this page will show your page position, reading time, and study consistency.</p>
+              <Button asChild className="mt-7"><Link href="/ielts-manual">Explore IELTS manual <ArrowRight /></Link></Button>
+            </div>
           ) : (
-            <motion.div variants={itemVariants}>
-              <Card className="p-6">
-                <h2 className="text-2xl font-semibold mb-6">Your Courses</h2>
-                <div className="space-y-4">
-                  {coursePurchases.map((purchase) => {
-                      const product = getProductInfo(purchase.product_id) ?? {
-                        id: purchase.product_id,
-                        name: purchase.product_id,
-                        description: 'Course',
-                        type: 'course' as const,
-                        totalPages: 100,
-                      };
-                      const totalPages = product.totalPages ?? 100;
-                      const readingProgress = getProgressForProduct(purchase.product_id);
-                      const progressPercent = readingProgress
-                        ? Math.min(100, Math.round(((readingProgress.last_page + 1) / totalPages) * 100))
-                        : 0;
-                      const hasProgress = readingProgress && (readingProgress.last_page > 0 || readingProgress.total_read_seconds > 0);
+            <div className="space-y-4">
+              {coursePurchases.map((purchase) => {
+                const product = getProductInfo(purchase.product_id);
+                if (!product?.totalPages) return null;
 
-                      return (
-                      <div
-                        key={purchase.id}
-                        className="p-4 rounded-lg bg-secondary/20 border border-secondary/40"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-lg font-semibold text-[#1B2242] dark:text-white">
-                                {product.name}
-                              </h3>
-                              <CheckCircle2 className="h-5 w-5 text-primary" />
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {product.description}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Purchased on {new Date(purchase.created_at).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </p>
-                          </div>
-                        </div>
+                const totalPages = product.totalPages;
+                const readingProgress = getProgressForProduct(purchase.product_id);
+                const currentPage = readingProgress ? readingProgress.last_page + 1 : 0;
+                const percentage = readingProgress ? Math.min(100, Math.round((currentPage / totalPages) * 100)) : 0;
 
-                        {/* Progress Section */}
-                        <div className="mt-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-[#1B2242] dark:text-white">
-                              Progress
-                            </span>
-                            {hasProgress ? (
-                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <BookOpen className="h-3 w-3" />
-                                  Page {readingProgress.last_page + 1}
-                                </span>
-                                {readingProgress.total_read_seconds > 0 && (
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    {formatReadingTime(readingProgress.total_read_seconds)}
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-sm text-muted-foreground">
-                                Not started
-                              </span>
-                            )}
-                          </div>
-                          <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-primary transition-all duration-300"
-                              style={{ width: `${progressPercent}%` }}
-                            />
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {hasProgress ? `${progressPercent}% complete` : "Start reading to track your progress"}
-                          </p>
-                        </div>
-
-                        <div className="mt-4 flex gap-2">
-                          <Link
-                            href={`/course/${purchase.product_id}`}
-                            className="flex-1 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-center"
-                          >
-                            {hasProgress ? "Continue Learning" : "Start Learning"}
-                          </Link>
-                        </div>
+                return (
+                  <article key={purchase.id} className="grid items-center gap-6 rounded-2xl border border-border/70 bg-card p-5 sm:grid-cols-[5rem_1fr_auto] sm:p-6">
+                    <div className="grid place-items-center rounded-lg bg-muted/50 p-2 dark:bg-[#10120f]"><Image src="/product-assets/ielts-manual-cover.png" alt={`${product.name} cover`} width={80} height={114} className="h-24 w-auto rounded-sm" /></div>
+                    <div>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <h3 className="font-semibold">{product.name}</h3>
+                        <span className="text-sm font-semibold tabular-nums">{percentage}%</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </Card>
-            </motion.div>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted" role="progressbar" aria-label={`${product.name} progress`} aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-primary" style={{ width: `${percentage}%` }} /></div>
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
+                        <span>{currentPage ? `Page ${currentPage} of ${totalPages}` : "Not started"}</span>
+                        <span>{readingProgress?.total_read_seconds ? formatReadingTime(readingProgress.total_read_seconds) : "No reading time yet"}</span>
+                      </div>
+                    </div>
+                    <Button asChild variant={percentage ? "default" : "outline"}><Link href={`/course/${purchase.product_id}`}>{percentage ? "Continue" : "Start"}<ArrowRight /></Link></Button>
+                  </article>
+                );
+              })}
+            </div>
           )}
-        </motion.div>
-      </motion.div>
-    </div>
+        </section>
+      )}
+    </DashboardPageFrame>
   );
 }
-

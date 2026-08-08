@@ -36,7 +36,7 @@ function SignInForm() {
       
       showSuccess("Signed in successfully!");
       router.push('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
       showError(error, 'auth');
     } finally {
       setLoading(false);
@@ -44,7 +44,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -151,7 +151,7 @@ function SignInForm() {
 export default function SignInPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     }>
