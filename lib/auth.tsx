@@ -59,9 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecoverySession(true);
+      }
+
       // Clear recovery session on sign out
-      // Note: Password updates are handled directly in updatePassword() function
       if (event === 'SIGNED_OUT') {
         setIsRecoverySession(false);
       }
@@ -117,9 +120,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updatePassword = async (newPassword: string) => {
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
-      data: {
-        password_changed: true,
-      },
     });
 
     if (error) {

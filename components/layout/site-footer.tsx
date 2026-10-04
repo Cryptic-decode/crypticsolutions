@@ -29,6 +29,7 @@ export function SiteFooter({ quickLinks }: FooterProps) {
     { href: "/", label: "Home" },
     { href: "/#products", label: "Products" },
     { href: "/#about", label: "What we build" },
+    { href: "/partners", label: "Partner Programme" },
     { href: "/#contact", label: "Contact" },
   ];
 
