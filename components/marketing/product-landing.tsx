@@ -9,6 +9,7 @@ import { ProductNav } from "@/components/layout/product-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { ProductVisual } from "@/components/marketing/product-visual";
 import { PaystackPayment } from "@/components/payment-paystack";
+import { normalizeReferralCode } from "@/lib/partner-program";
 
 interface ProductLandingProps {
   productId: string;
@@ -107,7 +108,7 @@ export function ProductLanding(props: ProductLandingProps) {
             <motion.div {...reveal} className="rounded-2xl border border-border/70 bg-card p-7 sm:p-9">
               <label htmlFor={`${props.productId}-email`} className="text-sm font-medium">Email address</label>
               <input id={`${props.productId}-email`} type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 outline-none transition-shadow focus:ring-2 focus:ring-ring/40" required />
-              {props.referralEnabled && <><label htmlFor="referral" className="mt-5 block text-sm font-medium">Referral code <span className="text-muted-foreground">(optional)</span></label><input id="referral" value={referralCode} onChange={(event) => setReferralCode(event.target.value.toUpperCase())} placeholder="e.g. FRIEND20" maxLength={20} className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 outline-none transition-shadow focus:ring-2 focus:ring-ring/40" /></>}
+              {props.referralEnabled && <><label htmlFor="referral" className="mt-5 block text-sm font-medium">Referral code <span className="text-muted-foreground">(optional)</span></label><input id="referral" value={referralCode} onChange={(event) => setReferralCode(normalizeReferralCode(event.target.value))} placeholder="e.g. FRIEND20" maxLength={20} autoCapitalize="characters" className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 font-mono uppercase outline-none transition-shadow focus:ring-2 focus:ring-ring/40" /><p className="mt-2 text-xs text-muted-foreground">Only approved partner codes are accepted.</p></>}
               <div className="mt-6"><PaystackPayment email={email} amount={props.price} productId={props.productId} productName={props.productName} successPath={props.successPath} referralCode={referralCode || undefined} buttonLabel={`Buy for ₦${props.price.toLocaleString()}`} /></div>
               <div className="mt-6 flex items-start gap-3 border-t border-border/70 pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Payment is verified securely before access is granted. Your card details are handled by Paystack.</div>
             </motion.div>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 
@@ -39,6 +39,7 @@ export function PaystackPayment({
   referralCode,
 }: PaystackPaymentProps) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const checkoutEmail = email.trim();
   const emailValid = !requireEmail || isCheckoutEmailValid(checkoutEmail);
 
@@ -46,6 +47,7 @@ export function PaystackPayment({
     if (!emailValid) return;
 
     setLoading(true);
+    setError("");
 
     try {
       // Call our API to initialize payment
@@ -78,6 +80,8 @@ export function PaystackPayment({
       }
       
     } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Payment could not be started. Please try again.";
+      setError(message);
       if (onError) {
         onError(error);
       }
@@ -88,25 +92,33 @@ export function PaystackPayment({
   const isDisabled = disabled || loading || !emailValid;
 
   return (
-    <Button
-      type="button"
-      onClick={initializePayment}
-      disabled={isDisabled}
-      size="lg"
-      className={cn(
-        "w-full",
-        className,
-        isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+    <div>
+      <Button
+        type="button"
+        onClick={initializePayment}
+        disabled={isDisabled}
+        size="lg"
+        className={cn(
+          "w-full",
+          className,
+          isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+        )}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          <>{buttonLabel ?? `Buy for ₦${amount.toLocaleString()}`}</>
+        )}
+      </Button>
+      {error && (
+        <div className="mt-3 flex items-start gap-2 rounded-md border border-destructive/25 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{error}</span>
+        </div>
       )}
-    >
-      {loading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Processing...
-        </>
-      ) : (
-        <>{buttonLabel ?? `Buy for ₦${amount.toLocaleString()}`}</>
-      )}
-    </Button>
+    </div>
   );
 }
