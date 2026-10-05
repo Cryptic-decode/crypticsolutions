@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 
+import { sendTransactionalEmail } from "@/lib/email";
 import {
   isValidReferralCode,
   normalizeReferralCode,
@@ -106,54 +106,49 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "We could not submit your application. Please try again." }, { status: 500 });
     }
 
-    const resendApiKey = process.env.RESEND_API_KEY;
-    if (resendApiKey) {
-      const resend = new Resend(resendApiKey);
-      const adminEmail = process.env.ADMIN_EMAIL || "info@crypticsolutionsltd.com";
-      const from = process.env.RESEND_FROM_EMAIL || "Cryptic Solutions <onboarding@resend.dev>";
-      const applicantLabel = organisationName || fullName;
-      const payoutLabel = payoutScheduleLabels[payoutSchedule as keyof typeof payoutScheduleLabels];
+    const adminEmail = process.env.ADMIN_EMAIL || "info@crypticsolutionsltd.com";
+    const applicantLabel = organisationName || fullName;
+    const payoutLabel = payoutScheduleLabels[payoutSchedule as keyof typeof payoutScheduleLabels];
 
-      const notifications = [
-        resend.emails.send({
-          from,
-          to: adminEmail,
-          subject: `New partner application from ${applicantLabel}`,
-          text: [
-            `Application ID: ${application.id}`,
-            `Partner type: ${partnerTypeLabel}`,
-            `Name: ${fullName}`,
-            `Organisation, community, or academy: ${organisationName || "Not applicable"}`,
-            `Email: ${email}`,
-            `Phone or WhatsApp: ${phone}`,
-            `Website or social page: ${website || "Not provided"}`,
-            `Preferred payout: ${payoutLabel}`,
-            `Requested code: ${requestedReferralCode}`,
-            `Commission: ${PARTNER_COMMISSION_PERCENT}%`,
-            "",
-            "Audience:",
-            audienceDescription,
-          ].join("\n"),
-        }),
-        resend.emails.send({
-          from,
-          to: email,
-          subject: "We received your Cryptic Partner Programme application",
-          text: [
-            `Hello ${fullName},`,
-            "",
-            "Thank you for applying to the Cryptic Partner Programme.",
-            `Your requested referral code is ${requestedReferralCode}. It will become active only after approval.`,
-            "We will review your application and contact you with the next steps.",
-            "",
-            "Cryptic Solutions",
-          ].join("\n"),
-        }),
-      ];
+    const notifications = [
+      sendTransactionalEmail({
+        to: adminEmail,
+        subject: `New partner application from ${applicantLabel}`,
+        text: [
+          `Application ID: ${application.id}`,
+          `Partner type: ${partnerTypeLabel}`,
+          `Name: ${fullName}`,
+          `Organisation, community, or academy: ${organisationName || "Not applicable"}`,
+          `Email: ${email}`,
+          `Phone or WhatsApp: ${phone}`,
+          `Website or social page: ${website || "Not provided"}`,
+          `Preferred payout: ${payoutLabel}`,
+          `Requested code: ${requestedReferralCode}`,
+          `Commission: ${PARTNER_COMMISSION_PERCENT}%`,
+          "",
+          "Audience:",
+          audienceDescription,
+        ].join("\n"),
+      }),
+      sendTransactionalEmail({
+        to: email,
+        subject: "We received your Cryptic Partner Programme application",
+        text: [
+          `Hello ${fullName},`,
+          "",
+          "Thank you for applying to the Cryptic Partner Programme.",
+          `Your requested referral code is ${requestedReferralCode}. It will become active only after approval.`,
+          "We will review your application and contact you with the next steps.",
+          "",
+          "Cryptic Solutions",
+        ].join("\n"),
+      }),
+    ];
 
-      const results = await Promise.allSettled(notifications);
-      if (results.some((result) => result.status === "rejected")) {
-        console.error("One or more partner application emails could not be sent.");
+    const results = await Promise.all(notifications);
+    for (const result of results) {
+      if (!result.sent) {
+        console.error("Partner application email could not be sent:", result.error);
       }
     }
 

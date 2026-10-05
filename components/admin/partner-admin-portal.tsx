@@ -6,8 +6,10 @@ import {
   Copy,
   ExternalLink,
   Loader2,
+  Mail,
   RefreshCw,
   ShieldAlert,
+  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -22,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { buildPartnerReferralUrl, partnerTypeLabels, payoutScheduleLabels, PartnerType, PayoutSchedule } from "@/lib/partner-program";
 import { supabase } from "@/lib/supabase";
-import { showError, showSuccess } from "@/lib/utils";
+import { showError, showSuccess, showWarning } from "@/lib/utils";
 
 type ApplicationStatus = "pending" | "approved" | "rejected";
 type PartnerStatus = "active" | "inactive";
@@ -153,6 +155,9 @@ export function PartnerAdminPortal() {
   const [reviewTarget, setReviewTarget] = useState<ReviewTarget | null>(null);
   const [reviewNote, setReviewNote] = useState("");
   const [reviewing, setReviewing] = useState(false);
+  const [emailingPartnerId, setEmailingPartnerId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Partner | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const loadData = useCallback(async () => {
     if (authLoading) return;
     if (!user) {
@@ -222,7 +227,15 @@ export function PartnerAdminPortal() {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "The application could not be reviewed.");
 
-      showSuccess(reviewTarget.action === "approve" ? "Partner approved and referral code activated." : "Application rejected.");
+      const successMessage = reviewTarget.action === "approve"
+        ? "Partner approved, referral code activated, and email sent."
+        : "Application rejected and email sent.";
+      const warningMessage = reviewTarget.action === "approve"
+        ? "Partner approved and referral code activated, but the email could not be sent. You can resend it from the Partners tab."
+        : "Application rejected, but the email could not be sent.";
+
+      if (result.email?.sent === false) showWarning(warningMessage);
+      else showSuccess(successMessage);
       setReviewTarget(null);
       setReviewNote("");
       await loadData();
@@ -249,6 +262,53 @@ export function PartnerAdminPortal() {
       showSuccess(`Referral link copied for ${partner.organisation_name || partner.full_name}.`);
     } catch (copyError) {
       showError(copyError);
+    }
+  };
+
+  const resendApprovalEmail = async (partner: Partner) => {
+    setEmailingPartnerId(partner.id);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
+
+      const response = await fetch(`/api/admin/partners/applications/${partner.id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "The approval email could not be sent.");
+
+      showSuccess(`Approval email sent to ${partner.email}.`);
+    } catch (emailError) {
+      showError(emailError);
+    } finally {
+      setEmailingPartnerId(null);
+    }
+  };
+
+  const deletePartner = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
+
+      const response = await fetch(`/api/admin/partners/applications/${deleteTarget.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "The partner could not be deleted.");
+
+      showSuccess(`${deleteTarget.organisation_name || deleteTarget.full_name} was deleted.`);
+      setDeleteTarget(null);
+      await loadData();
+    } catch (deleteError) {
+      showError(deleteError);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -393,7 +453,37 @@ export function PartnerAdminPortal() {
                         <div><dt className="text-xs text-muted-foreground">Commission</dt><dd className="mt-1 text-xl font-semibold">{formatCurrency(partner.metrics.pending)}</dd></div>
                         <div><dt className="text-xs text-muted-foreground">Rate</dt><dd className="mt-1 text-xl font-semibold">{Number(partner.commission_rate)}%</dd></div>
                       </dl>
-                      <div className="mt-5 border-t border-border/70 pt-4 text-sm text-muted-foreground"><p>{partner.email}</p><p className="mt-1">{payoutScheduleLabels[partner.payout_schedule]} payouts · {Number(partner.commission_rate)}% commission</p></div>
+                      <div className="mt-5 border-t border-border/70 pt-4">
+                        <div className="text-sm text-muted-foreground"><p>{partner.email}</p><p className="mt-1">{payoutScheduleLabels[partner.payout_schedule]} payouts · {Number(partner.commission_rate)}% commission</p></div>
+                        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void resendApprovalEmail(partner)}
+                            disabled={emailingPartnerId === partner.id}
+                          >
+                            {emailingPartnerId === partner.id ? <Loader2 className="animate-spin" /> : <Mail />}
+                            {emailingPartnerId === partner.id ? "Sending" : "Resend approval email"}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => setDeleteTarget(partner)}
+                            disabled={partner.metrics.sales > 0}
+                            aria-describedby={partner.metrics.sales > 0 ? `delete-restriction-${partner.id}` : undefined}
+                          >
+                            <Trash2 /> Delete partner
+                          </Button>
+                        </div>
+                        {partner.metrics.sales > 0 && (
+                          <p id={`delete-restriction-${partner.id}`} className="mt-2 text-xs text-muted-foreground">
+                            Partners with recorded purchases cannot be deleted because their financial history must remain available.
+                          </p>
+                        )}
+                      </div>
                     </article>
                   ))}
                 </div>
@@ -447,6 +537,30 @@ export function PartnerAdminPortal() {
               <Button variant={reviewTarget.action === "reject" ? "destructive" : "default"} onClick={() => void submitReview()} disabled={reviewing}>
                 {reviewing && <Loader2 className="animate-spin" />}
                 {reviewing ? "Saving" : reviewTarget.action === "approve" ? "Approve partner" : "Reject application"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal
+        isOpen={Boolean(deleteTarget)}
+        onClose={() => { if (!deleting) setDeleteTarget(null); }}
+        title="Delete partner?"
+      >
+        {deleteTarget && (
+          <div>
+            <p className="leading-7 text-muted-foreground">
+              This will permanently delete {deleteTarget.organisation_name || deleteTarget.full_name} and deactivate the referral code {deleteTarget.referral_code}.
+            </p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              This action cannot be undone. Partners with recorded purchases are protected from deletion.
+            </p>
+            <div className="mt-7 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
+              <Button variant="destructive" onClick={() => void deletePartner()} disabled={deleting}>
+                {deleting ? <Loader2 className="animate-spin" /> : <Trash2 />}
+                {deleting ? "Deleting" : "Delete partner"}
               </Button>
             </div>
           </div>

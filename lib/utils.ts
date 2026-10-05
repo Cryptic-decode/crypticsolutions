@@ -103,6 +103,10 @@ export function showSuccess(message: string) {
   toast.success(message);
 }
 
+export function showWarning(message: string) {
+  toast(message, { icon: "⚠️" });
+}
+
 /**
  * Show an error toast notification
  * Automatically converts technical errors to user-friendly messages
