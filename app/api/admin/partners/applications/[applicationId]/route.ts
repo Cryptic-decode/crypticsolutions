@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { adminErrorResponse, authenticateAdmin } from "@/lib/admin-auth";
+import { buildPartnerReferralUrl } from "@/lib/partner-program";
 
 interface ActionBody {
   action?: unknown;
@@ -37,6 +38,12 @@ export async function PATCH(
     }
 
     const status = action === "approve" ? "approved" : "rejected";
+    const referralLink = action === "approve"
+      ? buildPartnerReferralUrl(
+          application.requested_referral_code,
+          process.env.NEXT_PUBLIC_APP_URL || "https://www.crypticsolutionsltd.com",
+        )
+      : "";
     const { data: reviewedApplication, error: reviewError } = await admin
       .from("partner_applications")
       .update({
@@ -67,7 +74,8 @@ export async function PATCH(
             "",
             "Your Cryptic Partner Programme application has been approved.",
             `Your referral code is ${application.requested_referral_code}.`,
-            "We will share the remaining onboarding information with you shortly.",
+            `Share this link with your audience: ${referralLink}`,
+            "Purchases completed through this link will be attributed to your partner account.",
           ]
         : [
             `Hello ${greetingName},`,

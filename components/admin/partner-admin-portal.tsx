@@ -3,6 +3,7 @@
 import {
   Check,
   CircleDollarSign,
+  Copy,
   ExternalLink,
   Loader2,
   RefreshCw,
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
-import { partnerTypeLabels, payoutScheduleLabels, PartnerType, PayoutSchedule } from "@/lib/partner-program";
+import { buildPartnerReferralUrl, partnerTypeLabels, payoutScheduleLabels, PartnerType, PayoutSchedule } from "@/lib/partner-program";
 import { supabase } from "@/lib/supabase";
 import { showError, showSuccess } from "@/lib/utils";
 
@@ -238,6 +239,19 @@ export function PartnerAdminPortal() {
     setReviewNote("");
   };
 
+  const copyReferralLink = async (partner: Partner) => {
+    try {
+      const referralLink = buildPartnerReferralUrl(
+        partner.referral_code,
+        window.location.origin,
+      );
+      await navigator.clipboard.writeText(referralLink);
+      showSuccess(`Referral link copied for ${partner.organisation_name || partner.full_name}.`);
+    } catch (copyError) {
+      showError(copyError);
+    }
+  };
+
   return (
     <AdminShell>
 
@@ -367,9 +381,12 @@ export function PartnerAdminPortal() {
                         <div><h2 className="text-xl font-semibold">{partner.organisation_name || partner.full_name}</h2><p className="mt-1 text-sm text-muted-foreground">{partnerTypeLabels[partner.partner_type]} · Approved {formatDate(partner.approved_at)}</p></div>
                         <StatusBadge status={partner.status} />
                       </div>
-                      <div className="mt-5 rounded-lg border border-border/70 bg-background p-4">
-                        <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Active referral code</p>
-                        <p className="mt-2 font-mono text-lg font-semibold text-primary">{partner.referral_code}</p>
+                      <div className="mt-5 flex flex-col gap-4 rounded-lg border border-border/70 bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Active referral code</p>
+                          <p className="mt-2 font-mono text-lg font-semibold text-primary">{partner.referral_code}</p>
+                        </div>
+                        <Button type="button" variant="outline" size="sm" onClick={() => void copyReferralLink(partner)}><Copy /> Copy referral link</Button>
                       </div>
                       <dl className="mt-5 grid grid-cols-3 gap-3 text-center">
                         <div><dt className="text-xs text-muted-foreground">Sales</dt><dd className="mt-1 text-xl font-semibold">{partner.metrics.sales}</dd></div>

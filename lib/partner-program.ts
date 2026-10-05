@@ -2,6 +2,8 @@ export const PARTNER_COMMISSION_PERCENT = 20;
 export const IELTS_MANUAL_PRICE = 5_000;
 export const PARTNER_COMMISSION_AMOUNT =
   (IELTS_MANUAL_PRICE * PARTNER_COMMISSION_PERCENT) / 100;
+export const PARTNER_REFERRAL_QUERY_PARAM = "ref";
+export const PARTNER_REFERRAL_PATH = "/ielts-manual";
 
 export const PARTNER_TYPES = ["individual", "organisation", "community", "academy"] as const;
 export type PartnerType = (typeof PARTNER_TYPES)[number];
@@ -45,4 +47,23 @@ export function createReferralCodeSuggestions(value: string) {
 
 export function isValidReferralCode(value: string) {
   return /^[A-Z0-9](?:[A-Z0-9-]{2,18})[A-Z0-9]$/.test(value);
+}
+
+export function getReferralCodeFromSearchParams(searchParams: URLSearchParams) {
+  const referralCode = normalizeReferralCode(
+    searchParams.get(PARTNER_REFERRAL_QUERY_PARAM) || "",
+  );
+
+  return isValidReferralCode(referralCode) ? referralCode : "";
+}
+
+export function buildPartnerReferralUrl(referralCode: string, baseUrl: string) {
+  const normalizedCode = normalizeReferralCode(referralCode);
+  if (!isValidReferralCode(normalizedCode)) {
+    throw new Error("A valid referral code is required to create a partner link.");
+  }
+
+  const url = new URL(PARTNER_REFERRAL_PATH, baseUrl);
+  url.searchParams.set(PARTNER_REFERRAL_QUERY_PARAM, normalizedCode);
+  return url.toString();
 }
