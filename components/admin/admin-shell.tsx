@@ -1,31 +1,39 @@
 "use client";
 
-import { LayoutDashboard, LogOut, Moon, Sun, Users } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { AdminDrawer } from "@/components/admin/admin-drawer";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DashboardShellSkeleton } from "@/components/dashboard/dashboard-shell-skeleton";
+import { SignOutModal } from "@/components/dashboard/sign-out-modal";
+import { Drawer } from "@/components/ui/drawer";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { useAuth } from "@/lib/auth";
-
-const adminLinks = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/partners", label: "Partners", icon: Users },
-];
+import { getAdminPageTitle } from "@/lib/admin-navigation";
 
 export function AdminShell({ children }: { children: ReactNode }) {
+  const { user, loading, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const { signOut } = useAuth();
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
-    setDarkMode(localStorage.getItem("theme") !== "light");
-  }, []);
+    if (!loading && (!user || user.app_metadata?.role !== "admin")) {
+      router.replace("/admin");
+      return;
+    }
 
-  const toggleTheme = () => {
+    if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync with the theme applied before hydration
+      setDarkMode(document.documentElement.classList.contains("dark"));
+    }
+  }, [loading, router, user]);
+
+  const toggleDarkMode = () => {
     const next = !darkMode;
     setDarkMode(next);
     document.documentElement.classList.toggle("dark", next);
@@ -37,43 +45,49 @@ export function AdminShell({ children }: { children: ReactNode }) {
     router.replace("/admin");
   };
 
+  if (loading) return <DashboardShellSkeleton />;
+  if (!user || user.app_metadata?.role !== "admin") return null;
+
+  const pageTitle = getAdminPageTitle(pathname);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
-          <Link href="/admin/dashboard" aria-label="Admin dashboard">
-            <Image src="/cryptic-assets/fullLogo.png" alt="Cryptic Solutions" width={140} height={35} className="h-8 w-auto dark:hidden" priority />
-            <Image src="/cryptic-assets/fullLogo2.png" alt="Cryptic Solutions" width={140} height={35} className="hidden h-8 w-auto dark:block" priority />
-          </Link>
+    <div className="min-h-dvh bg-background text-foreground">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border/70 bg-background lg:flex">
+        <AdminDrawer currentPath={pathname} onSignOutClick={() => setShowSignOutModal(true)} />
+      </aside>
 
-          <nav aria-label="Administration" className="hidden items-center gap-1 sm:flex">
-            {adminLinks.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href;
-              return (
-                <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors ${active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
-                  <Icon className="h-4 w-4" /> {label}
-                </Link>
-              );
-            })}
-          </nav>
+      <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} position="left" showCloseButton={false}>
+        <AdminDrawer currentPath={pathname} onClose={() => setDrawerOpen(false)} onSignOutClick={() => { setDrawerOpen(false); setShowSignOutModal(true); }} />
+      </Drawer>
 
+      <SignOutModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={() => void handleSignOut()}
+        heading="Leave the admin portal?"
+        description="You will need to sign in again to manage internal operations."
+      />
+
+      <header className="fixed inset-x-0 top-0 z-40 h-16 border-b border-border/70 bg-background/90 backdrop-blur-xl lg:left-64">
+        <div className="hidden h-full lg:block">
+          <DashboardHeader pageTitle={pageTitle} userName={user.user_metadata?.full_name || "Administrator"} userEmail={user.email} darkMode={darkMode} onToggleTheme={toggleDarkMode} />
+        </div>
+        <div className="flex h-full items-center justify-between px-4 lg:hidden">
+          <p className="text-base font-semibold tracking-tight">{pageTitle}</p>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">{darkMode ? <Sun /> : <Moon />}</Button>
-            <Button variant="ghost" size="icon" onClick={() => void handleSignOut()} aria-label="Sign out"><LogOut /></Button>
+            <button type="button" onClick={toggleDarkMode} className="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={darkMode ? "Use light theme" : "Use dark theme"}>
+              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <button type="button" onClick={() => setDrawerOpen((open) => !open)} className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={drawerOpen ? "Close menu" : "Open menu"} aria-expanded={drawerOpen}>
+              {drawerOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
-        <nav aria-label="Mobile administration" className="mx-auto flex max-w-7xl border-t border-border/60 px-3 sm:hidden">
-          {adminLinks.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href;
-            return (
-              <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex flex-1 items-center justify-center gap-2 border-b-2 px-3 py-3 text-sm font-medium ${active ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}>
-                <Icon className="h-4 w-4" /> {label}
-              </Link>
-            );
-          })}
-        </nav>
       </header>
-      {children}
+
+      <main id="admin-content" className="min-h-dvh bg-muted/15 pt-16 lg:pl-64">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   );
 }

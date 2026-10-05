@@ -1,14 +1,12 @@
 "use client";
 
 import {
-  BadgeDollarSign,
   Check,
   CircleDollarSign,
   ExternalLink,
   Loader2,
   RefreshCw,
   ShieldAlert,
-  UserCheck,
   Users,
   X,
 } from "lucide-react";
@@ -16,9 +14,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AdminShell } from "@/components/admin/admin-shell";
+import { DashboardPageFrame, DashboardPageHeader } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { Skeleton, SkeletonCard } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { partnerTypeLabels, payoutScheduleLabels, PartnerType, PayoutSchedule } from "@/lib/partner-program";
 import { supabase } from "@/lib/supabase";
@@ -124,18 +123,21 @@ function StatusBadge({ status }: { status: keyof typeof statusStyles }) {
 
 function AdminLoading() {
   return (
-    <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
-      <Skeleton className="h-9 w-72" />
-      <Skeleton className="mt-3 h-4 w-96 max-w-full" />
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((item) => <SkeletonCard key={item} />)}
+    <DashboardPageFrame aria-busy="true" aria-label="Loading partner administration">
+      <div className="space-y-3 border-b border-border/70 pb-8">
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="h-10 w-72 max-w-full" />
+        <Skeleton className="h-5 w-[34rem] max-w-full" />
       </div>
-      <Skeleton className="mt-10 h-12 w-full" />
+      <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-24 rounded-none bg-card" />)}
+      </div>
+      <Skeleton className="mt-10 h-11 w-full" />
       <div className="mt-5 space-y-4">
-        <SkeletonCard />
-        <SkeletonCard />
+        <Skeleton className="h-48 w-full rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-xl" />
       </div>
-    </div>
+    </DashboardPageFrame>
   );
 }
 
@@ -242,7 +244,7 @@ export function PartnerAdminPortal() {
       {pageState === "loading" && <AdminLoading />}
 
       {(pageState === "forbidden" || pageState === "error") && (
-        <main className="mx-auto flex min-h-[calc(100dvh-4rem)] max-w-xl items-center px-5 py-16 text-center">
+        <div className="mx-auto flex min-h-[calc(100dvh-4rem)] max-w-xl items-center px-5 py-16 text-center">
           <div className="w-full rounded-2xl border border-border/70 bg-card p-8 sm:p-10">
             <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
             <h1 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">
@@ -251,33 +253,29 @@ export function PartnerAdminPortal() {
             <p className="mt-3 leading-7 text-muted-foreground">{error}</p>
             {pageState === "error" && <Button className="mt-7" onClick={() => void loadData()}><RefreshCw /> Try again</Button>}
           </div>
-        </main>
+        </div>
       )}
 
       {pageState === "ready" && data && (
-        <main className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-14">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Cryptic Partner Programme</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-[-0.045em] sm:text-5xl">Partner administration</h1>
-              <p className="mt-3 max-w-2xl text-muted-foreground">Review applications, monitor approved partners, and calculate commissions from completed referred purchases.</p>
-            </div>
-            <Button variant="outline" onClick={() => void loadData()}><RefreshCw /> Refresh</Button>
-          </div>
+        <DashboardPageFrame>
+          <DashboardPageHeader
+            eyebrow="Cryptic Partner Programme"
+            title="Partner administration"
+            description="Review applications, monitor approved partners, and calculate commissions from completed referred purchases."
+            action={<Button variant="outline" onClick={() => void loadData()}><RefreshCw /> Refresh</Button>}
+          />
 
-          <section aria-label="Partner programme summary" className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section aria-label="Partner programme summary" className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              { label: "Pending applications", value: data.summary.pending_applications, icon: Users },
-              { label: "Active partners", value: data.summary.active_partners, icon: UserCheck },
-              { label: "Tracked sales", value: data.summary.tracked_sales, icon: CircleDollarSign },
-              { label: "Calculated commission", value: formatCurrency(data.summary.outstanding_commission), icon: BadgeDollarSign },
-            ].map(({ label, value, icon: Icon }) => (
-              <article key={label} className="rounded-xl border border-border/70 bg-card p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm text-muted-foreground">{label}</p>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10"><Icon className="h-4 w-4 text-primary" /></span>
-                </div>
-                <p className="mt-5 text-3xl font-semibold tabular-nums tracking-[-0.04em]">{value}</p>
+              ["Pending applications", data.summary.pending_applications, "awaiting review"],
+              ["Approved partners", data.summary.active_partners, "active referral codes"],
+              ["Referred purchases", data.summary.tracked_sales, "completed purchases"],
+              ["Calculated commission", formatCurrency(data.summary.outstanding_commission), "at the agreed rates"],
+            ].map(([label, value, detail]) => (
+              <article key={label} className="bg-card px-5 py-5 sm:px-6">
+                <p className="text-xs font-medium text-muted-foreground">{label}</p>
+                <p className="mt-2 text-2xl font-semibold tabular-nums">{value}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
               </article>
             ))}
           </section>
@@ -293,7 +291,7 @@ export function PartnerAdminPortal() {
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 aria-current={activeTab === tab ? "page" : undefined}
-                className={`shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                className={`shrink-0 border-b-2 px-3 py-3 text-xs font-medium transition-colors sm:px-4 sm:text-sm ${activeTab === tab ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
               >
                 {label}
               </button>
@@ -406,7 +404,7 @@ export function PartnerAdminPortal() {
               )}
             </section>
           )}
-        </main>
+        </DashboardPageFrame>
       )}
 
       <Modal
