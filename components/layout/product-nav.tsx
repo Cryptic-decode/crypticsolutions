@@ -16,9 +16,11 @@ interface ProductNavProps {
   darkMode?: boolean;
   /** Optional: dark mode toggle from parent */
   onToggleDarkMode?: () => void;
+  /** Keep the product-page mobile purchase CTA unless a task-focused page opts out. */
+  showMobileStickyCta?: boolean;
 }
 
-export function ProductNav({ ctaLabel, onCtaClick, darkMode: externalDarkMode, onToggleDarkMode }: ProductNavProps) {
+export function ProductNav({ ctaLabel, onCtaClick, darkMode: externalDarkMode, onToggleDarkMode, showMobileStickyCta = true }: ProductNavProps) {
   const [internalDarkMode, setInternalDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -108,19 +110,21 @@ export function ProductNav({ ctaLabel, onCtaClick, darkMode: externalDarkMode, o
       </nav>
 
       {/* Mobile Sticky Bottom CTA */}
-      <motion.div
-        className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 shadow-lg"
-        initial={{ y: 100 }}
-        animate={{ y: mobileMenuOpen ? 100 : 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Button
-          className="w-full text-base h-12 cursor-pointer"
-          onClick={onCtaClick}
+      {showMobileStickyCta && (
+        <motion.div
+          className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 p-4 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden"
+          initial={{ y: 100 }}
+          animate={{ y: mobileMenuOpen ? 100 : 0 }}
+          transition={{ duration: 0.3 }}
         >
-          {ctaLabel}
-        </Button>
-      </motion.div>
+          <Button
+            className="h-12 w-full cursor-pointer text-base"
+            onClick={onCtaClick}
+          >
+            {ctaLabel}
+          </Button>
+        </motion.div>
+      )}
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (

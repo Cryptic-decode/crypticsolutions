@@ -238,7 +238,14 @@ export default function Home() {
         </section>
       </main>
 
-      <SiteFooter quickLinks={[{ href: "#products", label: "Products" }, { href: "#about", label: "What we build" }, { href: "#contact", label: "Contact" }]} />
+      <SiteFooter
+        quickLinks={[
+          { href: "#products", label: "Products" },
+          { href: "#about", label: "What we build" },
+          { href: "/partners", label: "Partner Programme" },
+          { href: "#contact", label: "Contact" },
+        ]}
+      />
     </div>
   );
 }

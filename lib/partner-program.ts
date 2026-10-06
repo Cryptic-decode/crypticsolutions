@@ -1,0 +1,71 @@
+export const PARTNER_COMMISSION_PERCENT = 20;
+export const IELTS_MANUAL_PRICE = 5_000;
+export const PARTNER_COMMISSION_AMOUNT =
+  (IELTS_MANUAL_PRICE * PARTNER_COMMISSION_PERCENT) / 100;
+export const PARTNER_REFERRAL_QUERY_PARAM = "ref";
+export const PARTNER_REFERRAL_PATH = "/ielts-manual";
+
+export const PARTNER_TYPES = ["individual", "organisation", "community", "academy"] as const;
+export type PartnerType = (typeof PARTNER_TYPES)[number];
+
+export const partnerTypeLabels: Record<PartnerType, string> = {
+  individual: "Individual",
+  organisation: "Organisation",
+  community: "Community",
+  academy: "Academy",
+};
+
+export const PAYOUT_SCHEDULES = ["biweekly", "monthly"] as const;
+export type PayoutSchedule = (typeof PAYOUT_SCHEDULES)[number];
+
+export const payoutScheduleLabels: Record<PayoutSchedule, string> = {
+  biweekly: "Bi-weekly",
+  monthly: "Monthly",
+};
+
+export function normalizeReferralCode(value: string) {
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 20);
+}
+
+export function createReferralCodeSuggestions(value: string) {
+  const base = normalizeReferralCode(value).replace(/-/g, "").slice(0, 14);
+  if (base.length < 3) return [];
+
+  return Array.from(
+    new Set([
+      base,
+      `${base.slice(0, 15)}IELTS`,
+      `${base.slice(0, 15)}LEARN`,
+    ].map((code) => code.slice(0, 20))),
+  );
+}
+
+export function isValidReferralCode(value: string) {
+  return /^[A-Z0-9](?:[A-Z0-9-]{2,18})[A-Z0-9]$/.test(value);
+}
+
+export function getReferralCodeFromSearchParams(searchParams: URLSearchParams) {
+  const referralCode = normalizeReferralCode(
+    searchParams.get(PARTNER_REFERRAL_QUERY_PARAM) || "",
+  );
+
+  return isValidReferralCode(referralCode) ? referralCode : "";
+}
+
+export function buildPartnerReferralUrl(referralCode: string, baseUrl: string) {
+  const normalizedCode = normalizeReferralCode(referralCode);
+  if (!isValidReferralCode(normalizedCode)) {
+    throw new Error("A valid referral code is required to create a partner link.");
+  }
+
+  const url = new URL(PARTNER_REFERRAL_PATH, baseUrl);
+  url.searchParams.set(PARTNER_REFERRAL_QUERY_PARAM, normalizedCode);
+  return url.toString();
+}
+export const PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH = 20;
+export const PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH = 1_000;

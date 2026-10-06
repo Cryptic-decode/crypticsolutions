@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getPaystackSecretKey } from "@/lib/paystack-accounts";
 import { getPaymentProduct } from "@/lib/payments";
+import { getActiveReferralCode, InvalidReferralCodeError } from "@/lib/partner-referrals";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,10 @@ export async function POST(request: NextRequest) {
 
     const reference = `ref_${randomUUID()}`;
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://crypticsolutionsltd.com";
-    const referral = typeof referralCode === "string" ? referralCode.trim().slice(0, 20) : "";
+    const requestedReferral = typeof referralCode === "string" ? referralCode : "";
+    const referral = requestedReferral.trim()
+      ? await getActiveReferralCode(requestedReferral)
+      : "";
     const callbackUrl = new URL(product.successPath, baseUrl);
     callbackUrl.searchParams.set("reference", reference);
     if (referral) callbackUrl.searchParams.set("referral_code", referral);
@@ -56,6 +60,9 @@ export async function POST(request: NextRequest) {
       reference,
     });
   } catch (error: unknown) {
+    if (error instanceof InvalidReferralCodeError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     const message = axios.isAxiosError(error)
       ? error.response?.data?.message || "Failed to initiate payment"
       : "Failed to initiate payment";

@@ -86,6 +86,12 @@ PAYSTACK_SECRET_KEY=your_paystack_secret_key
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Transactional email
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL="Cryptic Solutions <partners@mail.crypticsolutionsltd.com>"
+RESEND_REPLY_TO_EMAIL=info@crypticsolutionsltd.com
+ADMIN_EMAIL=info@crypticsolutionsltd.com
 ```
 
 4. Set up Supabase:
@@ -139,6 +145,10 @@ cryptic-solutions/
 | `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key       |
 | `PAYSTACK_SECRET_KEY`             | Paystack secret key       |
 | `NEXT_PUBLIC_APP_URL`             | Application URL           |
+| `RESEND_API_KEY`                  | Resend API key            |
+| `RESEND_FROM_EMAIL`               | Verified sender address   |
+| `RESEND_REPLY_TO_EMAIL`           | Reply-to address          |
+| `ADMIN_EMAIL`                     | Internal notification address |
 
 ## 🎨 Design System
 

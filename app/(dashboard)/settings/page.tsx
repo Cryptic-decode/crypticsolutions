@@ -39,7 +39,6 @@ export default function SettingsPage() {
   if (!user) return null;
 
   const fullName = user.user_metadata?.full_name || "Not set";
-  const passwordChanged = Boolean(user.user_metadata?.password_changed);
   const emailVerified = Boolean(user.email_confirmed_at);
 
   return (
@@ -74,10 +73,10 @@ export default function SettingsPage() {
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/12"><KeyRound className="h-5 w-5 text-primary" /></div>
             <div>
               <h3 className="font-semibold">Password</h3>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">{passwordChanged ? "Your temporary password has been replaced." : "Your account is still using its temporary password."}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">Update your password whenever you need to keep your account secure.</p>
             </div>
           </div>
-          <Button onClick={() => setShowPasswordModal(true)} variant={passwordChanged ? "outline" : "default"}>Change password</Button>
+          <Button onClick={() => setShowPasswordModal(true)} variant="outline">Change password</Button>
         </div>
       </section>
 

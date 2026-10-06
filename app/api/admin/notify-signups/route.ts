@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+
+import { sendTransactionalEmail } from '@/lib/email';
 
 /**
  * Admin Notification API Route
@@ -33,7 +34,6 @@ export async function GET(request: NextRequest) {
     // Validate environment variables
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const resendApiKey = process.env.RESEND_API_KEY;
     const adminEmail = process.env.ADMIN_EMAIL || 'info@crypticsolutionsltd.com';
 
     if (!supabaseUrl || !supabaseServiceKey) {
@@ -43,16 +43,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!resendApiKey) {
-      return NextResponse.json(
-        { error: 'Server configuration error: Missing Resend API key' },
-        { status: 500 }
-      );
-    }
-
     // Initialize clients
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    const resend = new Resend(resendApiKey);
 
     // Get unnotified signup events
     const { data: signups, error: fetchError } = await supabaseAdmin
@@ -136,16 +128,15 @@ export async function GET(request: NextRequest) {
     `;
 
     // Send email via Resend
-    const { data: emailData, error: emailError } = await resend.emails.send({
-      from: 'Cryptic Solutions <onboarding@resend.dev>',
+    const emailResult = await sendTransactionalEmail({
       to: adminEmail,
       subject: emailSubject,
       html: emailHtml,
     });
 
-    if (emailError) {
+    if (!emailResult.sent) {
       return NextResponse.json(
-        { error: 'Failed to send email', details: emailError.message },
+        { error: 'Failed to send email', details: emailResult.error },
         { status: 500 }
       );
     }
@@ -168,7 +159,7 @@ export async function GET(request: NextRequest) {
       success: true,
       message: `Sent notification for ${signups.length} signup(s)`,
       count: signups.length,
-      emailId: emailData?.id
+      emailId: emailResult.id
     });
   } catch (error: unknown) {
     return NextResponse.json(

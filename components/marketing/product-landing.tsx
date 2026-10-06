@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, CreditCard, MonitorSmartphone, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Check, CircleCheck, CreditCard, MonitorSmartphone, ShieldCheck } from "lucide-react";
 
 import { ProductNav } from "@/components/layout/product-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { ProductVisual } from "@/components/marketing/product-visual";
 import { PaystackPayment } from "@/components/payment-paystack";
+import { getReferralCodeFromSearchParams, normalizeReferralCode } from "@/lib/partner-program";
 
 interface ProductLandingProps {
   productId: string;
@@ -38,7 +39,18 @@ const reveal = {
 
 export function ProductLanding(props: ProductLandingProps) {
   const [email, setEmail] = useState("");
-  const [referralCode, setReferralCode] = useState("");
+  const [referral, setReferral] = useState({ code: "", fromLink: false });
+
+  useEffect(() => {
+    if (!props.referralEnabled) return;
+    const linkedReferralCode = getReferralCodeFromSearchParams(
+      new URLSearchParams(window.location.search),
+    );
+    if (!linkedReferralCode) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate the referral supplied by the shareable partner URL
+    setReferral({ code: linkedReferralCode, fromLink: true });
+  }, [props.referralEnabled]);
 
   const scrollToPricing = () => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -107,8 +119,8 @@ export function ProductLanding(props: ProductLandingProps) {
             <motion.div {...reveal} className="rounded-2xl border border-border/70 bg-card p-7 sm:p-9">
               <label htmlFor={`${props.productId}-email`} className="text-sm font-medium">Email address</label>
               <input id={`${props.productId}-email`} type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 outline-none transition-shadow focus:ring-2 focus:ring-ring/40" required />
-              {props.referralEnabled && <><label htmlFor="referral" className="mt-5 block text-sm font-medium">Referral code <span className="text-muted-foreground">(optional)</span></label><input id="referral" value={referralCode} onChange={(event) => setReferralCode(event.target.value.toUpperCase())} placeholder="e.g. FRIEND20" maxLength={20} className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 outline-none transition-shadow focus:ring-2 focus:ring-ring/40" /></>}
-              <div className="mt-6"><PaystackPayment email={email} amount={props.price} productId={props.productId} productName={props.productName} successPath={props.successPath} referralCode={referralCode || undefined} buttonLabel={`Buy for ₦${props.price.toLocaleString()}`} /></div>
+              {props.referralEnabled && <><label htmlFor="referral" className="mt-5 block text-sm font-medium">Referral code <span className="text-muted-foreground">(optional)</span></label><input id="referral" value={referral.code} onChange={(event) => setReferral({ code: normalizeReferralCode(event.target.value), fromLink: false })} placeholder="e.g. FRIEND20" maxLength={20} autoCapitalize="characters" className="mt-2 h-12 w-full rounded-md border border-input bg-background px-4 font-mono uppercase outline-none transition-shadow focus:ring-2 focus:ring-ring/40" />{referral.fromLink ? <p className="mt-2 flex items-center gap-1.5 text-xs text-primary"><CircleCheck className="h-3.5 w-3.5" /> Partner referral code applied.</p> : <p className="mt-2 text-xs text-muted-foreground">Only approved partner codes are accepted.</p>}</>}
+              <div className="mt-6"><PaystackPayment email={email} amount={props.price} productId={props.productId} productName={props.productName} successPath={props.successPath} referralCode={referral.code || undefined} buttonLabel={`Buy for ₦${props.price.toLocaleString()}`} /></div>
               <div className="mt-6 flex items-start gap-3 border-t border-border/70 pt-5 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Payment is verified securely before access is granted. Your card details are handled by Paystack.</div>
             </motion.div>
           </div>

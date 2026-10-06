@@ -4,10 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, ArrowRight, BookOpen, Check, Clock, Flame, LockKeyhole, RefreshCw } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, ArrowRight, BookOpen, Check, Clock, Flame, RefreshCw } from "lucide-react";
 
-import { ChangePasswordModal } from "@/components/dashboard/change-password-modal";
 import { DashboardPageFrame, DashboardPageHeader, DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -48,7 +46,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [linkingPurchases, setLinkingPurchases] = useState(false);
   const [linkingError, setLinkingError] = useState("");
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const hasLinkedPurchases = useRef(false);
 
   const coursePurchases = useMemo(
@@ -151,25 +148,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      <AnimatePresence>
-        {!user.user_metadata?.password_changed && (
-          <motion.section
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="mt-8 grid gap-4 rounded-xl border border-primary/25 bg-primary/[0.06] p-5 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-6"
-            aria-labelledby="security-task-title"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15"><LockKeyhole className="h-5 w-5 text-primary" /></div>
-            <div>
-              <h2 id="security-task-title" className="font-semibold">Secure your account</h2>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">Replace your temporary password before your next study session.</p>
-            </div>
-            <Button variant="outline" onClick={() => setShowPasswordModal(true)}>Change password</Button>
-          </motion.section>
-        )}
-      </AnimatePresence>
-
       <section className="mt-12" aria-labelledby="library-title">
         <DashboardSectionHeader
           title="My library"
@@ -269,8 +247,6 @@ export default function DashboardPage() {
           </a>
         </div>
       </section>
-
-      <ChangePasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
     </DashboardPageFrame>
   );
 }

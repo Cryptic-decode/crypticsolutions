@@ -4,12 +4,52 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { showError, showSuccess } from "@/lib/utils";
+
+interface PasswordFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  placeholder: string;
+  onChange: (value: string) => void;
+}
+
+function PasswordField({ id, label, value, placeholder, onChange }: PasswordFieldProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div>
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          type={isVisible ? "text" : "password"}
+          required
+          minLength={8}
+          autoComplete="new-password"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className="pr-11"
+        />
+        <button
+          type="button"
+          onClick={() => setIsVisible((current) => !current)}
+          className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={isVisible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+          aria-pressed={isVisible}
+        >
+          {isVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -154,31 +194,21 @@ function PaymentSuccessContent() {
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="password">Choose Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      required
-                      minLength={8}
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      placeholder="At least 8 characters"
-                    />
-                  </div>
+                  <PasswordField
+                    id="password"
+                    label="Choose Password"
+                    value={formData.password}
+                    onChange={(password) => setFormData({ ...formData, password })}
+                    placeholder="At least 8 characters"
+                  />
 
-                  <div>
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      required
-                      minLength={8}
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      placeholder="Repeat your password"
-                    />
-                  </div>
+                  <PasswordField
+                    id="confirmPassword"
+                    label="Confirm Password"
+                    value={formData.confirmPassword}
+                    onChange={(confirmPassword) => setFormData({ ...formData, confirmPassword })}
+                    placeholder="Repeat your password"
+                  />
 
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button type="submit" size="lg" className="w-full" disabled={loading}>
