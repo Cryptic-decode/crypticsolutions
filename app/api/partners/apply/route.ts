@@ -5,6 +5,8 @@ import { sendPartnerAdminNotification, sendPartnerApplicationReceipt } from "@/l
 import {
   isValidReferralCode,
   normalizeReferralCode,
+  PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH,
+  PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH,
   PARTNER_COMMISSION_PERCENT,
   PARTNER_TYPES,
   partnerTypeLabels,
@@ -34,7 +36,10 @@ export async function POST(request: NextRequest) {
     const email = text(body.email, 160).toLowerCase();
     const phone = text(body.phone, 40);
     const website = text(body.website, 240);
-    const audienceDescription = text(body.audienceDescription, 1_000);
+    const audienceDescription = text(
+      body.audienceDescription,
+      PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH,
+    );
     const payoutSchedule = text(body.payoutSchedule, 20);
     const requestedReferralCode = normalizeReferralCode(text(body.referralCode, 20));
     const acceptedTerms = body.acceptedTerms === true;
@@ -58,8 +63,11 @@ export async function POST(request: NextRequest) {
     if (phone.length < 7) {
       return NextResponse.json({ error: "Enter a valid phone or WhatsApp number." }, { status: 400 });
     }
-    if (audienceDescription.length < 20) {
-      return NextResponse.json({ error: "Tell us briefly how you reach IELTS candidates." }, { status: 400 });
+    if (audienceDescription.length < PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH) {
+      return NextResponse.json(
+        { error: `Enter at least ${PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH} characters describing how you reach IELTS candidates.` },
+        { status: 400 },
+      );
     }
     if (!PAYOUT_SCHEDULES.includes(payoutSchedule as (typeof PAYOUT_SCHEDULES)[number])) {
       return NextResponse.json({ error: "Choose a valid payout schedule." }, { status: 400 });

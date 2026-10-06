@@ -67,3 +67,5 @@ export function buildPartnerReferralUrl(referralCode: string, baseUrl: string) {
   url.searchParams.set(PARTNER_REFERRAL_QUERY_PARAM, normalizedCode);
   return url.toString();
 }
+export const PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH = 20;
+export const PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH = 1_000;

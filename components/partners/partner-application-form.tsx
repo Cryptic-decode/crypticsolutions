@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import {
   createReferralCodeSuggestions,
   normalizeReferralCode,
+  PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH,
+  PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH,
   partnerTypeLabels,
   payoutScheduleLabels,
 } from "@/lib/partner-program";
@@ -40,6 +42,11 @@ export function PartnerApplicationForm() {
   const selectedPartnerType = form.partnerType as keyof typeof partnerTypeLabels;
   const selectedPartnerTypeLabel = partnerTypeLabels[selectedPartnerType];
   const requiresEntityName = selectedPartnerType !== "individual";
+  const audienceDescriptionLength = form.audienceDescription.length;
+  const audienceCharactersRemaining = Math.max(
+    PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH - audienceDescriptionLength,
+    0,
+  );
   const suggestions = useMemo(
     () => createReferralCodeSuggestions(suggestionSource),
     [suggestionSource],
@@ -98,7 +105,11 @@ export function PartnerApplicationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} aria-busy={submitting}>
+      <fieldset
+        disabled={submitting}
+        className="min-w-0 space-y-6 border-0 p-0 transition-opacity disabled:cursor-wait disabled:opacity-65"
+      >
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <Label htmlFor="partnerType">Applying as</Label>
@@ -193,11 +204,28 @@ export function PartnerApplicationForm() {
           onChange={(event) => update("audienceDescription", event.target.value)}
           placeholder="Tell us about your students, community, clients, or audience."
           rows={5}
-          maxLength={1_000}
+          minLength={PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH}
+          maxLength={PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH}
+          aria-describedby="audienceDescriptionHelp"
+          aria-invalid={audienceDescriptionLength > 0 && audienceCharactersRemaining > 0}
           className={fieldClassName}
           required
         />
-        <p className="mt-2 text-xs text-muted-foreground">A short description is enough.</p>
+        <div
+          id="audienceDescriptionHelp"
+          className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs"
+        >
+          <p className={audienceDescriptionLength > 0 && audienceCharactersRemaining > 0 ? "text-destructive" : "text-muted-foreground"}>
+            {audienceCharactersRemaining > 0
+              ? audienceDescriptionLength > 0
+                ? `${audienceCharactersRemaining} more character${audienceCharactersRemaining === 1 ? "" : "s"} needed.`
+                : `Minimum ${PARTNER_AUDIENCE_DESCRIPTION_MIN_LENGTH} characters.`
+              : "Description length looks good."}
+          </p>
+          <p className="text-muted-foreground">
+            {audienceDescriptionLength}/{PARTNER_AUDIENCE_DESCRIPTION_MAX_LENGTH}
+          </p>
+        </div>
       </div>
 
       <fieldset>
@@ -287,6 +315,7 @@ export function PartnerApplicationForm() {
       <Button type="submit" size="lg" className="h-12 w-full sm:w-auto" disabled={submitting}>
         {submitting ? <><Loader2 className="animate-spin" /> Submitting application</> : "Submit application"}
       </Button>
+      </fieldset>
     </form>
   );
 }

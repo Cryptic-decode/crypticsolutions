@@ -14,6 +14,7 @@ const LOGO_URL = "https://www.crypticsolutionsltd.com/cryptic-assets/fullLogoWhi
 interface EmailDetail {
   label: string;
   value: string;
+  href?: string;
 }
 
 interface EmailAction {
@@ -58,7 +59,13 @@ export function renderBrandedEmail({
     .join("");
   const detailMarkup = details.length
     ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 24px;border-collapse:separate;border-spacing:0 8px;">${details
-        .map(({ label, value }) => `<tr><td style="padding:14px 16px;background:${BRAND.surface};border:1px solid ${BRAND.border};border-radius:10px;"><div style="margin:0 0 4px;color:${BRAND.muted};font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">${escapeHtml(label)}</div><div style="color:${BRAND.navy};font-size:16px;font-weight:700;line-height:1.45;word-break:break-word;">${escapeHtml(value)}</div></td></tr>`)
+        .map(({ label, value, href }) => {
+          const detailValue = href
+            ? `<a href="${escapeHtml(href)}" style="color:${BRAND.navy};text-decoration:underline;text-decoration-color:${BRAND.green};text-underline-offset:3px;">${escapeHtml(value)}</a>`
+            : escapeHtml(value);
+
+          return `<tr><td style="padding:14px 16px;background:${BRAND.surface};border:1px solid ${BRAND.border};border-radius:10px;"><div style="margin:0 0 4px;color:${BRAND.muted};font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">${escapeHtml(label)}</div><div style="color:${BRAND.navy};font-size:16px;font-weight:700;line-height:1.45;word-break:break-word;">${detailValue}</div></td></tr>`;
+        })
         .join("")}</table>`
     : "";
   const calloutMarkup = callout
@@ -104,7 +111,7 @@ export function renderBrandedEmail({
             <tr>
               <td style="padding:24px 28px;background:${BRAND.navy};">
                 <p style="margin:0;color:#FFFFFF;font-size:14px;font-weight:700;">Cryptic Solutions</p>
-                <p style="margin:6px 0 0;color:#CAD0DF;font-size:13px;line-height:1.5;">Practical digital products for learning and work.</p>
+                <p style="margin:6px 0 0;font-size:13px;line-height:1.5;"><a href="https://www.crypticsolutionsltd.com" style="color:#CAD0DF;text-decoration:none;">crypticsolutionsltd.com</a></p>
                 ${disclaimerMarkup}
               </td>
             </tr>

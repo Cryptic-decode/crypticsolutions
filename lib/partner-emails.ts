@@ -80,10 +80,11 @@ export function sendPartnerReviewEmail({
           paragraphs: ["Your application has been approved. You can now share your unique referral link with your audience."],
           details: [
             { label: "Referral code", value: application.requested_referral_code },
+            { label: "Referral link", value: referralLink, href: referralLink },
             { label: "Status", value: "Active" },
           ],
-          callout: "Purchases completed through your referral link will be attributed to your partner account.",
-          action: { label: "Open your referral link", href: referralLink },
+          callout: "Copy and share your referral link with your audience. Purchases completed through it will be attributed to your partner account.",
+          action: { label: "View referral page", href: referralLink },
         })
       : renderBrandedEmail({
           preview: "An update on your Cryptic Partner Programme application.",
