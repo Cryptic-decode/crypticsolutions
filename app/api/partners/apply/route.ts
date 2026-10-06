@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-import { sendTransactionalEmail } from "@/lib/email";
+import { sendPartnerAdminNotification, sendPartnerApplicationReceipt } from "@/lib/partner-emails";
 import {
   isValidReferralCode,
   normalizeReferralCode,
@@ -11,6 +11,7 @@ import {
   PAYOUT_SCHEDULES,
   payoutScheduleLabels,
 } from "@/lib/partner-program";
+import { getServerAppUrl } from "@/lib/server-url";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -111,37 +112,26 @@ export async function POST(request: NextRequest) {
     const payoutLabel = payoutScheduleLabels[payoutSchedule as keyof typeof payoutScheduleLabels];
 
     const notifications = [
-      sendTransactionalEmail({
+      sendPartnerAdminNotification({
         to: adminEmail,
-        subject: `New partner application from ${applicantLabel}`,
-        text: [
-          `Application ID: ${application.id}`,
-          `Partner type: ${partnerTypeLabel}`,
-          `Name: ${fullName}`,
-          `Organisation, community, or academy: ${organisationName || "Not applicable"}`,
-          `Email: ${email}`,
-          `Phone or WhatsApp: ${phone}`,
-          `Website or social page: ${website || "Not provided"}`,
-          `Preferred payout: ${payoutLabel}`,
-          `Requested code: ${requestedReferralCode}`,
-          `Commission: ${PARTNER_COMMISSION_PERCENT}%`,
-          "",
-          "Audience:",
-          audienceDescription,
-        ].join("\n"),
+        applicantLabel,
+        fullName,
+        email,
+        applicationId: application.id,
+        partnerTypeLabel,
+        organisationName,
+        phone,
+        website,
+        payoutLabel,
+        requestedReferralCode,
+        commissionRate: PARTNER_COMMISSION_PERCENT,
+        audienceDescription,
+        reviewUrl: `${getServerAppUrl()}/admin/partners`,
       }),
-      sendTransactionalEmail({
-        to: email,
-        subject: "We received your Cryptic Partner Programme application",
-        text: [
-          `Hello ${fullName},`,
-          "",
-          "Thank you for applying to the Cryptic Partner Programme.",
-          `Your requested referral code is ${requestedReferralCode}. It will become active only after approval.`,
-          "We will review your application and contact you with the next steps.",
-          "",
-          "Cryptic Solutions",
-        ].join("\n"),
+      sendPartnerApplicationReceipt({
+        fullName,
+        email,
+        requestedReferralCode,
       }),
     ];
 

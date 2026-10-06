@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { adminErrorResponse, authenticateAdmin } from "@/lib/admin-auth";
 import { sendPartnerReviewEmail } from "@/lib/partner-emails";
 import { buildPartnerReferralUrl } from "@/lib/partner-program";
+import { getServerAppUrl } from "@/lib/server-url";
 
 interface ActionBody {
   action?: unknown;
@@ -41,7 +42,7 @@ export async function PATCH(
     const referralLink = action === "approve"
       ? buildPartnerReferralUrl(
           application.requested_referral_code,
-          process.env.NEXT_PUBLIC_APP_URL || "https://www.crypticsolutionsltd.com",
+          getServerAppUrl(),
         )
       : "";
     const { data: reviewedApplication, error: reviewError } = await admin
@@ -101,7 +102,7 @@ export async function POST(
 
     const referralLink = buildPartnerReferralUrl(
       application.requested_referral_code,
-      process.env.NEXT_PUBLIC_APP_URL || "https://www.crypticsolutionsltd.com",
+      getServerAppUrl(),
     );
     const email = await sendPartnerReviewEmail({
       application,
