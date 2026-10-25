@@ -31,6 +31,7 @@ export function getDashboardPageTitle(pathname: string) {
   }
 
   if (pathname.startsWith("/practice/reading")) return "Reading Practice";
+  if (pathname.startsWith("/practice/listening")) return "Listening Practice";
   if (pathname.startsWith("/practice")) return "IELTS Practice";
 
   return dashboardPageTitles[pathname] ?? "Dashboard";

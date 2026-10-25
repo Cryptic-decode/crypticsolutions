@@ -1,9 +1,13 @@
 export const PRACTICE_PRODUCT_ID = "ielts-manual";
 
 export type PracticeSkill = "reading" | "listening" | "writing" | "speaking";
-export type PracticeDevelopmentStatus = "available" | "in_development" | "planned";
+export type PracticeDevelopmentStatus =
+  | "available"
+  | "in_development"
+  | "planned";
 export type PracticeAttemptStatus = "in_progress" | "completed" | "abandoned";
 export type ReadingQuestionType = "single_choice" | "short_answer";
+export type ListeningQuestionType = ReadingQuestionType;
 
 export interface PracticeSkillDefinition {
   skill: PracticeSkill;
@@ -77,36 +81,62 @@ export interface ReadingAttemptState {
   review?: ReadingAttemptReviewItem[];
 }
 
-export interface ReadingSetDetail extends Omit<ReadingSetSummary, "questionCount"> {
+export interface ReadingSetDetail
+  extends Omit<ReadingSetSummary, "questionCount"> {
   instructions: string;
   sections: ReadingSection[];
   questionCount: number;
   attempt: ReadingAttemptState | null;
 }
 
+export interface ListeningSection {
+  id: string;
+  title: string;
+  instructions: string;
+  position: number;
+  questions: ReadingQuestion[];
+  transcript?: string;
+}
+
+export type ListeningSetSummary = ReadingSetSummary;
+export type ListeningAttemptReviewItem = ReadingAttemptReviewItem;
+export type ListeningAttemptState = ReadingAttemptState;
+
+export interface ListeningSetDetail
+  extends Omit<ListeningSetSummary, "questionCount"> {
+  instructions: string;
+  sections: ListeningSection[];
+  questionCount: number;
+  attempt: ListeningAttemptState | null;
+}
+
 export const PRACTICE_SKILLS: PracticeSkillDefinition[] = [
   {
     skill: "reading",
     title: "Reading",
-    description: "Practise finding evidence, managing time, and answering common IELTS reading question types.",
+    description:
+      "Practise finding evidence, managing time, and answering common IELTS reading question types.",
     status: "in_development",
   },
   {
     skill: "listening",
     title: "Listening",
-    description: "Build accuracy across conversations, monologues, note completion, and multiple-choice tasks.",
+    description:
+      "Build accuracy across conversations, monologues, note completion, and multiple-choice tasks.",
     status: "in_development",
   },
   {
     skill: "writing",
     title: "Writing",
-    description: "Develop clearer responses with structured practice and useful feedback.",
+    description:
+      "Develop clearer responses with structured practice and useful feedback.",
     status: "planned",
   },
   {
     skill: "speaking",
     title: "Speaking",
-    description: "Prepare for each speaking part with guided prompts and focused review.",
+    description:
+      "Prepare for each speaking part with guided prompts and focused review.",
     status: "planned",
   },
 ];

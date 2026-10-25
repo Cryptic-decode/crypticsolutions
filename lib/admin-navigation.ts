@@ -15,5 +15,7 @@ export function isAdminRouteActive(pathname: string, href: string) {
 }
 
 export function getAdminPageTitle(pathname: string) {
+  if (pathname.startsWith("/admin/practice/listening"))
+    return "Listening practice";
   return adminPageTitles[pathname] ?? "Administration";
 }
