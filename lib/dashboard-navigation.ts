@@ -1,11 +1,13 @@
 export const dashboardNavigation = [
   { href: "/dashboard", label: "My Library", icon: "library" },
+  { href: "/practice", label: "Practice", icon: "practice" },
   { href: "/progress", label: "Progress", icon: "progress" },
   { href: "/settings", label: "Settings", icon: "settings" },
 ] as const;
 
 const dashboardPageTitles: Record<string, string> = {
   "/dashboard": "My Library",
+  "/practice": "IELTS Practice",
   "/progress": "Study progress",
   "/settings": "Settings",
 };
