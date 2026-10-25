@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -12,20 +11,14 @@ import {
   CreditCard,
   Download,
   Mail,
-  Menu,
-  Moon,
   ShieldCheck,
-  Sun,
-  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Drawer } from "@/components/ui/drawer";
-import { MainDrawer } from "@/components/navigation/main-drawer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { ProductVisual } from "@/components/marketing/product-visual";
 import { BrandHeroVisual } from "@/components/marketing/brand-hero-visual";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { useAuth } from "@/lib/auth";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 import { useActiveSection } from "@/lib/hooks/use-active-section";
 
@@ -67,9 +60,6 @@ const products = [
 
 export default function Home() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
   const activeSection = useActiveSection(homeSections);
 
   useEffect(() => {
@@ -77,70 +67,25 @@ export default function Home() {
       router.replace("/update-password");
       return;
     }
-    const storedTheme = localStorage.getItem("theme");
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate client-only theme preference
-    setDarkMode(storedTheme !== "light");
   }, [router]);
-
-  const toggleDarkMode = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  };
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const sectionLinkClass = (section: string) =>
-    `relative py-2 text-sm font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:origin-left after:bg-primary after:transition-transform ${
-      activeSection === section
-        ? "text-foreground after:scale-x-100"
-        : "text-muted-foreground after:scale-x-0 hover:text-foreground"
-    }`;
-
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-border/70 bg-background/92 backdrop-blur-xl">
-        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 md:px-8">
-          <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top">
-            <Image src="/cryptic-assets/fullLogo.png" alt="Cryptic Solutions" width={150} height={38} className="h-9 w-auto dark:hidden" priority />
-            <Image src="/cryptic-assets/fullLogo2.png" alt="Cryptic Solutions" width={150} height={38} className="hidden h-9 w-auto dark:block" priority />
-          </button>
-
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#products" aria-current={activeSection === "products" ? "location" : undefined} className={sectionLinkClass("products")}>Products</a>
-            <a href="#about" aria-current={activeSection === "about" ? "location" : undefined} className={sectionLinkClass("about")}>What we build</a>
-            <a href="#contact" aria-current={activeSection === "contact" ? "location" : undefined} className={sectionLinkClass("contact")}>Contact</a>
-            {!authLoading && <Link href={user ? "/dashboard" : "/signin"} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{user ? "Dashboard" : "Sign in"}</Link>}
-            <button onClick={toggleDarkMode} className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="Toggle theme">
-              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            <Button asChild className="h-10 px-5"><a href="#products">Browse products</a></Button>
-          </div>
-
-          <button className="rounded-md p-2 md:hidden" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="Open navigation">
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-      </nav>
-
-      <Drawer isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
-        <MainDrawer
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
-          onClose={() => setMobileMenuOpen(false)}
-          links={[
-            { href: "#products", label: "Products", onClick: () => scrollTo("products") },
-            { href: "#about", label: "What we build", onClick: () => scrollTo("about") },
-            { href: "#contact", label: "Contact", onClick: () => scrollTo("contact") },
-            ...(!authLoading ? [{ href: user ? "/dashboard" : "/signin", label: user ? "Dashboard" : "Sign in" }] : []),
-          ]}
-          ctaButton={{ label: "Browse products", onClick: () => scrollTo("products") }}
-          activeHref={activeSection ? `#${activeSection}` : undefined}
-        />
-      </Drawer>
+      <SiteHeader
+        links={[
+          { href: "#products", label: "Products", onClick: () => scrollTo("products") },
+          { href: "#about", label: "What we build", onClick: () => scrollTo("about") },
+          { href: "#contact", label: "Contact", onClick: () => scrollTo("contact") },
+        ]}
+        activeHref={activeSection ? `#${activeSection}` : undefined}
+        ctaLabel="Browse products"
+        onCtaClick={() => scrollTo("products")}
+        onLogoClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      />
 
       <main className="pt-[4.5rem]">
         <section className="relative border-b border-border/60">
