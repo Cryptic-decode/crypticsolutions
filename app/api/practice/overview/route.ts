@@ -30,21 +30,36 @@ export async function GET(request: NextRequest) {
 
     if (!purchases?.length) {
       return NextResponse.json(
-        { hasAccess: false, attempts: [] },
+        { hasAccess: false, attempts: [], availableSetCounts: {} },
         { headers: { "Cache-Control": "private, no-store" } },
       );
     }
 
-    const { data, error: attemptsError } = await supabase
+    const [{ data, error: attemptsError }, { data: availableSets, error: availableSetsError }] = await Promise.all([
+      supabase
       .from("practice_attempts")
       .select("id, status, score, max_score, started_at, completed_at, practice_sets(title, skill)")
       .eq("user_id", user.id)
       .order("started_at", { ascending: false })
-      .limit(6);
+      .limit(6),
+      supabase
+        .from("practice_sets")
+        .select("skill")
+        .eq("product_id", PRACTICE_PRODUCT_ID)
+        .eq("status", "published"),
+    ]);
 
     if (attemptsError && !missingPracticeTableCodes.has(attemptsError.code ?? "")) {
       throw attemptsError;
     }
+    if (availableSetsError && !missingPracticeTableCodes.has(availableSetsError.code ?? "")) {
+      throw availableSetsError;
+    }
+
+    const availableSetCounts = (availableSets ?? []).reduce<Record<string, number>>((counts, set) => {
+      counts[set.skill] = (counts[set.skill] ?? 0) + 1;
+      return counts;
+    }, {});
 
     const attempts = ((data ?? []) as AttemptRow[]).flatMap((attempt) => {
       const set = Array.isArray(attempt.practice_sets)
@@ -66,7 +81,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { hasAccess: true, attempts },
+      { hasAccess: true, attempts, availableSetCounts },
       { headers: { "Cache-Control": "private, no-store" } },
     );
   } catch (error) {

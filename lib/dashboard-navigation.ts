@@ -30,5 +30,8 @@ export function getDashboardPageTitle(pathname: string) {
     return courseNames[productId] ?? "Course";
   }
 
+  if (pathname.startsWith("/practice/reading")) return "Reading Practice";
+  if (pathname.startsWith("/practice")) return "IELTS Practice";
+
   return dashboardPageTitles[pathname] ?? "Dashboard";
 }

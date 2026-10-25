@@ -1,8 +1,9 @@
 export const PRACTICE_PRODUCT_ID = "ielts-manual";
 
 export type PracticeSkill = "reading" | "listening" | "writing" | "speaking";
-export type PracticeDevelopmentStatus = "in_development" | "planned";
+export type PracticeDevelopmentStatus = "available" | "in_development" | "planned";
 export type PracticeAttemptStatus = "in_progress" | "completed" | "abandoned";
+export type ReadingQuestionType = "single_choice" | "short_answer";
 
 export interface PracticeSkillDefinition {
   skill: PracticeSkill;
@@ -25,6 +26,62 @@ export interface PracticeAttemptSummary {
 export interface PracticeOverviewData {
   hasAccess: boolean;
   attempts: PracticeAttemptSummary[];
+  availableSetCounts: Partial<Record<PracticeSkill, number>>;
+}
+
+export interface ReadingQuestion {
+  id: string;
+  type: ReadingQuestionType;
+  prompt: string;
+  options: string[];
+  points: number;
+  position: number;
+}
+
+export interface ReadingSection {
+  id: string;
+  title: string;
+  instructions: string;
+  passage: string;
+  position: number;
+  questions: ReadingQuestion[];
+}
+
+export interface ReadingSetSummary {
+  id: string;
+  title: string;
+  description: string;
+  durationMinutes: number | null;
+  questionCount: number;
+  position: number;
+  latestAttemptStatus?: PracticeAttemptStatus;
+}
+
+export interface ReadingAttemptReviewItem {
+  questionId: string;
+  answer: string;
+  correctAnswer: string;
+  explanation: string;
+  isCorrect: boolean;
+  pointsAwarded: number;
+}
+
+export interface ReadingAttemptState {
+  id: string;
+  status: PracticeAttemptStatus;
+  answers: Record<string, string>;
+  score: number | null;
+  maxScore: number | null;
+  startedAt: string;
+  completedAt: string | null;
+  review?: ReadingAttemptReviewItem[];
+}
+
+export interface ReadingSetDetail extends Omit<ReadingSetSummary, "questionCount"> {
+  instructions: string;
+  sections: ReadingSection[];
+  questionCount: number;
+  attempt: ReadingAttemptState | null;
 }
 
 export const PRACTICE_SKILLS: PracticeSkillDefinition[] = [
@@ -55,6 +112,7 @@ export const PRACTICE_SKILLS: PracticeSkillDefinition[] = [
 ];
 
 export function getPracticeStatusLabel(status: PracticeDevelopmentStatus) {
+  if (status === "available") return "Available";
   return status === "in_development" ? "In development" : "Planned";
 }
 

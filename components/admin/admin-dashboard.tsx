@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, RefreshCw, ShieldAlert, Users } from "lucide-react";
+import { ArrowRight, BookOpenCheck, RefreshCw, ShieldAlert, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -119,12 +119,20 @@ export function AdminDashboard() {
 
               <section className="mt-12" aria-labelledby="admin-tools-title">
                 <DashboardSectionHeader title="Admin tools" description="Only the operational modules currently in use appear here." />
-                <article className="max-w-2xl rounded-xl border border-border/70 bg-card p-6 sm:p-7">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10"><Users className="h-5 w-5 text-primary" /></span>
-                  <h3 className="mt-6 text-xl font-semibold">Partner Programme</h3>
-                  <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Review applications, activate referral codes, and monitor purchases attributed to approved partners.</p>
-                  <Button asChild className="mt-6"><Link href="/admin/partners">Manage partners <ArrowRight /></Link></Button>
-                </article>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <article className="rounded-xl border border-border/70 bg-card p-6 sm:p-7">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10"><Users className="h-5 w-5 text-primary" /></span>
+                    <h3 className="mt-6 text-xl font-semibold">Partner Programme</h3>
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Review applications, activate referral codes, and monitor purchases attributed to approved partners.</p>
+                    <Button asChild className="mt-6"><Link href="/admin/partners">Manage partners <ArrowRight /></Link></Button>
+                  </article>
+                  <article className="rounded-xl border border-border/70 bg-card p-6 sm:p-7">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10"><BookOpenCheck className="h-5 w-5 text-primary" /></span>
+                    <h3 className="mt-6 text-xl font-semibold">Practice content</h3>
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Generate Reading drafts, review every question and answer, then publish approved practice sets.</p>
+                    <Button asChild className="mt-6"><Link href="/admin/practice">Manage practice <ArrowRight /></Link></Button>
+                  </article>
+                </div>
               </section>
             </>
           )}

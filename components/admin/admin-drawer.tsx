@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, LogOut, Users, X } from "lucide-react";
+import { BookOpenCheck, LayoutDashboard, LogOut, Users, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,6 +16,7 @@ interface AdminDrawerProps {
 const icons = {
   dashboard: LayoutDashboard,
   partners: Users,
+  practice: BookOpenCheck,
 };
 
 export function AdminDrawer({ currentPath, onClose, onSignOutClick }: AdminDrawerProps) {

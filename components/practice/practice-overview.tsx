@@ -116,6 +116,7 @@ export function PracticeOverview() {
     () => data?.attempts.filter((attempt) => attempt.status === "completed").length ?? 0,
     [data],
   );
+  const hasReadingPractice = Boolean(data?.availableSetCounts.reading);
 
   if (loading) return <PracticeSkeleton />;
 
@@ -140,7 +141,7 @@ export function PracticeOverview() {
       <DashboardPageHeader
         eyebrow="IELTS practice"
         title="Practise with purpose"
-        description="Reading and Listening are the first practice areas we are building. Writing and Speaking will follow on the same focused learning path."
+        description={hasReadingPractice ? "Reading practice is ready. Listening is the next area in development, followed by Writing and Speaking." : "Reading and Listening are the first practice areas we are building. Writing and Speaking will follow on the same focused learning path."}
         action={<Button asChild variant="outline"><Link href="/course/ielts-manual">Open the manual <ArrowRight /></Link></Button>}
       />
 
@@ -149,23 +150,30 @@ export function PracticeOverview() {
         <div className="grid gap-4 md:grid-cols-2">
           {PRACTICE_SKILLS.map((item) => {
             const Icon = skillIcons[item.skill];
-            const isInDevelopment = item.status === "in_development";
+            const isAvailable = item.skill === "reading" && hasReadingPractice;
+            const status = isAvailable ? "available" : item.status;
+            const isInDevelopment = status === "in_development";
+            const isPrimaryStatus = isAvailable || isInDevelopment;
 
             return (
               <article key={item.skill} className="relative overflow-hidden rounded-2xl border border-border/70 bg-card p-6 sm:p-7">
                 <div className="flex items-start justify-between gap-4">
-                  <div className={cn("grid h-11 w-11 place-items-center rounded-lg", isInDevelopment ? "bg-primary/12 text-primary" : "bg-muted text-muted-foreground")}>
+                  <div className={cn("grid h-11 w-11 place-items-center rounded-lg", isPrimaryStatus ? "bg-primary/12 text-primary" : "bg-muted text-muted-foreground")}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <span className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", isInDevelopment ? "border-primary/25 bg-primary/8 text-primary" : "border-border/70 bg-muted/50 text-muted-foreground")}>
-                    {getPracticeStatusLabel(item.status)}
+                  <span className={cn("rounded-full border px-2.5 py-1 text-xs font-medium", isPrimaryStatus ? "border-primary/25 bg-primary/8 text-primary" : "border-border/70 bg-muted/50 text-muted-foreground")}>
+                    {getPracticeStatusLabel(status)}
                   </span>
                 </div>
                 <h3 className="mt-6 text-xl font-semibold tracking-[-0.02em]">{item.title}</h3>
                 <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">{item.description}</p>
-                <p className="mt-6 border-t border-border/70 pt-4 text-xs font-medium text-muted-foreground">
-                  {isInDevelopment ? "Activities will appear here when they are ready." : "Scheduled after Reading and Listening."}
-                </p>
+                <div className="mt-6 border-t border-border/70 pt-4">
+                  {isAvailable ? (
+                    <Button asChild size="sm"><Link href="/practice/reading">Open Reading practice <ArrowRight /></Link></Button>
+                  ) : (
+                    <p className="text-xs font-medium text-muted-foreground">{isInDevelopment ? "Activities will appear here when they are ready." : "Scheduled after Reading and Listening."}</p>
+                  )}
+                </div>
               </article>
             );
           })}
