@@ -12,15 +12,9 @@ import {
   Sparkles,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
-import { AdminShell } from "@/components/admin/admin-shell";
-import {
-  DashboardPageFrame,
-  DashboardPageHeader,
-  DashboardSectionHeader,
-} from "@/components/dashboard/dashboard-page";
+import { DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,18 +94,14 @@ function getAnswerKey(
 
 function AdminPracticeSkeleton() {
   return (
-    <DashboardPageFrame
+    <div
+      className="mt-10"
       aria-busy="true"
       aria-label="Loading Listening practice administration"
     >
-      <div className="space-y-3 border-b border-border/70 pb-8">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-5 w-[32rem] max-w-full" />
-      </div>
-      <Skeleton className="mt-10 h-72 rounded-2xl" />
+      <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="mt-10 h-60 rounded-2xl" />
-    </DashboardPageFrame>
+    </div>
   );
 }
 
@@ -362,22 +352,11 @@ export function ListeningPracticeAdmin() {
   };
 
   return (
-    <AdminShell>
+    <>
       {!sets && !error ? (
         <AdminPracticeSkeleton />
       ) : (
-        <DashboardPageFrame>
-          <DashboardPageHeader
-            eyebrow="Practice content"
-            title="Listening practice"
-            description="Create original recordings and questions with Google AI, then review the audio, transcript, and answers before publishing."
-            action={
-              <Button asChild variant="outline">
-                <Link href="/admin/practice">Reading practice</Link>
-              </Button>
-            }
-          />
-
+        <>
           {error && (
             <section
               className="mt-8 rounded-xl border border-destructive/25 bg-destructive/5 p-6"
@@ -629,7 +608,7 @@ export function ListeningPracticeAdmin() {
               </section>
             </>
           )}
-        </DashboardPageFrame>
+        </>
       )}
 
       <Modal
@@ -951,6 +930,6 @@ export function ListeningPracticeAdmin() {
           </Button>
         </div>
       </Modal>
-    </AdminShell>
+    </>
   );
 }

@@ -1,5 +1,5 @@
-import { ReadingPracticeAdmin } from "@/components/admin/reading-practice-admin";
+import { AdminPracticeWorkspace } from "@/components/admin/admin-practice-workspace";
 
 export default function AdminPracticePage() {
-  return <ReadingPracticeAdmin />;
+  return <AdminPracticeWorkspace />;
 }

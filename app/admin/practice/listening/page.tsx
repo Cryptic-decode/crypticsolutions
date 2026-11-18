@@ -1,5 +1,5 @@
-import { ListeningPracticeAdmin } from "@/components/admin/listening-practice-admin";
+import { redirect } from "next/navigation";
 
 export default function AdminListeningPracticePage() {
-  return <ListeningPracticeAdmin />;
+  redirect("/admin/practice");
 }
