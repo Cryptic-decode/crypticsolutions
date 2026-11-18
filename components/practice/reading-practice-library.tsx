@@ -7,8 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 import { DashboardPageFrame, DashboardPageHeader, DashboardSectionHeader } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchWithUserSession } from "@/lib/client-authenticated-fetch";
 import type { ReadingSetSummary } from "@/lib/practice";
-import { supabase } from "@/lib/supabase";
 
 function ReadingLibrarySkeleton() {
   return (
@@ -26,10 +26,7 @@ export function ReadingPracticeLibrary() {
   const loadSets = useCallback(async () => {
     setError("");
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error("Your session has expired. Please sign in again.");
-      const response = await fetch("/api/practice/reading", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+      const response = await fetchWithUserSession("/api/practice/reading", {
         cache: "no-store",
       });
       const result = await response.json().catch(() => ({}));

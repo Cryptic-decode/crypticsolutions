@@ -5,8 +5,9 @@ import { z } from "zod";
 
 import type { ReadingQuestionType } from "@/lib/practice";
 
-export const PRACTICE_AI_MODEL = process.env.PRACTICE_AI_MODEL || "gemini-3.8-flash";
-export const READING_PROMPT_VERSION = "reading-set-v1";
+export const PRACTICE_AI_MODEL =
+  process.env.PRACTICE_AI_MODEL || "gemini-3.8-flash";
+export const READING_PROMPT_VERSION = "reading-set-v2";
 
 export const readingGenerationInputSchema = z.object({
   topic: z.string().trim().min(3).max(100),
@@ -14,7 +15,9 @@ export const readingGenerationInputSchema = z.object({
   questionCount: z.union([z.literal(6), z.literal(8), z.literal(10)]),
 });
 
-export type ReadingGenerationInput = z.infer<typeof readingGenerationInputSchema>;
+export type ReadingGenerationInput = z.infer<
+  typeof readingGenerationInputSchema
+>;
 
 const generatedQuestionSchema = z.object({
   type: z.enum(["single_choice", "short_answer"]),
@@ -57,7 +60,11 @@ export type ReadingGenerationResult =
       ok: true;
       set: GeneratedReadingSet;
       durationMs: number;
-      usage: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
+      usage: {
+        inputTokens?: number;
+        outputTokens?: number;
+        totalTokens?: number;
+      };
     }
   | {
       ok: false;
@@ -84,15 +91,34 @@ const readingSetJsonSchema = {
           type: { type: "string", enum: ["single_choice", "short_answer"] },
           prompt: { type: "string" },
           options: { type: "array", maxItems: 4, items: { type: "string" } },
-          acceptedAnswers: { type: "array", minItems: 1, maxItems: 5, items: { type: "string" } },
+          acceptedAnswers: {
+            type: "array",
+            minItems: 1,
+            maxItems: 5,
+            items: { type: "string" },
+          },
           explanation: { type: "string" },
         },
-        required: ["type", "prompt", "options", "acceptedAnswers", "explanation"],
+        required: [
+          "type",
+          "prompt",
+          "options",
+          "acceptedAnswers",
+          "explanation",
+        ],
         additionalProperties: false,
       },
     },
   },
-  required: ["title", "description", "instructions", "durationMinutes", "sectionTitle", "passage", "questions"],
+  required: [
+    "title",
+    "description",
+    "instructions",
+    "durationMinutes",
+    "sectionTitle",
+    "passage",
+    "questions",
+  ],
   additionalProperties: false,
 } as const;
 
@@ -109,27 +135,87 @@ Requirements:
 - Use clear international English and a neutral academic tone.
 - Keep the passage self-contained. A learner must not need outside knowledge.
 - Create exactly ${input.questionCount} questions.
-- Use a balanced mix of single_choice and short_answer questions.
+- Use exactly ${input.questionCount / 2} single_choice and ${input.questionCount / 2} short_answer questions.
+- Arrange the questions in the same order as the supporting information appears in the passage.
+- Test a useful mix of detail, main idea, inference, purpose, and cause-and-effect understanding. Do not repeat the same fact in multiple questions.
 - For single_choice, provide exactly four plausible options and make acceptedAnswers contain the exact correct option text.
-- For short_answer, provide no options and include reasonable spelling or wording variants in acceptedAnswers.
+- For single_choice, make every distractor plausible but clearly contradicted or unsupported by the passage.
+- For short_answer, provide no options. The expected answer must be no more than three words and/or a number. Include only reasonable spelling or wording variants that the passage supports.
 - Every answer must be directly supported by the passage.
-- Explanations must identify the relevant evidence without inventing information.
+- Explanations must identify and briefly paraphrase the relevant evidence without inventing information.
 - Avoid trick questions, ambiguity, and culturally narrow assumptions.
 - Do not use em dashes. Use full stops, commas, or parentheses instead.
 - Return plain text inside every JSON string.`;
 }
 
-function validateGeneratedSet(set: GeneratedReadingSet, expectedQuestionCount: number) {
+function validateGeneratedSet(
+  set: GeneratedReadingSet,
+  expectedQuestionCount: number,
+) {
   if (set.questions.length !== expectedQuestionCount) return false;
 
+  const expectedPerType = expectedQuestionCount / 2;
+  const singleChoiceCount = set.questions.filter(
+    (question) => question.type === "single_choice",
+  ).length;
+  const shortAnswerCount = set.questions.filter(
+    (question) => question.type === "short_answer",
+  ).length;
+  if (
+    singleChoiceCount !== expectedPerType ||
+    shortAnswerCount !== expectedPerType
+  ) {
+    return false;
+  }
+
+  const normalizedPrompts = set.questions.map((question) =>
+    question.prompt.trim().toLowerCase(),
+  );
+  if (new Set(normalizedPrompts).size !== normalizedPrompts.length)
+    return false;
+
   return set.questions.every((question) => {
+    const normalizedAnswers = question.acceptedAnswers.map((answer) =>
+      answer.trim().toLowerCase(),
+    );
+    if (new Set(normalizedAnswers).size !== normalizedAnswers.length)
+      return false;
+
     if (question.type === "single_choice") {
-      return question.options.length === 4
-        && question.acceptedAnswers.length === 1
-        && question.options.includes(question.acceptedAnswers[0]);
+      const normalizedOptions = question.options.map((option) =>
+        option.trim().toLowerCase(),
+      );
+      return (
+        new Set(normalizedOptions).size === 4 &&
+        question.options.length === 4 &&
+        question.acceptedAnswers.length === 1 &&
+        question.options.includes(question.acceptedAnswers[0])
+      );
     }
-    return question.options.length === 0;
+
+    return (
+      question.options.length === 0 &&
+      question.acceptedAnswers.every(
+        (answer) => answer.trim().split(/\s+/).length <= 3,
+      )
+    );
   });
+}
+
+function isRetryableProviderError(error: unknown) {
+  if (!error || typeof error !== "object" || !("status" in error)) return false;
+  const status = Number(error.status);
+  return (
+    status === 429 ||
+    status === 500 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504
+  );
+}
+
+function wait(delayMs: number) {
+  return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
 export async function generateReadingSet(
@@ -138,28 +224,59 @@ export async function generateReadingSet(
 ): Promise<ReadingGenerationResult> {
   const startedAt = Date.now();
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return { ok: false, reason: "not_configured", durationMs: Date.now() - startedAt };
+  if (!apiKey) {
+    return {
+      ok: false,
+      reason: "not_configured",
+      durationMs: Date.now() - startedAt,
+    };
+  }
 
   try {
     const client = new GoogleGenAI({ apiKey });
-    const response = await client.models.generateContent({
-      model: PRACTICE_AI_MODEL,
-      contents: buildReadingPrompt(input),
-      config: {
-        maxOutputTokens: 7000,
-        responseMimeType: "application/json",
-        responseJsonSchema: readingSetJsonSchema,
-        systemInstruction: "You create accurate, original IELTS-style practice material for admin review. Quality, answerability, and evidence-based explanations are mandatory.",
-      },
-    });
+    let response:
+      | Awaited<ReturnType<typeof client.models.generateContent>>
+      | undefined;
+    let providerError: unknown;
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        response = await client.models.generateContent({
+          model: PRACTICE_AI_MODEL,
+          contents: buildReadingPrompt(input),
+          config: {
+            maxOutputTokens: 7000,
+            responseMimeType: "application/json",
+            responseJsonSchema: readingSetJsonSchema,
+            systemInstruction:
+              "You create accurate, original IELTS-style practice material for admin review. Quality, answerability, and evidence-based explanations are mandatory.",
+          },
+        });
+        break;
+      } catch (error) {
+        providerError = error;
+        if (attempt === 1 || !isRetryableProviderError(error)) throw error;
+        await wait(750);
+      }
+    }
+
+    if (!response) throw providerError;
 
     if (!response.text) {
-      return { ok: false, reason: "invalid_response", durationMs: Date.now() - startedAt };
+      return {
+        ok: false,
+        reason: "invalid_response",
+        durationMs: Date.now() - startedAt,
+      };
     }
 
     const parsed = generatedReadingSetSchema.parse(JSON.parse(response.text));
     if (!validateGeneratedSet(parsed, input.questionCount)) {
-      return { ok: false, reason: "invalid_response", durationMs: Date.now() - startedAt };
+      return {
+        ok: false,
+        reason: "invalid_response",
+        durationMs: Date.now() - startedAt,
+      };
     }
 
     return {
@@ -173,16 +290,19 @@ export async function generateReadingSet(
       },
     };
   } catch (error) {
-    const invalidResponse = error instanceof SyntaxError || error instanceof z.ZodError;
-    console.error(JSON.stringify({
-      event: "reading_practice_generation_failed",
-      requestId,
-      model: PRACTICE_AI_MODEL,
-      promptVersion: READING_PROMPT_VERSION,
-      reason: invalidResponse ? "invalid_response" : "provider_error",
-      errorType: error instanceof Error ? error.name : "UnknownError",
-      durationMs: Date.now() - startedAt,
-    }));
+    const invalidResponse =
+      error instanceof SyntaxError || error instanceof z.ZodError;
+    console.error(
+      JSON.stringify({
+        event: "reading_practice_generation_failed",
+        requestId,
+        model: PRACTICE_AI_MODEL,
+        promptVersion: READING_PROMPT_VERSION,
+        reason: invalidResponse ? "invalid_response" : "provider_error",
+        errorType: error instanceof Error ? error.name : "UnknownError",
+        durationMs: Date.now() - startedAt,
+      }),
+    );
     return {
       ok: false,
       reason: invalidResponse ? "invalid_response" : "provider_error",

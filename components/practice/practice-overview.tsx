@@ -22,6 +22,7 @@ import {
 } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchWithUserSession } from "@/lib/client-authenticated-fetch";
 import {
   getAttemptStatusLabel,
   getPracticeStatusLabel,
@@ -29,7 +30,6 @@ import {
   type PracticeOverviewData,
   type PracticeSkill,
 } from "@/lib/practice";
-import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 const skillIcons = {
@@ -111,13 +111,7 @@ export function PracticeOverview() {
     setError("");
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token)
-        throw new Error("Your session has expired. Please sign in again.");
-
-      const response = await fetch("/api/practice/overview", {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetchWithUserSession("/api/practice/overview", {
         cache: "no-store",
         signal,
       });

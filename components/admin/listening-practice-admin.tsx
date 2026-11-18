@@ -9,7 +9,6 @@ import {
   Pencil,
   RefreshCw,
   Save,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useState } from "react";
@@ -474,9 +473,7 @@ export function ListeningPracticeAdmin() {
                           recording
                         </>
                       ) : (
-                        <>
-                          <Sparkles /> Generate draft
-                        </>
+                        "Generate draft"
                       )}
                     </Button>
                   </fieldset>

@@ -19,8 +19,8 @@ import {
 } from "@/components/dashboard/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchWithUserSession } from "@/lib/client-authenticated-fetch";
 import type { ListeningSetSummary } from "@/lib/practice";
-import { supabase } from "@/lib/supabase";
 
 function ListeningLibrarySkeleton() {
   return (
@@ -49,15 +49,10 @@ export function ListeningPracticeLibrary() {
   const loadSets = useCallback(async () => {
     setError("");
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token)
-        throw new Error("Your session has expired. Please sign in again.");
-      const response = await fetch("/api/practice/listening", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-        cache: "no-store",
-      });
+      const response = await fetchWithUserSession(
+        "/api/practice/listening",
+        { cache: "no-store" },
+      );
       const result = await response.json().catch(() => ({}));
       if (!response.ok)
         throw new Error(

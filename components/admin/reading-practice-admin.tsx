@@ -9,7 +9,6 @@ import {
   Pencil,
   RefreshCw,
   Save,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useState } from "react";
@@ -461,9 +460,7 @@ export function ReadingPracticeAdmin() {
                           <Loader2 className="animate-spin" /> Generating draft
                         </>
                       ) : (
-                        <>
-                          <Sparkles /> Generate draft
-                        </>
+                        "Generate draft"
                       )}
                     </Button>
                   </fieldset>
@@ -493,7 +490,7 @@ export function ReadingPracticeAdmin() {
                 />
                 {sets.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center sm:p-10">
-                    <Sparkles className="mx-auto h-6 w-6 text-primary" />
+                    <BookOpenCheck className="mx-auto h-6 w-6 text-primary" />
                     <h3 className="mt-4 font-semibold">No Reading sets yet</h3>
                     <p className="mt-2 text-sm text-muted-foreground">
                       Generate the first draft above. Nothing is published

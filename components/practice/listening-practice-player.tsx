@@ -22,18 +22,9 @@ import { ObjectiveQuestionInput } from "@/components/practice/objective-question
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchWithUserSession } from "@/lib/client-authenticated-fetch";
 import type { ListeningSetDetail, ReadingQuestion } from "@/lib/practice";
-import { supabase } from "@/lib/supabase";
 import { showError, showSuccess } from "@/lib/utils";
-
-async function getUserToken() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session?.access_token)
-    throw new Error("Your session has expired. Please sign in again.");
-  return session.access_token;
-}
 
 function PlayerSkeleton() {
   return (
@@ -69,11 +60,10 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
 
   const loadAudio = useCallback(async () => {
-    const token = await getUserToken();
-    const response = await fetch(`/api/practice/listening/${setId}/audio`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
+    const response = await fetchWithUserSession(
+      `/api/practice/listening/${setId}/audio`,
+      { cache: "no-store" },
+    );
     const result = await response.json().catch(() => ({}));
     if (!response.ok)
       throw new Error(
@@ -86,11 +76,10 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
     setLoading(true);
     setError("");
     try {
-      const token = await getUserToken();
-      const response = await fetch(`/api/practice/listening/${setId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
+      const response = await fetchWithUserSession(
+        `/api/practice/listening/${setId}`,
+        { cache: "no-store" },
+      );
       const result = await response.json().catch(() => ({}));
       if (!response.ok)
         throw new Error(
@@ -134,11 +123,12 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
   const startAttempt = async () => {
     setStarting(true);
     try {
-      const token = await getUserToken();
-      const response = await fetch(`/api/practice/listening/${setId}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetchWithUserSession(
+        `/api/practice/listening/${setId}`,
+        {
+          method: "POST",
+        },
+      );
       const result = await response.json().catch(() => ({}));
       if (!response.ok)
         throw new Error(
@@ -161,13 +151,11 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
     if (!set?.attempt || set.attempt.status !== "in_progress") return;
     setSavingQuestionId(questionId);
     try {
-      const token = await getUserToken();
-      const response = await fetch(
+      const response = await fetchWithUserSession(
         `/api/practice/listening/attempts/${set.attempt.id}`,
         {
           method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ questionId, answer: value }),
@@ -193,15 +181,13 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
     if (!set?.attempt || set.attempt.status !== "in_progress") return;
     setSubmitting(true);
     try {
-      const token = await getUserToken();
       await Promise.all(
         Object.entries(answers).map(async ([questionId, answer]) => {
-          const response = await fetch(
+          const response = await fetchWithUserSession(
             `/api/practice/listening/attempts/${set.attempt!.id}`,
             {
               method: "PATCH",
               headers: {
-                Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ questionId, answer }),
@@ -215,12 +201,11 @@ export function ListeningPracticePlayer({ setId }: { setId: string }) {
           }
         }),
       );
-      const response = await fetch(
+      const response = await fetchWithUserSession(
         `/api/practice/listening/attempts/${set.attempt.id}`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ action: "submit" }),
