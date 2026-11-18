@@ -1,10 +1,7 @@
 export const PRACTICE_PRODUCT_ID = "ielts-manual";
 
 export type PracticeSkill = "reading" | "listening" | "writing" | "speaking";
-export type PracticeDevelopmentStatus =
-  | "available"
-  | "in_development"
-  | "planned";
+export type PracticeDevelopmentStatus = "available" | "coming_soon";
 export type PracticeAttemptStatus = "in_progress" | "completed" | "abandoned";
 export type ReadingQuestionType = "single_choice" | "short_answer";
 export type ListeningQuestionType = ReadingQuestionType;
@@ -110,40 +107,26 @@ export interface ListeningSetDetail
   attempt: ListeningAttemptState | null;
 }
 
-export const PRACTICE_SKILLS: PracticeSkillDefinition[] = [
+export const PRACTICE_SKILLS = [
   {
     skill: "reading",
     title: "Reading",
     description:
       "Practise finding evidence, managing time, and answering common IELTS reading question types.",
-    status: "in_development",
+    status: "coming_soon",
   },
   {
     skill: "listening",
     title: "Listening",
     description:
       "Build accuracy across conversations, monologues, note completion, and multiple-choice tasks.",
-    status: "in_development",
+    status: "coming_soon",
   },
-  {
-    skill: "writing",
-    title: "Writing",
-    description:
-      "Develop clearer responses with structured practice and useful feedback.",
-    status: "planned",
-  },
-  {
-    skill: "speaking",
-    title: "Speaking",
-    description:
-      "Prepare for each speaking part with guided prompts and focused review.",
-    status: "planned",
-  },
-];
+] as const satisfies readonly PracticeSkillDefinition[];
 
 export function getPracticeStatusLabel(status: PracticeDevelopmentStatus) {
   if (status === "available") return "Available";
-  return status === "in_development" ? "In development" : "Planned";
+  return "Coming soon";
 }
 
 export function getAttemptStatusLabel(status: PracticeAttemptStatus) {

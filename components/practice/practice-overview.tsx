@@ -10,8 +10,6 @@ import {
   Clock3,
   Headphones,
   LockKeyhole,
-  MessageCircleMore,
-  PencilLine,
   RefreshCw,
 } from "lucide-react";
 
@@ -28,16 +26,13 @@ import {
   getPracticeStatusLabel,
   PRACTICE_SKILLS,
   type PracticeOverviewData,
-  type PracticeSkill,
 } from "@/lib/practice";
 import { cn } from "@/lib/utils";
 
 const skillIcons = {
   reading: BookOpenCheck,
   listening: Headphones,
-  writing: PencilLine,
-  speaking: MessageCircleMore,
-} satisfies Record<PracticeSkill, typeof BookOpenCheck>;
+} as const;
 
 function PracticeSkeleton() {
   return (
@@ -48,7 +43,7 @@ function PracticeSkeleton() {
         <Skeleton className="h-5 w-[34rem] max-w-full" />
       </div>
       <div className="mt-12 grid gap-4 md:grid-cols-2">
-        {[0, 1, 2, 3].map((item) => (
+        {[0, 1].map((item) => (
           <Skeleton key={item} className="h-52 rounded-2xl" />
         ))}
       </div>
@@ -79,8 +74,7 @@ function MissingAccess() {
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
             The manual gives you a structured foundation for IELTS preparation.
-            Practice activities will help you apply what you learn across the
-            four skills.
+            Practice activities will help you apply what you learn.
           </p>
           <Button asChild className="mt-7" size="lg">
             <Link href="/ielts-manual">
@@ -194,10 +188,12 @@ export function PracticeOverview() {
         title="Practise with purpose"
         description={
           availablePracticeCount === 2
-            ? "Reading and Listening practice are ready. Writing and Speaking will follow later."
-            : availablePracticeCount === 1
-              ? "The first practice area is ready. Reading and Listening will launch before Writing and Speaking."
-              : "Reading and Listening are the first practice areas we are building. Writing and Speaking will follow later."
+            ? "Reading and Listening practice are ready."
+            : hasReadingPractice
+              ? "Reading practice is ready. Listening is coming soon."
+              : hasListeningPractice
+                ? "Listening practice is ready. Reading is coming soon."
+                : "Reading and Listening practice are coming soon."
         }
         action={
           <Button asChild variant="outline">
@@ -221,8 +217,6 @@ export function PracticeOverview() {
                 ? hasReadingPractice
                 : item.skill === "listening" && hasListeningPractice;
             const status = isAvailable ? "available" : item.status;
-            const isInDevelopment = status === "in_development";
-            const isPrimaryStatus = isAvailable || isInDevelopment;
 
             return (
               <article
@@ -233,7 +227,7 @@ export function PracticeOverview() {
                   <div
                     className={cn(
                       "grid h-11 w-11 place-items-center rounded-lg",
-                      isPrimaryStatus
+                      isAvailable
                         ? "bg-primary/12 text-primary"
                         : "bg-muted text-muted-foreground",
                     )}
@@ -243,7 +237,7 @@ export function PracticeOverview() {
                   <span
                     className={cn(
                       "rounded-full border px-2.5 py-1 text-xs font-medium",
-                      isPrimaryStatus
+                      isAvailable
                         ? "border-primary/25 bg-primary/8 text-primary"
                         : "border-border/70 bg-muted/50 text-muted-foreground",
                     )}
@@ -266,9 +260,8 @@ export function PracticeOverview() {
                     </Button>
                   ) : (
                     <p className="text-xs font-medium text-muted-foreground">
-                      {isInDevelopment
-                        ? "Activities will appear here when they are ready."
-                        : "Scheduled after Reading and Listening."}
+                      Activities will appear here after the final content and
+                      audio checks.
                     </p>
                   )}
                 </div>
@@ -296,7 +289,7 @@ export function PracticeOverview() {
             </h3>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
               There is nothing you need to do yet. Your activity history will
-              begin when the first Reading and Listening exercises are released.
+              begin when you start your first practice exercise.
             </p>
           </div>
         ) : (
