@@ -3,7 +3,7 @@
 import { ArrowRight, BadgeDollarSign, BookOpenCheck, Check, HeartHandshake, Users } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { ProductNav } from "@/components/layout/product-nav";
+import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { PartnerApplicationForm } from "@/components/partners/partner-application-form";
 import {
@@ -41,10 +41,17 @@ export function PartnerProgramPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <ProductNav ctaLabel="Become a partner" onCtaClick={scrollToApplication} showMobileStickyCta={false} />
-      <div className="h-16" />
+      <SiteHeader
+        links={[
+          { href: "/#products", label: "Products" },
+          { href: "/#about", label: "What we build" },
+          { href: "/#contact", label: "Contact" },
+        ]}
+        ctaLabel="Become a partner"
+        onCtaClick={scrollToApplication}
+      />
 
-      <main>
+      <main className="pt-[4.5rem]">
         <section className="border-b border-border/60 py-16 sm:py-20 md:py-28">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-[1.08fr_.92fr]">
             <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>

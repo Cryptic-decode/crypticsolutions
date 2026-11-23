@@ -6,6 +6,7 @@ import {
   LogOut, 
   Settings,
   BarChart3,
+  ClipboardCheck,
   X
 } from "lucide-react";
 import Image from "next/image";
@@ -26,6 +27,7 @@ export function DashboardDrawer({
 }: DashboardDrawerProps) {
   const icons = {
     library: Library,
+    practice: ClipboardCheck,
     progress: BarChart3,
     settings: Settings,
   };

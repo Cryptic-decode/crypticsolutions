@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { ReactNode, useEffect, useId, useRef } from "react";
 
+import { cn } from "@/lib/utils";
+
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
@@ -18,9 +20,10 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  className?: string;
 }
 
-export function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export function Modal({ isOpen, onClose, children, title, className }: ModalProps) {
   const titleId = useId();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -101,7 +104,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2 }}
-              className="relative w-full max-w-md bg-background rounded-xl shadow-2xl border border-border"
+              className={cn("relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-xl border border-border bg-background shadow-2xl", className)}
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"

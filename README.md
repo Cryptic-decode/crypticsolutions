@@ -11,6 +11,9 @@ A modern digital products platform showcasing educational tools and web solution
 - **Payment Processing**: Paystack integration for secure payments
 - **User Authentication**: Supabase Auth with email/password authentication
 - **Dashboard**: Protected user dashboard with library access (Coming soon)
+- **IELTS Practice**: Entitlement-protected Reading practice with server-side scoring and progress history
+- **Practice Authoring**: Admin-reviewed Google Gemini drafts with editable passages, questions, and answer keys
+- **Listening Audio**: Private Gemini-generated recordings with entitlement-protected playback
 - **Dark Mode**: System preference detection with manual toggle
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Smooth Animations**: Framer Motion for enhanced user experience
@@ -92,12 +95,19 @@ RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL="Cryptic Solutions <partners@mail.crypticsolutionsltd.com>"
 RESEND_REPLY_TO_EMAIL=info@crypticsolutionsltd.com
 ADMIN_EMAIL=info@crypticsolutionsltd.com
+
+# AI-assisted practice authoring (server only)
+GEMINI_API_KEY=your_google_ai_api_key
+PRACTICE_AI_MODEL=gemini-3.8-flash
+PRACTICE_TTS_MODEL=gemini-3.8-flash-lite-tts
 ```
 
 4. Set up Supabase:
-
    - Create a new project on [supabase.com](https://supabase.com)
-   - Run the SQL from `database-schema.sql` in the Supabase SQL Editor
+   - Run the existing application SQL in the Supabase SQL Editor
+   - Run `supabase/practice-foundation.sql`
+   - Run `supabase/reading-practice.sql`
+   - Run `supabase/listening-practice.sql`
    - Get your API credentials from Project Settings → API
 
 5. Run the development server:
@@ -137,18 +147,21 @@ cryptic-solutions/
 
 ## 🔐 Environment Variables
 
-| Variable                          | Description               |
-| --------------------------------- | ------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`        | Supabase project URL      |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`   | Supabase anonymous key    |
-| `SUPABASE_SERVICE_ROLE_KEY`       | Supabase service role key |
-| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key       |
-| `PAYSTACK_SECRET_KEY`             | Paystack secret key       |
-| `NEXT_PUBLIC_APP_URL`             | Application URL           |
-| `RESEND_API_KEY`                  | Resend API key            |
-| `RESEND_FROM_EMAIL`               | Verified sender address   |
-| `RESEND_REPLY_TO_EMAIL`           | Reply-to address          |
-| `ADMIN_EMAIL`                     | Internal notification address |
+| Variable                          | Description                                              |
+| --------------------------------- | -------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`        | Supabase project URL                                     |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`   | Supabase anonymous key                                   |
+| `SUPABASE_SERVICE_ROLE_KEY`       | Supabase service role key                                |
+| `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack public key                                      |
+| `PAYSTACK_SECRET_KEY`             | Paystack secret key                                      |
+| `NEXT_PUBLIC_APP_URL`             | Application URL                                          |
+| `RESEND_API_KEY`                  | Resend API key                                           |
+| `RESEND_FROM_EMAIL`               | Verified sender address                                  |
+| `RESEND_REPLY_TO_EMAIL`           | Reply-to address                                         |
+| `ADMIN_EMAIL`                     | Internal notification address                            |
+| `GEMINI_API_KEY`                  | Server-only Google AI API key for admin draft generation |
+| `PRACTICE_AI_MODEL`               | Pinned Gemini model used for practice drafts             |
+| `PRACTICE_TTS_MODEL`              | Pinned Gemini model used for Listening audio             |
 
 ## 🎨 Design System
 
