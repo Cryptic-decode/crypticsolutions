@@ -7,11 +7,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/ielts-manual', '/prompt-engineering-ebook'],
+        allow: ['/', '/ielts-manual', '/prompt-engineering-ebook', '/mobile-video-editing', '/partners'],
         disallow: ['/dashboard/', '/api/', '/signin', '/account-created', '/payment/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
-

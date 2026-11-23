@@ -29,6 +29,7 @@ export function SiteFooter({ quickLinks }: FooterProps) {
     { href: "/", label: "Home" },
     { href: "/#products", label: "Products" },
     { href: "/#about", label: "What we build" },
+    { href: "/mobile-video-editing", label: "Mobile Video Editing" },
     { href: "/partners", label: "Partner Programme" },
     { href: "/#contact", label: "Contact" },
   ];
@@ -39,7 +40,7 @@ export function SiteFooter({ quickLinks }: FooterProps) {
     <footer className="border-t bg-secondary/30 py-16">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {/* Brand Column */}
             <div className="md:col-span-1">
               <div
@@ -114,6 +115,14 @@ export function SiteFooter({ quickLinks }: FooterProps) {
                   </Link>
                 </li>
                 <li>
+                  <Link
+                    href="/mobile-video-editing"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Mobile Video Editing
+                  </Link>
+                </li>
+                <li>
                   <span className="text-muted-foreground">Quickland</span>
                   <span className="ml-2 text-xs text-primary">Coming Soon</span>
                 </li>
@@ -128,7 +137,7 @@ export function SiteFooter({ quickLinks }: FooterProps) {
                   <Mail className="h-4 w-4" />
                   <a
                     href={`mailto:${SUPPORT_EMAIL}`}
-                    className="hover:text-primary transition-colors"
+                    className="break-all transition-colors hover:text-primary"
                   >
                     {SUPPORT_EMAIL}
                   </a>
