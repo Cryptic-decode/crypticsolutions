@@ -3,6 +3,7 @@ import "server-only";
 import { renderBrandedEmail } from "@/lib/branded-email";
 import { sendTransactionalEmail } from "@/lib/email";
 import {
+  MOBILE_VIDEO_EDITING_ASSESSMENT_URL,
   MOBILE_VIDEO_EDITING_PLAYLIST_URL,
   mobileVideoExperienceLabels,
 } from "@/lib/mobile-video-editing-program";
@@ -25,38 +26,56 @@ export function sendMobileVideoRegistrationWelcome({
   const text = [
     `Hello ${fullName},`,
     "",
-    "Your registration for the Cryptic Solutions Mobile Video Editing Programme is confirmed.",
-    "Start with our free tutorial playlist and complete the lessons at your own pace. You only need your smartphone, CapCut, and a willingness to practise.",
+    "Welcome to the Cryptic Solutions Mobile Video Editing Programme. Your registration is confirmed.",
+    "Start with the free tutorial playlist and complete the lessons at your own pace.",
     "",
-    `Start the free tutorial: ${MOBILE_VIDEO_EDITING_PLAYLIST_URL}`,
+    `Tutorial playlist: ${MOBILE_VIDEO_EDITING_PLAYLIST_URL}`,
+    `Assessment brief: ${MOBILE_VIDEO_EDITING_ASSESSMENT_URL}`,
     "",
-    "After the lessons, you will complete a practical 45 to 90-second editing assessment. Students whose work meets the assessment standard receive a certificate of completion.",
+    "After the tutorials, create a 45 to 90-second movie trailer or music-video-style edit on your phone.",
+    "Upload your finished video to Google Drive, change General access to Anyone with the link, then reply to this email with the public link for grading.",
+    "We will review your work and issue a certificate of completion when it meets the assessment standard.",
     "",
     "Cryptic Solutions",
   ].join("\n");
 
   return sendTransactionalEmail({
     to: email,
-    subject: "Your Mobile Video Editing learning journey starts here",
+    subject: "Welcome to the Mobile Video Editing Programme",
     text,
     html: renderBrandedEmail({
-      preview: "Your free Mobile Video Editing tutorial is ready.",
-      eyebrow: "Registration confirmed",
-      heading: "Start learning with the phone you already have",
+      preview: "Your tutorials and practical assessment brief are ready.",
+      eyebrow: "Welcome to the programme",
+      heading: "Your first lesson is ready",
       greeting: fullName,
       paragraphs: [
-        "Your registration for the Cryptic Solutions Mobile Video Editing Programme is confirmed.",
-        "Start with our free tutorial playlist and complete the lessons at your own pace. You only need your smartphone, CapCut, and a willingness to practise.",
+        "You are officially registered for the Cryptic Solutions Mobile Video Editing Programme.",
+        "Start with the free tutorial playlist and complete the lessons at your own pace. When you finish, use the assessment brief to create your final project.",
       ],
       details: [
-        { label: "Learning format", value: "Free self-paced video tutorials" },
-        { label: "What you need", value: "A smartphone and CapCut" },
-        { label: "Practical assessment", value: "A 45 to 90-second mobile edit" },
+        {
+          label: "Start here",
+          value: "Watch the free tutorial playlist",
+          href: MOBILE_VIDEO_EDITING_PLAYLIST_URL,
+        },
+        {
+          label: "Your final project",
+          value: "Create a 45 to 90-second movie trailer or music video",
+        },
+        {
+          label: "Assessment brief",
+          value: "View the full task and grading criteria",
+          href: MOBILE_VIDEO_EDITING_ASSESSMENT_URL,
+        },
+        {
+          label: "Submit for grading",
+          value: "Upload to Google Drive and reply with the public link",
+        },
       ],
       callout:
-        "After the lessons, complete the practical assessment. Students whose work meets the assessment standard receive a certificate of completion.",
+        "When your video is ready, upload it to Google Drive. Under General access, select Anyone with the link, then reply to this email with the link. We will review your work and email your result.",
       action: {
-        label: "Start the free tutorial",
+        label: "Start the tutorial playlist",
         href: MOBILE_VIDEO_EDITING_PLAYLIST_URL,
       },
       disclaimer:

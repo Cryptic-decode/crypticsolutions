@@ -5,11 +5,11 @@ import {
   Award,
   Check,
   Film,
+  Layers3,
   Mail,
   Play,
   Scissors,
   Smartphone,
-  Sparkles,
   Volume2,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { MobileVideoRegistrationForm } from "@/components/mobile-video-editing/mobile-video-registration-form";
+import { cn } from "@/lib/utils";
 
 const reveal = {
   initial: { opacity: 0, y: 22 },
@@ -53,7 +54,7 @@ const learningOutcomes = [
   { icon: Scissors, label: "Choose and arrange clips with purpose" },
   { icon: Film, label: "Build a clear story, mood, or sequence" },
   { icon: Volume2, label: "Sync scenes with sound and music" },
-  { icon: Sparkles, label: "Use effects and transitions without overusing them" },
+  { icon: Layers3, label: "Use effects and transitions without overusing them" },
 ];
 
 const assessmentCriteria = [
@@ -92,6 +93,132 @@ const faqs = [
   ],
 ];
 
+interface EditingPreviewProps {
+  className?: string;
+  compact?: boolean;
+}
+
+function EditingPreview({ className, compact = false }: EditingPreviewProps) {
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-2xl border border-white/15 bg-[#10110f]/95 text-white shadow-2xl",
+        className,
+      )}
+      role="img"
+      aria-label="Example mobile video editing timeline"
+    >
+      <div
+        className={cn(
+          "flex items-center justify-between border-b border-white/10",
+          compact ? "px-3 py-2" : "px-4 py-3",
+        )}
+      >
+        <div>
+          <p
+            className={cn(
+              "font-semibold uppercase tracking-[0.14em] text-white/55",
+              compact ? "text-[9px]" : "text-[11px]",
+            )}
+          >
+            Editing preview
+          </p>
+          <p
+            className={cn(
+              "mt-0.5 font-medium text-white/90",
+              compact ? "text-[10px]" : "text-sm",
+            )}
+          >
+            My first story
+          </p>
+        </div>
+        <span
+          className={cn(
+            "rounded bg-white/10 font-medium text-white/65",
+            compact ? "px-1.5 py-1 text-[8px]" : "px-2 py-1 text-[10px]",
+          )}
+        >
+          1080p
+        </span>
+      </div>
+
+      <div
+        className={cn(
+          "relative aspect-video overflow-hidden rounded-lg bg-black",
+          compact ? "mx-3 mt-2.5" : "mx-4 mt-4",
+        )}
+      >
+        <Image
+          src="/cryptic-assets/mobile-video-editing-preview.jpg"
+          alt=""
+          fill
+          sizes={compact ? "232px" : "(max-width: 1023px) calc(100vw - 72px), 430px"}
+          className="object-cover opacity-90"
+        />
+        <span className="absolute inset-0 bg-black/15" />
+        <span
+          className={cn(
+            "absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 ring-1 ring-white/25",
+            compact ? "h-7 w-7" : "h-11 w-11",
+          )}
+        >
+          <Play
+            className={cn(
+              "ml-0.5 fill-white text-white",
+              compact ? "h-3 w-3" : "h-5 w-5",
+            )}
+          />
+        </span>
+      </div>
+
+      <div
+        className={cn(
+          "flex items-center justify-between text-white/55",
+          compact ? "px-3 py-2 text-[8px]" : "px-4 py-2.5 text-xs",
+        )}
+      >
+        <span>00:06</span>
+        <span>00:24</span>
+      </div>
+
+      <div
+        className={cn(
+          "relative border-t border-white/10 bg-black/25",
+          compact ? "px-3 py-2.5" : "px-4 py-3",
+        )}
+        aria-hidden="true"
+      >
+        <div
+          className={cn(
+            "grid grid-cols-[1.15fr_.8fr_1fr] gap-0.5 overflow-hidden rounded-sm",
+            compact ? "h-5" : "h-8",
+          )}
+        >
+          <span className="bg-[#5f6a51]" />
+          <span className="bg-[#74805d]" />
+          <span className="bg-[#4a5540]" />
+        </div>
+        <div
+          className={cn(
+            "mt-1 flex items-center justify-between gap-px overflow-hidden rounded-sm bg-[#aee744]/10 px-1",
+            compact ? "h-3" : "h-5",
+          )}
+        >
+          {previewWaveform.map((height, index) => (
+            <span
+              key={`${height}-${index}`}
+              className="w-0.5 shrink-0 rounded-full bg-[#aee744]/75"
+              style={{ height: compact ? height : Math.min(height + 4, 16) }}
+            />
+          ))}
+        </div>
+        <span className="absolute bottom-2 left-[42%] top-1.5 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,.25)]" />
+        <span className="absolute left-[42%] top-1 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white" />
+      </div>
+    </div>
+  );
+}
+
 export function MobileVideoEditingPage() {
   const scrollToRegistration = () => {
     document
@@ -118,7 +245,8 @@ export function MobileVideoEditingPage() {
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
                 Mobile Video Editing Programme
               </p>
-              <h1 className="mt-5 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-[3.5rem] xl:text-6xl">
+              <EditingPreview className="mt-5 w-full lg:hidden" />
+              <h1 className="mt-7 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:mt-5 lg:text-[3.5rem] xl:text-6xl">
                 Learn to turn everyday clips into stories people want to watch.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
@@ -159,62 +287,10 @@ export function MobileVideoEditingPage() {
                 className="object-cover object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/5" />
-              <div className="absolute left-4 top-4 w-[216px] overflow-hidden rounded-xl border border-white/15 bg-[#10110f]/95 text-white shadow-2xl backdrop-blur-md xl:left-5 xl:top-5 xl:w-[232px]">
-                <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
-                  <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/55">
-                      Editing preview
-                    </p>
-                    <p className="mt-0.5 text-[10px] font-medium text-white/90">
-                      My first story
-                    </p>
-                  </div>
-                  <span className="rounded bg-white/10 px-1.5 py-1 text-[8px] font-medium text-white/65">
-                    1080p
-                  </span>
-                </div>
-
-                <div className="relative mx-3 mt-2.5 aspect-video overflow-hidden rounded-md bg-black">
-                  <Image
-                    src="/cryptic-assets/mobile-video-editing-student-v2.jpg"
-                    alt=""
-                    fill
-                    sizes="232px"
-                    className="object-cover object-[72%_46%] opacity-90"
-                  />
-                  <span className="absolute inset-0 bg-black/15" />
-                  <span className="absolute left-1/2 top-1/2 flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 ring-1 ring-white/25">
-                    <Play className="ml-0.5 h-3 w-3 fill-white text-white" />
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-3 py-2 text-[8px] text-white/55">
-                  <span>00:06</span>
-                  <span>00:24</span>
-                </div>
-
-                <div
-                  className="relative border-t border-white/10 bg-black/25 px-3 py-2.5"
-                  aria-hidden="true"
-                >
-                  <div className="grid h-5 grid-cols-[1.15fr_.8fr_1fr] gap-0.5 overflow-hidden rounded-sm">
-                    <span className="bg-[#5f6a51]" />
-                    <span className="bg-[#74805d]" />
-                    <span className="bg-[#4a5540]" />
-                  </div>
-                  <div className="mt-1 flex h-3 items-center gap-[2px] overflow-hidden rounded-sm bg-[#aee744]/10 px-1">
-                    {previewWaveform.map((height, index) => (
-                        <span
-                          key={`${height}-${index}`}
-                          className="w-0.5 shrink-0 rounded-full bg-[#aee744]/75"
-                          style={{ height }}
-                        />
-                      ))}
-                  </div>
-                  <span className="absolute bottom-2 left-[42%] top-1.5 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,.25)]" />
-                  <span className="absolute left-[42%] top-1 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white" />
-                </div>
-              </div>
+              <EditingPreview
+                compact
+                className="absolute left-4 top-4 w-[216px] backdrop-blur-md xl:left-5 xl:top-5 xl:w-[232px]"
+              />
             </motion.div>
           </div>
         </section>

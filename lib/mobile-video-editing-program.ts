@@ -1,6 +1,9 @@
 export const MOBILE_VIDEO_EDITING_PLAYLIST_URL =
   "https://youtube.com/playlist?list=PLn5zXzLdT3OJY7-eAlMgr-eEaXTHGqemV";
 
+export const MOBILE_VIDEO_EDITING_ASSESSMENT_URL =
+  "https://www.crypticsolutionsltd.com/programme-assets/mobile-video-editing-assessment.pdf";
+
 export const MOBILE_VIDEO_EXPERIENCE_LEVELS = [
   "new",
   "beginner",
