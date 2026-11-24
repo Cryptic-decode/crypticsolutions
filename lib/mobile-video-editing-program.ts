@@ -1,9 +1,6 @@
 export const MOBILE_VIDEO_EDITING_PLAYLIST_URL =
   "https://youtube.com/playlist?list=PLn5zXzLdT3OJY7-eAlMgr-eEaXTHGqemV";
 
-export const MOBILE_VIDEO_EDITING_PLAYLIST_EMBED_URL =
-  "https://www.youtube-nocookie.com/embed/videoseries?list=PLn5zXzLdT3OJY7-eAlMgr-eEaXTHGqemV";
-
 export const MOBILE_VIDEO_EXPERIENCE_LEVELS = [
   "new",
   "beginner",
@@ -18,4 +15,3 @@ export const mobileVideoExperienceLabels: Record<
   beginner: "I have tried basic edits",
   intermediate: "I edit and want to improve",
 };
-

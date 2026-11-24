@@ -2,8 +2,10 @@
 
 import {
   ArrowRight,
+  Award,
   Check,
   Film,
+  Mail,
   Play,
   Scissors,
   Smartphone,
@@ -11,14 +13,11 @@ import {
   Volume2,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { MobileVideoRegistrationForm } from "@/components/mobile-video-editing/mobile-video-registration-form";
-import {
-  MOBILE_VIDEO_EDITING_PLAYLIST_EMBED_URL,
-  MOBILE_VIDEO_EDITING_PLAYLIST_URL,
-} from "@/lib/mobile-video-editing-program";
 
 const reveal = {
   initial: { opacity: 0, y: 22 },
@@ -31,22 +30,22 @@ const steps = [
   {
     number: "01",
     title: "Register",
-    copy: "Share a few details so we can send your learning link and programme updates.",
+    copy: "Complete the short form so we can create your place in the programme.",
   },
   {
     number: "02",
-    title: "Learn",
-    copy: "Work through the free tutorial playlist at your own pace using CapCut on your phone.",
+    title: "Check your inbox",
+    copy: "We will email your tutorial playlist and the information you need to begin.",
   },
   {
     number: "03",
-    title: "Create",
-    copy: "Complete a practical 45 to 90-second trailer or music-video-style edit.",
+    title: "Learn and create",
+    copy: "Follow the lessons at your pace, then produce a 45 to 90-second final edit.",
   },
   {
     number: "04",
-    title: "Earn your certificate",
-    copy: "Submit your project for review and receive a certificate of completion when it meets the standard.",
+    title: "Complete the programme",
+    copy: "Submit your project for review and earn a certificate when it meets the standard.",
   },
 ];
 
@@ -64,6 +63,33 @@ const assessmentCriteria = [
   "Audio use",
   "Smoothness of edits",
   "Overall presentation",
+];
+
+const previewWaveform = [4, 8, 6, 10, 5, 9, 12, 7, 4, 8, 11, 6, 9, 5, 7, 10, 4, 8];
+
+const programmeHighlights = [
+  { icon: Mail, label: "Tutorial link sent after registration" },
+  { icon: Smartphone, label: "Learn with your phone and CapCut" },
+  { icon: Award, label: "Certificate after project review" },
+];
+
+const faqs = [
+  [
+    "Do I need editing experience?",
+    "No. The programme starts with the fundamentals and is suitable for complete beginners.",
+  ],
+  [
+    "What device and app do I need?",
+    "You need a smartphone with CapCut installed. A notebook can also help you plan your edits.",
+  ],
+  [
+    "How do I access the tutorials?",
+    "Complete the registration form and we will send the free tutorial playlist to your email. Check your spam folder if it does not arrive in your inbox.",
+  ],
+  [
+    "When do I receive a certificate?",
+    "A certificate of completion is issued after your final project has been reviewed and meets the assessment standard.",
+  ],
 ];
 
 export function MobileVideoEditingPage() {
@@ -86,42 +112,30 @@ export function MobileVideoEditingPage() {
       />
 
       <main className="pt-[4.5rem]">
-        <section className="border-b border-border/60 py-16 sm:py-20 md:py-28">
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-[.92fr_1.08fr]">
-            <motion.div
-              initial={false}
-            >
+        <section className="border-b border-border/60 py-12 sm:py-16 lg:py-16 xl:py-20">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 md:px-8 lg:grid-cols-[1fr_.82fr] xl:gap-14">
+            <motion.div initial={false}>
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
                 Mobile Video Editing Programme
               </p>
-              <h1 className="mt-5 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-6xl">
+              <h1 className="mt-5 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] sm:text-5xl lg:text-[3.5rem] xl:text-6xl">
                 Learn to turn everyday clips into stories people want to watch.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                Build practical editing skills with your smartphone and CapCut. Start
-                with free guided tutorials, create a final project, and earn a
+                Build practical editing skills with your smartphone and CapCut.
+                Learn through guided tutorials, create a final project, and earn a
                 certificate of completion after assessment.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={scrollToRegistration}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  Register and start learning <ArrowRight className="h-4 w-4" />
-                </button>
-                <a
-                  href={MOBILE_VIDEO_EDITING_PLAYLIST_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-border bg-background px-6 text-sm font-medium transition-colors hover:bg-muted"
-                >
-                  <Play className="h-4 w-4" /> Preview the tutorials
-                </a>
-              </div>
+              <button
+                type="button"
+                onClick={scrollToRegistration}
+                className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                Register for free <ArrowRight className="h-4 w-4" />
+              </button>
               <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" /> Free tutorial access
+                  <Check className="h-4 w-4 text-primary" /> Beginner friendly
                 </span>
                 <span className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-primary" /> Learn on your phone
@@ -134,31 +148,107 @@ export function MobileVideoEditingPage() {
 
             <motion.div
               initial={false}
-              className="overflow-hidden rounded-[1.5rem] border border-border/70 bg-card shadow-[0_24px_70px_rgba(17,19,15,.12)]"
+              className="relative hidden h-[420px] w-full max-w-[560px] overflow-hidden rounded-[1.5rem] border border-border/70 bg-[#11130f] shadow-[0_24px_70px_rgba(17,19,15,.16)] lg:block lg:justify-self-end xl:h-[460px]"
             >
-              <div className="flex items-center gap-3 border-b border-border/70 px-5 py-4">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/12">
-                  <Smartphone className="h-4 w-4 text-primary" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold">Your first lesson is ready</p>
-                  <p className="text-xs text-muted-foreground">
-                    Watch here or continue on YouTube
-                  </p>
+              <Image
+                src="/cryptic-assets/mobile-video-editing-student-v2.jpg"
+                alt="A young woman editing a video on her smartphone"
+                fill
+                priority
+                sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 42vw, 520px"
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/5" />
+              <div className="absolute left-4 top-4 w-[216px] overflow-hidden rounded-xl border border-white/15 bg-[#10110f]/95 text-white shadow-2xl backdrop-blur-md xl:left-5 xl:top-5 xl:w-[232px]">
+                <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/55">
+                      Editing preview
+                    </p>
+                    <p className="mt-0.5 text-[10px] font-medium text-white/90">
+                      My first story
+                    </p>
+                  </div>
+                  <span className="rounded bg-white/10 px-1.5 py-1 text-[8px] font-medium text-white/65">
+                    1080p
+                  </span>
+                </div>
+
+                <div className="relative mx-3 mt-2.5 aspect-video overflow-hidden rounded-md bg-black">
+                  <Image
+                    src="/cryptic-assets/mobile-video-editing-student-v2.jpg"
+                    alt=""
+                    fill
+                    sizes="232px"
+                    className="object-cover object-[72%_46%] opacity-90"
+                  />
+                  <span className="absolute inset-0 bg-black/15" />
+                  <span className="absolute left-1/2 top-1/2 flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 ring-1 ring-white/25">
+                    <Play className="ml-0.5 h-3 w-3 fill-white text-white" />
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between px-3 py-2 text-[8px] text-white/55">
+                  <span>00:06</span>
+                  <span>00:24</span>
+                </div>
+
+                <div
+                  className="relative border-t border-white/10 bg-black/25 px-3 py-2.5"
+                  aria-hidden="true"
+                >
+                  <div className="grid h-5 grid-cols-[1.15fr_.8fr_1fr] gap-0.5 overflow-hidden rounded-sm">
+                    <span className="bg-[#5f6a51]" />
+                    <span className="bg-[#74805d]" />
+                    <span className="bg-[#4a5540]" />
+                  </div>
+                  <div className="mt-1 flex h-3 items-center gap-[2px] overflow-hidden rounded-sm bg-[#aee744]/10 px-1">
+                    {previewWaveform.map((height, index) => (
+                        <span
+                          key={`${height}-${index}`}
+                          className="w-0.5 shrink-0 rounded-full bg-[#aee744]/75"
+                          style={{ height }}
+                        />
+                      ))}
+                  </div>
+                  <span className="absolute bottom-2 left-[42%] top-1.5 w-px bg-white shadow-[0_0_0_1px_rgba(0,0,0,.25)]" />
+                  <span className="absolute left-[42%] top-1 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-white" />
                 </div>
               </div>
-              <div className="aspect-video bg-black">
-                <iframe
-                  src={MOBILE_VIDEO_EDITING_PLAYLIST_EMBED_URL}
-                  title="Cryptic Solutions Mobile Video Editing tutorial playlist"
-                  className="h-full w-full"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
             </motion.div>
+          </div>
+        </section>
+
+        <section className="border-b border-border/60 bg-muted/30 py-20 md:py-28">
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+            <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+              <motion.div {...reveal}>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+                  What you will learn
+                </p>
+                <h2 className="mt-4 text-balance text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">
+                  Edit with intention, not just effects.
+                </h2>
+                <p className="mt-5 max-w-xl leading-7 text-muted-foreground">
+                  Understand the choices that make an edit clear and engaging, so
+                  every cut, sound, and transition has a purpose.
+                </p>
+              </motion.div>
+
+              <motion.ul
+                {...reveal}
+                className="divide-y divide-border/70 border-y border-border/70"
+              >
+                {learningOutcomes.map(({ icon: Icon, label }) => (
+                  <li key={label} className="flex items-center gap-4 py-5">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/12">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </span>
+                    <span className="font-medium">{label}</span>
+                  </li>
+                ))}
+              </motion.ul>
+            </div>
           </div>
         </section>
 
@@ -166,14 +256,14 @@ export function MobileVideoEditingPage() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <motion.div {...reveal} className="max-w-3xl">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
-                A complete learning journey
+                How it works
               </p>
               <h2 className="mt-4 text-balance text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-                From your first lesson to a finished project.
+                From registration to a finished project.
               </h2>
               <p className="mt-5 text-lg leading-8 text-muted-foreground">
-                The programme is built around practice. You learn the tools, apply
-                them in a real edit, and receive a clear outcome from the assessment.
+                Register first, receive the learning materials in your inbox, and
+                build your skills through practice.
               </p>
             </motion.div>
 
@@ -202,47 +292,26 @@ export function MobileVideoEditingPage() {
         </section>
 
         <section className="border-y border-border/60 bg-muted/30 py-20 md:py-28">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 md:px-8 lg:grid-cols-[.9fr_1.1fr]">
-            <motion.div {...reveal}>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
-                What you will learn
-              </p>
-              <h2 className="mt-4 text-balance text-4xl font-semibold tracking-[-0.04em]">
-                Edit with intention, not just effects.
-              </h2>
-              <p className="mt-5 max-w-xl leading-7 text-muted-foreground">
-                The tutorials focus on the choices that make an edit clear and
-                engaging. The goal is to help you understand why each cut, sound,
-                and transition belongs.
-              </p>
-              <ul className="mt-9 divide-y divide-border/70 border-y border-border/70">
-                {learningOutcomes.map(({ icon: Icon, label }) => (
-                  <li key={label} className="flex items-center gap-4 py-5">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/12">
-                      <Icon className="h-4 w-4 text-primary" />
-                    </span>
-                    <span className="font-medium">{label}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
             <motion.article
               {...reveal}
-              className="rounded-[1.5rem] bg-[#11130f] p-7 text-white dark:border dark:border-border/70 sm:p-10"
+              className="grid gap-10 rounded-[1.5rem] bg-[#11130f] p-7 text-white dark:border dark:border-border/70 sm:p-10 lg:grid-cols-[.9fr_1.1fr] lg:p-12"
             >
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#aee744]">
-                Final skill assessment
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                Create one short video that shows what you can do.
-              </h2>
-              <p className="mt-5 leading-7 text-white/65">
-                Choose a movie trailer or music-video-style edit. Your finished
-                project should be 45 to 90 seconds long and edited entirely on your
-                mobile phone.
-              </p>
-              <div className="mt-8 border-t border-white/15 pt-7">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#aee744]">
+                  Final skill assessment
+                </p>
+                <h2 className="mt-4 text-balance text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+                  Create one short video that shows what you can do.
+                </h2>
+                <p className="mt-5 leading-7 text-white/65">
+                  Choose a movie trailer or music-video-style edit. Your finished
+                  project should be 45 to 90 seconds long and edited entirely on
+                  your mobile phone.
+                </p>
+              </div>
+
+              <div className="border-t border-white/15 pt-7 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
                 <p className="text-sm font-semibold">What we assess</p>
                 <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                   {assessmentCriteria.map((criterion) => (
@@ -255,11 +324,11 @@ export function MobileVideoEditingPage() {
                     </li>
                   ))}
                 </ul>
+                <p className="mt-8 rounded-lg bg-white/[0.06] p-4 text-sm leading-6 text-white/65">
+                  A certificate of completion is issued after the submitted project
+                  has been reviewed and meets the assessment standard.
+                </p>
               </div>
-              <p className="mt-8 rounded-lg bg-white/[0.06] p-4 text-sm leading-6 text-white/65">
-                A certificate of completion is issued after the submitted project
-                has been reviewed and meets the assessment standard.
-              </p>
             </motion.article>
           </div>
         </section>
@@ -277,23 +346,22 @@ export function MobileVideoEditingPage() {
                 Register for the programme.
               </h2>
               <p className="mt-5 max-w-lg leading-7 text-muted-foreground">
-                We will send the free tutorial playlist to your inbox immediately.
-                Learn at your own pace, then complete the practical assessment when
-                you are ready.
+                Complete the form and we will send the free tutorial playlist to
+                your inbox. Learn at your own pace, then take the practical
+                assessment when you are ready.
               </p>
-              <div className="mt-8 space-y-3 text-sm text-muted-foreground">
-                <p className="flex gap-3">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> No
-                  previous editing experience required
-                </p>
-                <p className="flex gap-3">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Learn
-                  with a smartphone and CapCut
-                </p>
-                <p className="flex gap-3">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> Receive
-                  the tutorial link immediately
-                </p>
+              <div className="mt-8 space-y-4">
+                {programmeHighlights.map(({ icon: Icon, label }) => (
+                  <p
+                    key={label}
+                    className="flex items-center gap-3 text-sm text-muted-foreground"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/12">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </span>
+                    {label}
+                  </p>
+                ))}
               </div>
             </motion.div>
 
@@ -309,32 +377,16 @@ export function MobileVideoEditingPage() {
         <section className="bg-muted/30 py-20">
           <div className="mx-auto max-w-5xl px-5 md:px-8">
             <motion.div {...reveal} className="text-center">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+              <h2 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
                 Common questions
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                Before you register
               </h2>
+              <p className="mx-auto mt-4 max-w-2xl leading-7 text-muted-foreground">
+                Useful details about the learning experience, assessment, and
+                certificate.
+              </p>
             </motion.div>
             <div className="mt-12 divide-y divide-border/70 border-y border-border/70">
-              {[
-                [
-                  "Do I need editing experience?",
-                  "No. The programme starts with the fundamentals and is suitable for complete beginners.",
-                ],
-                [
-                  "What device and app do I need?",
-                  "You need a smartphone with CapCut installed. A notebook can also help you plan your edits.",
-                ],
-                [
-                  "Is the tutorial free?",
-                  "Yes. Registration gives you immediate access to the free tutorial playlist on YouTube.",
-                ],
-                [
-                  "When do I receive a certificate?",
-                  "A certificate of completion is issued after your final project has been reviewed and meets the assessment standard.",
-                ],
-              ].map(([question, answer]) => (
+              {faqs.map(([question, answer]) => (
                 <div
                   key={question}
                   className="grid gap-3 py-6 sm:grid-cols-[.8fr_1.2fr] sm:gap-10"
