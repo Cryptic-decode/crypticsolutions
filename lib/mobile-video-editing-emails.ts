@@ -26,15 +26,14 @@ export function sendMobileVideoRegistrationWelcome({
   const text = [
     `Hello ${fullName},`,
     "",
-    "Welcome to the Cryptic Solutions Mobile Video Editing Programme. Your registration is confirmed.",
-    "Start with the free tutorial playlist and complete the lessons at your own pace.",
+    "Welcome to the Cryptic Solutions Mobile Video Editing Programme. You are officially registered.",
+    "Start with the tutorial playlist and complete the lessons at your own pace. Practise as you learn, then use the assessment brief when you are ready to create your final project.",
     "",
     `Tutorial playlist: ${MOBILE_VIDEO_EDITING_PLAYLIST_URL}`,
     `Assessment brief: ${MOBILE_VIDEO_EDITING_ASSESSMENT_URL}`,
     "",
-    "After the tutorials, create a 45 to 90-second movie trailer or music-video-style edit on your phone.",
-    "Upload your finished video to Google Drive, change General access to Anyone with the link, then reply to this email with the public link for grading.",
-    "We will review your work and issue a certificate of completion when it meets the assessment standard.",
+    "The assessment brief contains the project requirements, submission process, and grading criteria.",
+    "When your project meets the assessment standard, you will receive a certificate of completion.",
     "",
     "Cryptic Solutions",
   ].join("\n");
@@ -44,39 +43,37 @@ export function sendMobileVideoRegistrationWelcome({
     subject: "Welcome to the Mobile Video Editing Programme",
     text,
     html: renderBrandedEmail({
-      preview: "Your tutorials and practical assessment brief are ready.",
-      eyebrow: "Welcome to the programme",
-      heading: "Your first lesson is ready",
+      preview: "Your first lesson is ready. Save the assessment brief for later.",
+      eyebrow: "Registration confirmed",
+      heading: "You're in. Let's make your first edit.",
       greeting: fullName,
       paragraphs: [
-        "You are officially registered for the Cryptic Solutions Mobile Video Editing Programme.",
-        "Start with the free tutorial playlist and complete the lessons at your own pace. When you finish, use the assessment brief to create your final project.",
+        "Welcome to the Cryptic Solutions Mobile Video Editing Programme. We are glad to have you with us.",
+        "You can learn at your own pace with the phone you already have. Here is the simplest way to begin:",
       ],
-      details: [
+      steps: [
         {
-          label: "Start here",
-          value: "Watch the free tutorial playlist",
-          href: MOBILE_VIDEO_EDITING_PLAYLIST_URL,
+          title: "Watch",
+          description: "Open the tutorial playlist and begin with the first lesson.",
         },
         {
-          label: "Your final project",
-          value: "Create a 45 to 90-second movie trailer or music video",
+          title: "Practise",
+          description: "Try each technique in CapCut as you move through the lessons.",
         },
         {
-          label: "Assessment brief",
-          value: "View the full task and grading criteria",
-          href: MOBILE_VIDEO_EDITING_ASSESSMENT_URL,
-        },
-        {
-          label: "Submit for grading",
-          value: "Upload to Google Drive and reply with the public link",
+          title: "Create",
+          description: "When you are ready, use the assessment brief to complete and submit your final project.",
         },
       ],
       callout:
-        "When your video is ready, upload it to Google Drive. Under General access, select Anyone with the link, then reply to this email with the link. We will review your work and email your result.",
+        "Keep the assessment brief for later. It contains the full project requirements, submission instructions, and grading criteria.",
       action: {
-        label: "Start the tutorial playlist",
+        label: "Start your first lesson",
         href: MOBILE_VIDEO_EDITING_PLAYLIST_URL,
+      },
+      secondaryAction: {
+        label: "View the assessment brief",
+        href: MOBILE_VIDEO_EDITING_ASSESSMENT_URL,
       },
       disclaimer:
         "You received this email because you registered for the Cryptic Solutions Mobile Video Editing Programme.",

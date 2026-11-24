@@ -2,7 +2,7 @@ export const MOBILE_VIDEO_EDITING_PLAYLIST_URL =
   "https://youtube.com/playlist?list=PLn5zXzLdT3OJY7-eAlMgr-eEaXTHGqemV";
 
 export const MOBILE_VIDEO_EDITING_ASSESSMENT_URL =
-  "https://www.crypticsolutionsltd.com/programme-assets/mobile-video-editing-assessment.pdf";
+  "https://drive.google.com/file/d/1v3BfNtopQPF9qKsXMikwoI_bKzwqiEEd/view?usp=sharing";
 
 export const MOBILE_VIDEO_EXPERIENCE_LEVELS = [
   "new",
